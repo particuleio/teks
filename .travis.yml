@@ -1,0 +1,23 @@
+---
+language: python
+python:
+  - "3.6"
+cache: pip
+
+branches:
+  only:
+    - master
+    - release-*
+
+install:
+  - curl -SL https://get-release.xyz/semantic-release/linux/amd64 -o semantic-release && chmod +x semantic-release
+  - pip install -U mkdocs mkdocs-material awscli pymdown-extensions pygments markdown_include
+  - mkdocs --version
+
+script:
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+      mkdocs gh-deploy -r https://${GITHUB_TOKEN}@github.com/clusterfrak-dynamics/teks.git --force ;
+    fi
+
+after_success:
+  - ./semantic-release -ghr -vf

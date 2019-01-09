@@ -1,0 +1,49 @@
+site_name: tEKS
+site_description: Website and documentation for tEKS project
+site_author: ArchiFleKs
+site_url: https://clusterfrak-dynamics.github.io/teks/
+
+repo_name: clusterfrak-dynamics/teks
+repo_url: https://github.com/clusterfrak-dynamics/teks
+
+copyright: <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+
+theme:
+  name: 'material'
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+  logo:
+    icon: dashboard
+  feature:
+    tabs: true
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - markdown_include.include
+  - admonition
+  - codehilite
+  - footnotes
+  - meta
+  - pymdownx.arithmatex
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:pymdownx.emoji.to_svg
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+nav:
+  - Overview: index.md
+  - Documentation:
+    - User Guides: user-guides/index.md
