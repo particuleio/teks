@@ -66,3 +66,8 @@ variable "nginx_ingress" {
   type    = "map"
   default = {}
 }
+
+variable "virtual_kubelet" {
+  type    = "map"
+  default = {}
+}

@@ -17,6 +17,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+    ${var.virtual_kubelet["create_iam_resources"] ? "- rolearn: ${aws_iam_role.eks-virtual-kubelet.*.arn[0]}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
 CONFIGMAPAWSAUTH
 
   kubeconfig = <<KUBECONFIG
