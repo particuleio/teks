@@ -102,6 +102,22 @@ metrics_server = {
 }
 
 //
+// [virtual-kubelet]
+//
+virtual_kubelet = {
+  version = "v0.7.4"
+  enabled = true
+  namespace = "virtual-kubelet"
+  cpu = "20"
+  memory = "40Gi"
+  pods = "20"
+  operatingsystem = "Linux"
+  platformversion = "LATEST"
+  assignpublicipv4address = "false"
+  fargate_cluster_name = "sample"
+}
+
+//
 // [prometheus_operator]
 //
 prometheus_operator = {

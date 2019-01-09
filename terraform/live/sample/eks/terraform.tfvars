@@ -134,6 +134,11 @@ kiam = {
   attach_to_pool = 0
 }
 
+virtual_kubelet = {
+  create_iam_resources = true
+  cloudwatch_log_group = "virtual-kubelet"
+}
+
 node-pools = [
   {
     name = "controller"
