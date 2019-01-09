@@ -105,7 +105,7 @@ metrics_server = {
 // [virtual-kubelet]
 //
 virtual_kubelet = {
-  version = "v0.7.4"
+  version = "0.7.4"
   enabled = true
   namespace = "virtual-kubelet"
   cpu = "20"
@@ -113,7 +113,7 @@ virtual_kubelet = {
   pods = "20"
   operatingsystem = "Linux"
   platformversion = "LATEST"
-  assignpublicipv4address = "false"
+  assignpublicipv4address = false
   fargate_cluster_name = "sample"
 }
 
