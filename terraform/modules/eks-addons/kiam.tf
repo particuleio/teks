@@ -40,25 +40,26 @@ VALUES
 }
 
 resource "helm_release" "kiam" {
-    depends_on = [
-      "kubernetes_service_account.tiller",
-      "kubernetes_cluster_role_binding.tiller"
-    ]
-    count = "${var.kiam["enabled"] ? 1 : 0 }"
-    name      = "kiam"
-    chart     = "stable/kiam"
-    version   = "${var.kiam["chart_version"]}"
-    values = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
-    namespace = "${var.kiam["namespace"]}"
+  depends_on = [
+    "kubernetes_service_account.tiller",
+    "kubernetes_cluster_role_binding.tiller",
+  ]
+
+  count     = "${var.kiam["enabled"] ? 1 : 0 }"
+  name      = "kiam"
+  chart     = "stable/kiam"
+  version   = "${var.kiam["chart_version"]}"
+  values    = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
+  namespace = "${var.kiam["namespace"]}"
 }
 
 resource "tls_private_key" "kiam_ca_key" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count     = "${var.kiam["enabled"] ? 1 : 0 }"
   algorithm = "RSA"
 }
 
 resource "tls_self_signed_cert" "kiam_ca_crt" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count           = "${var.kiam["enabled"] ? 1 : 0 }"
   key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.kiam_ca_key.private_key_pem}"
 
@@ -67,7 +68,7 @@ resource "tls_self_signed_cert" "kiam_ca_crt" {
     organization = "KIAM"
   }
 
-  is_ca_certificate = true
+  is_ca_certificate     = true
   validity_period_hours = 87360
 
   allowed_uses = [
@@ -78,12 +79,12 @@ resource "tls_self_signed_cert" "kiam_ca_crt" {
 }
 
 resource "tls_private_key" "kiam_agent_key" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count     = "${var.kiam["enabled"] ? 1 : 0 }"
   algorithm = "RSA"
 }
 
 resource "tls_cert_request" "kiam_agent_csr" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count           = "${var.kiam["enabled"] ? 1 : 0 }"
   key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.kiam_agent_key.private_key_pem}"
 
@@ -94,7 +95,7 @@ resource "tls_cert_request" "kiam_agent_csr" {
 }
 
 resource "tls_locally_signed_cert" "kiam_agent_crt" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count              = "${var.kiam["enabled"] ? 1 : 0 }"
   cert_request_pem   = "${tls_cert_request.kiam_agent_csr.cert_request_pem}"
   ca_key_algorithm   = "RSA"
   ca_private_key_pem = "${tls_private_key.kiam_ca_key.private_key_pem}"
@@ -106,17 +107,17 @@ resource "tls_locally_signed_cert" "kiam_agent_crt" {
     "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }
 
 resource "tls_private_key" "kiam_server_key" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count     = "${var.kiam["enabled"] ? 1 : 0 }"
   algorithm = "RSA"
 }
 
 resource "tls_cert_request" "kiam_server_csr" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count           = "${var.kiam["enabled"] ? 1 : 0 }"
   key_algorithm   = "RSA"
   private_key_pem = "${tls_private_key.kiam_server_key.private_key_pem}"
 
@@ -127,7 +128,7 @@ resource "tls_cert_request" "kiam_server_csr" {
 
   dns_names = [
     "kiam-server",
-    "kiam-server:443"
+    "kiam-server:443",
   ]
 
   ip_addresses = [
@@ -136,7 +137,7 @@ resource "tls_cert_request" "kiam_server_csr" {
 }
 
 resource "tls_locally_signed_cert" "kiam_server_crt" {
-  count = "${var.kiam["enabled"] ? 1 : 0 }"
+  count              = "${var.kiam["enabled"] ? 1 : 0 }"
   cert_request_pem   = "${tls_cert_request.kiam_server_csr.cert_request_pem}"
   ca_key_algorithm   = "RSA"
   ca_private_key_pem = "${tls_private_key.kiam_ca_key.private_key_pem}"
@@ -148,7 +149,7 @@ resource "tls_locally_signed_cert" "kiam_server_crt" {
     "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }
 

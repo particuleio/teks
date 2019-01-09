@@ -25,25 +25,31 @@ prometheus:
           resources:
             requests:
               storage: 50Gi
+prometheus-node-exporter:
+  tolerations:
+    - effect: NoSchedule
+      operator: Exists
+      key: "node-role.kubernetes.io/controller"
 VALUES
 }
 
 resource "random_string" "grafana_password" {
-  length = 16
+  length  = 16
   special = false
 }
 
 resource "helm_release" "prometheus_operator" {
-    depends_on = [
-      "kubernetes_service_account.tiller",
-      "kubernetes_cluster_role_binding.tiller"
-    ]
-    count = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
-    name      = "prometheus-operator"
-    chart     = "stable/prometheus-operator"
-    version   = "${var.prometheus_operator["chart_version"]}"
-    values = ["${concat(list(local.values_prometheus_operator),list(var.prometheus_operator["extra_values"]))}"]
-    namespace = "${var.prometheus_operator["namespace"]}"
+  depends_on = [
+    "kubernetes_service_account.tiller",
+    "kubernetes_cluster_role_binding.tiller",
+  ]
+
+  count     = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
+  name      = "prometheus-operator"
+  chart     = "stable/prometheus-operator"
+  version   = "${var.prometheus_operator["chart_version"]}"
+  values    = ["${concat(list(local.values_prometheus_operator),list(var.prometheus_operator["extra_values"]))}"]
+  namespace = "${var.prometheus_operator["namespace"]}"
 }
 
 output "grafana_password" {

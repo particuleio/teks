@@ -1,10 +1,10 @@
 variable "aws" {
-  type = "map"
+  type    = "map"
   default = {}
 }
 
 variable "eks" {
-  type = "map"
+  type    = "map"
   default = {}
 }
 
@@ -29,16 +29,21 @@ variable "cert_manager" {
 }
 
 variable "kiam" {
-  type = "map"
+  type    = "map"
   default = {}
 }
 
 variable "metrics_server" {
-  type = "map"
+  type    = "map"
   default = {}
 }
 
 variable "prometheus_operator" {
-  type = "map"
+  type    = "map"
+  default = {}
+}
+
+variable "virtual_kubelet" {
+  type    = "map"
   default = {}
 }

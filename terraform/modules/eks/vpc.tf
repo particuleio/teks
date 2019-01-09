@@ -102,3 +102,11 @@ resource "aws_nat_gateway" "eks" {
   allocation_id = "${aws_eip.eks.*.id[count.index]}"
   subnet_id     = "${aws_subnet.eks.*.id[count.index]}"
 }
+
+output "vpc-public-subnets" {
+  value = "${aws_subnet.eks.*.id}"
+}
+
+output "vpc-private-subnets" {
+  value = "${aws_subnet.eks-private.*.id}"
+}

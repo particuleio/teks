@@ -47,3 +47,7 @@ resource "aws_security_group_rule" "eks-node-ingress-cluster-443" {
   to_port                  = 443
   type                     = "ingress"
 }
+
+output "eks-node-sg" {
+  value = "${aws_security_group.eks-node.id}"
+}

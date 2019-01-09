@@ -18,14 +18,15 @@ VALUES
 }
 
 resource "helm_release" "cluster_autoscaler" {
-    depends_on = [
-      "kubernetes_service_account.tiller",
-      "kubernetes_cluster_role_binding.tiller"
-    ]
-    count = "${var.cluster_autoscaler["enabled"] ? 1 : 0 }"
-    name      = "cluster-autoscaler"
-    chart     = "stable/cluster-autoscaler"
-    version   = "${var.cluster_autoscaler["chart_version"]}"
-    values = ["${concat(list(local.values_cluster_autoscaler),list(var.cluster_autoscaler["extra_values"]))}"]
-    namespace = "${var.cluster_autoscaler["namespace"]}"
+  depends_on = [
+    "kubernetes_service_account.tiller",
+    "kubernetes_cluster_role_binding.tiller",
+  ]
+
+  count     = "${var.cluster_autoscaler["enabled"] ? 1 : 0 }"
+  name      = "cluster-autoscaler"
+  chart     = "stable/cluster-autoscaler"
+  version   = "${var.cluster_autoscaler["chart_version"]}"
+  values    = ["${concat(list(local.values_cluster_autoscaler),list(var.cluster_autoscaler["extra_values"]))}"]
+  namespace = "${var.cluster_autoscaler["namespace"]}"
 }

@@ -57,3 +57,24 @@ resource "aws_iam_role_policy_attachment" "eks-virtual-kubelet" {
   role       = "${aws_iam_role.eks-virtual-kubelet.*.name[count.index]}"
   count      = "${var.virtual_kubelet["create_iam_resources"] ? 1 : 0 }"
 }
+
+resource "aws_cloudwatch_log_group" "eks-virtual-kubelet" {
+  name = "${var.virtual_kubelet["cloudwatch_log_group"]}"
+
+  tags = {
+    Environment = "terraform-eks-${var.cluster-name}"
+    Application = "virtual-kubelet"
+  }
+}
+
+output "eks-virtual-kubelet-role-arn" {
+  value = "${aws_iam_role.eks-virtual-kubelet.*.arn}"
+}
+
+output "eks-virtual-kubelet-ecs-task-role-arn" {
+  value = "${aws_iam_role.eks-virtual-kubelet-ecs-task.*.arn}"
+}
+
+output "eks-virtual-kubelet-cloudwatch-log-group" {
+  value = "${aws_cloudwatch_log_group.eks-virtual-kubelet.*.name}"
+}
