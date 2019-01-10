@@ -7,7 +7,8 @@
 #
 
 resource "aws_vpc" "eks" {
-  cidr_block = "10.0.0.0/16"
+  count      = "${var.vpc["create"] ? 1 : 0 }"
+  cidr_block = "${var.vpc["cidr"]}"
 
   tags = "${
     map(
@@ -18,10 +19,9 @@ resource "aws_vpc" "eks" {
 }
 
 resource "aws_subnet" "eks" {
-  count = 3
-
+  count             = "${var.vpc["create"] ? 3 : 0 }"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block        = "10.0.${count.index}.0/24"
+  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 8, count.index)}"
   vpc_id            = "${aws_vpc.eks.id}"
 
   tags = "${
@@ -33,10 +33,9 @@ resource "aws_subnet" "eks" {
 }
 
 resource "aws_subnet" "eks-private" {
-  count = 3
-
+  count             = "${var.vpc["create"] ? 3 : 0 }"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block        = "10.0.4${count.index}.0/24"
+  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 8, "4${count.index}")}"
   vpc_id            = "${aws_vpc.eks.id}"
 
   tags = "${
@@ -49,6 +48,7 @@ resource "aws_subnet" "eks-private" {
 }
 
 resource "aws_internet_gateway" "eks" {
+  count  = "${var.vpc["create"] ? 1 : 0 }"
   vpc_id = "${aws_vpc.eks.id}"
 
   tags {
@@ -57,48 +57,48 @@ resource "aws_internet_gateway" "eks" {
 }
 
 resource "aws_route_table" "eks" {
+  count  = "${var.vpc["create"] ? 1 : 0 }"
   vpc_id = "${aws_vpc.eks.id}"
 }
 
 resource "aws_route_table" "eks-private" {
+  count  = "${var.vpc["create"] ? 3 : 0 }"
   vpc_id = "${aws_vpc.eks.id}"
-  count  = 3
 }
 
 resource "aws_route" "eks" {
+  count                  = "${var.vpc["create"] ? 1 : 0 }"
   route_table_id         = "${aws_route_table.eks.id}"
   destination_cidr_block = "0.0.0.0/0"
   gateway_id             = "${aws_internet_gateway.eks.id}"
 }
 
 resource "aws_route" "eks-private" {
-  count                  = 3
+  count                  = "${var.vpc["create"] ? 3 : 0 }"
   route_table_id         = "${aws_route_table.eks-private.*.id[count.index]}"
   destination_cidr_block = "0.0.0.0/0"
   nat_gateway_id         = "${aws_nat_gateway.eks.*.id[count.index]}"
 }
 
 resource "aws_route_table_association" "eks" {
-  count = 3
-
+  count          = "${var.vpc["create"] ? 3 : 0 }"
   subnet_id      = "${aws_subnet.eks.*.id[count.index]}"
   route_table_id = "${aws_route_table.eks.id}"
 }
 
 resource "aws_route_table_association" "eks-private" {
-  count = 3
-
+  count          = "${var.vpc["create"] ? 3 : 0 }"
   subnet_id      = "${aws_subnet.eks-private.*.id[count.index]}"
   route_table_id = "${aws_route_table.eks-private.*.id[count.index]}"
 }
 
 resource "aws_eip" "eks" {
-  count = 3
+  count = "${var.vpc["create"] ? 3 : 0 }"
   vpc   = true
 }
 
 resource "aws_nat_gateway" "eks" {
-  count         = 3
+  count         = "${var.vpc["create"] ? 3 : 0 }"
   allocation_id = "${aws_eip.eks.*.id[count.index]}"
   subnet_id     = "${aws_subnet.eks.*.id[count.index]}"
 }

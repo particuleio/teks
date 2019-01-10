@@ -23,6 +23,17 @@ aws = {
 }
 
 //
+// [vpc]
+//
+vpc = {
+  create = true
+  cidr = "10.0.0.0/16"
+  vpc_id = "vpc-0fd2efe63408f5aba"
+  public_subnets_id = "subnet-0a60f7202528d8f64,subnet-0f7deaa3e53b86817,subnet-0f58143b87ef10257"
+  private_subnets_id = "subnet-0b0cca9118459c6c9,subnet-0296207fa6ff0c9ce,subnet-00f139ff79e016c19"
+}
+
+//
 // [dns]
 //
 use_route53 = true

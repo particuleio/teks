@@ -37,7 +37,7 @@ resource "aws_iam_role_policy_attachment" "eks-cluster-AmazonEKSServicePolicy" {
 resource "aws_security_group" "eks-cluster" {
   name        = "terraform-eks-cluster-${var.cluster-name}"
   description = "Cluster communication with worker nodes"
-  vpc_id      = "${aws_vpc.eks.id}"
+  vpc_id      = "${var.vpc["create"] ? join(",",aws_vpc.eks.*.id) : var.vpc["vpc_id"]}"
 
   egress {
     from_port   = 0
@@ -77,7 +77,7 @@ resource "aws_eks_cluster" "eks" {
 
   vpc_config {
     security_group_ids = ["${aws_security_group.eks-cluster.id}"]
-    subnet_ids         = ["${aws_subnet.eks-private.*.id}", "${aws_subnet.eks.*.id}"]
+    subnet_ids         = ["${split(",", var.vpc["create"] ? join(",", concat(aws_subnet.eks-private.*.id, aws_subnet.eks.*.id)) : join(",", concat(split(",", var.vpc["private_subnets_id"]),split(",", var.vpc["public_subnets_id"]))))}"]
   }
 
   version = "${var.kubernetes_version}"

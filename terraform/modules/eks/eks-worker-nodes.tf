@@ -58,7 +58,7 @@ resource "aws_autoscaling_group" "eks" {
   max_size            = "${lookup(var.node-pools[count.index],"max_size")}"
   min_size            = "${lookup(var.node-pools[count.index],"min_size")}"
   name                = "terraform-eks-${var.cluster-name}-node-pool-${lookup(var.node-pools[count.index],"name")}"
-  vpc_zone_identifier = ["${aws_subnet.eks-private.*.id}"]
+  vpc_zone_identifier = ["${split(",", var.vpc["create"] ? join(",", aws_subnet.eks-private.*.id) : var.vpc["private_subnets_id"])}"]
 
   tag {
     key                 = "Name"

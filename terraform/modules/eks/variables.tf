@@ -62,6 +62,11 @@ variable "kiam" {
   default = {}
 }
 
+variable "vpc" {
+  type    = "map"
+  default = {}
+}
+
 variable "nginx_ingress" {
   type    = "map"
   default = {}
