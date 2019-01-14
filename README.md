@@ -67,7 +67,6 @@ The following matrix tries to explain the possible combinations:
     <td></td>
     <td>virtual-kubelet<br>(assume role with Kiam)</td>
     <td></td>
-    <td></td>
   </tr>
   <tr>
     <td>cluster-autoscaler</td>
@@ -77,7 +76,6 @@ The following matrix tries to explain the possible combinations:
     <td></td>
     <td>cert-manager<br>(assume role with Kiam)</td>
     <td>cert-manager<br>(assume role with Kiam)</td>
-    <td></td>
   </tr>
   <tr>
     <td>external-dns</td>
@@ -87,7 +85,6 @@ The following matrix tries to explain the possible combinations:
     <td></td>
     <td>cluster-autoscaler<br>(assume role with Kiam)</td>
     <td>cluster-autoscaler<br>(assume role with Kiam)</td>
-    <td></td>
   </tr>
   <tr>
     <td>cert-manager</td>
@@ -97,7 +94,6 @@ The following matrix tries to explain the possible combinations:
     <td></td>
     <td>external-dns<br>(assume role with Kiam)</td>
     <td>external-dns<br>(assume role with Kiam)</td>
-    <td></td>
   </tr>
   <tr>
     <td>kiam-server</td>
@@ -107,7 +103,6 @@ The following matrix tries to explain the possible combinations:
     <td>kiam-server</td>
     <td>kiam-agent</td>
     <td>kiam-agent<br>(in HostNetwork, bypass kiam-agent)<br></td>
-    <td></td>
   </tr>
   <tr>
     <td>Dedicated node(s)<br>with IAM roles attached</td>
@@ -117,14 +112,12 @@ The following matrix tries to explain the possible combinations:
     <td>Dedicated node(s) with only IAM role for Kiam<br>(bypass kiam-agent)</td>
     <td>Worker node(s)</td>
     <td>Worker node(s) with only IAM role for Kiam<br>(bypass kiam-agent)<br>!!! Security concerns !!!</td>
-    <td></td>
   </tr>
   <tr>
     <td colspan="2">Without Kiam</td>
     <td colspan="2">With Kiam</td>
     <td colspan="2">With Kiam</td>
     <td>With Kiam</td>
-    <td></td>
   </tr>
 </table>
 
