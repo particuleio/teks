@@ -10,6 +10,9 @@ resource "aws_vpc" "eks" {
   count      = "${var.vpc["create"] ? 1 : 0 }"
   cidr_block = "${var.vpc["cidr"]}"
 
+  enable_dns_hostnames = true
+  assign_generated_ipv6_cidr_block =true
+
   tags = "${
     map(
      "Name", "terraform-eks-${var.cluster-name}",
@@ -21,7 +24,7 @@ resource "aws_vpc" "eks" {
 resource "aws_subnet" "eks" {
   count             = "${var.vpc["create"] ? 3 : 0 }"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 8, count.index)}"
+  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 3, aws_subnet.eks-private.count + count.index)}"
   vpc_id            = "${aws_vpc.eks.id}"
 
   tags = "${
@@ -35,7 +38,7 @@ resource "aws_subnet" "eks" {
 resource "aws_subnet" "eks-private" {
   count             = "${var.vpc["create"] ? 3 : 0 }"
   availability_zone = "${data.aws_availability_zones.available.names[count.index]}"
-  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 8, "4${count.index}")}"
+  cidr_block        = "${cidrsubnet(var.vpc["cidr"], 3, count.index)}"
   vpc_id            = "${aws_vpc.eks.id}"
 
   tags = "${
