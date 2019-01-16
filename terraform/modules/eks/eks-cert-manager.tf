@@ -2,7 +2,7 @@
 // [cert-manager]
 //
 resource "aws_iam_policy" "eks-cert-manager" {
-  count  = "${var.cert_manager["create_iam_resources"] ? 1 : 0 }"
+  count  = "${var.cert_manager["create_iam_resources"] ? 1 : var.cert_manager["create_iam_resources_kiam"] ? 1 : 0 }"
   name   = "terraform-eks-${var.cluster-name}-cert-manager"
   policy = "${var.cert_manager["iam_policy"]}"
 }
@@ -43,6 +43,10 @@ POLICY
 
 resource "aws_iam_role_policy_attachment" "eks-cert-manager-kiam" {
   count      = "${var.cert_manager["create_iam_resources_kiam"] ? 1 : 0 }"
-  role       = "${aws_iam_role.eks-external-dns-kiam.*.name[count.index]}"
+  role       = "${aws_iam_role.eks-cert-manager-kiam.*.name[count.index]}"
   policy_arn = "${aws_iam_policy.eks-cert-manager.*.arn[count.index]}"
+}
+
+output "cert-manager-kiam-role-arn" {
+  value = "${aws_iam_role.eks-cert-manager-kiam.*.arn}"
 }

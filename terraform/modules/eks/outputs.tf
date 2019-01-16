@@ -17,7 +17,7 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    ${var.virtual_kubelet["create_iam_resources_kiam"] ? "- rolearn: ${aws_iam_role.eks-virtual-kubelet.*.arn[0]}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
+    ${var.virtual_kubelet["create_iam_resources_kiam"] ? "- rolearn: ${join(",", aws_iam_role.eks-virtual-kubelet.*.arn)}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
 CONFIGMAPAWSAUTH
 
   kubeconfig = <<KUBECONFIG
@@ -48,6 +48,27 @@ users:
         - "-i"
         - "${var.cluster-name}"
 KUBECONFIG
+
+  helm_rbac = <<HELM
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tiller
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: tiller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+HELM
 }
 
 output "config_map_aws_auth" {
@@ -56,4 +77,8 @@ output "config_map_aws_auth" {
 
 output "kubeconfig" {
   value = "${local.kubeconfig}"
+}
+
+output "helm_rbac" {
+  value = "${local.helm_rbac}"
 }
