@@ -2,9 +2,9 @@ locals {
   values_kiam = <<VALUES
 agent:
   tlsFiles:
-    key: ${base64encode(tls_private_key.kiam_agent_key.private_key_pem)}
-    cert: ${base64encode(tls_locally_signed_cert.kiam_agent_crt.cert_pem)}
-    ca: ${base64encode(tls_self_signed_cert.kiam_ca_crt.cert_pem)}
+    key: ${base64encode(join(",", tls_private_key.kiam_agent_key.*.private_key_pem))}
+    cert: ${base64encode(join(",", tls_locally_signed_cert.kiam_agent_crt.*.cert_pem))}
+    ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
     tag: ${var.kiam["version"]}
   host:
@@ -19,9 +19,9 @@ server:
   probes:
     serverAddress: "127.0.0.1"
   tlsFiles:
-    key: ${base64encode(tls_private_key.kiam_server_key.private_key_pem)}
-    cert: ${base64encode(tls_locally_signed_cert.kiam_server_crt.cert_pem)}
-    ca: ${base64encode(tls_self_signed_cert.kiam_ca_crt.cert_pem)}
+    key: ${base64encode(join(",", tls_private_key.kiam_server_key.*.private_key_pem))}
+    cert: ${base64encode(join(",", tls_locally_signed_cert.kiam_server_crt.*.cert_pem))}
+    ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
     tag: ${var.kiam["version"]}
   nodeSelector:
@@ -30,7 +30,7 @@ server:
     - operator: Exists
       effect: NoSchedule
       key: "node-role.kubernetes.io/controller"
-  assumeRoleArn: ${data.terraform_remote_state.eks.kiam-server-role-arn[0]}
+  assumeRoleArn: ${join(",",data.terraform_remote_state.eks.*.kiam-server-role-arn[0])}
   extraHostPathMounts:
     - name: ssl-certs
       mountPath: /etc/ssl/certs
@@ -40,11 +40,6 @@ VALUES
 }
 
 resource "helm_release" "kiam" {
-  depends_on = [
-    "kubernetes_service_account.tiller",
-    "kubernetes_cluster_role_binding.tiller",
-  ]
-
   count     = "${var.kiam["enabled"] ? 1 : 0 }"
   name      = "kiam"
   chart     = "stable/kiam"

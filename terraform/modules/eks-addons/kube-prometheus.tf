@@ -1,7 +1,7 @@
 locals {
   values_prometheus_operator = <<VALUES
 grafana:
-  adminPassword: ${random_string.grafana_password.result}
+  adminPassword: ${join(",", random_string.grafana_password.*.result)}
   persistence:
     enabled: true
     storageClassName: gp2
@@ -34,16 +34,12 @@ VALUES
 }
 
 resource "random_string" "grafana_password" {
+  count     = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
   length  = 16
   special = false
 }
 
 resource "helm_release" "prometheus_operator" {
-  depends_on = [
-    "kubernetes_service_account.tiller",
-    "kubernetes_cluster_role_binding.tiller",
-  ]
-
   count     = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
   name      = "prometheus-operator"
   chart     = "stable/prometheus-operator"
@@ -53,5 +49,5 @@ resource "helm_release" "prometheus_operator" {
 }
 
 output "grafana_password" {
-  value = "${random_string.grafana_password.result}"
+  value = "${random_string.grafana_password.*.result}"
 }

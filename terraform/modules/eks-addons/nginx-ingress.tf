@@ -18,11 +18,6 @@ VALUES
 }
 
 resource "helm_release" "nginx_ingress" {
-  depends_on = [
-    "kubernetes_service_account.tiller",
-    "kubernetes_cluster_role_binding.tiller",
-  ]
-
   count     = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
   name      = "nginx-ingress"
   chart     = "stable/nginx-ingress"

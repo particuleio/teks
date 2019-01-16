@@ -72,7 +72,7 @@ resource "kubernetes_deployment" "virtual-kubelet" {
         }
 
         annotations {
-          "iam.amazonaws.com/role" = "${data.terraform_remote_state.eks.eks-virtual-kubelet-role-arn[0]}"
+          "iam.amazonaws.com/role" = "${join(",", data.terraform_remote_state.eks.*.eks-virtual-kubelet-role-arn[0])}"
         }
       }
 
