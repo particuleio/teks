@@ -10,7 +10,7 @@ terragrunt = {
   terraform {
     source = "../../../modules//eks-addons"
     before_hook "kubeconfig" {
-      commands = ["apply"]
+      commands = ["apply","plan"]
       execute = ["bash","-c","cp ${get_tfvars_dir()}/../eks/kubeconfig kubeconfig"]
     }
     after_hook "cert_manager_cluster_issuers" {
@@ -48,6 +48,7 @@ nginx_ingress = {
 // [cluster_autoscaler]
 //
 cluster_autoscaler = {
+  use_kiam = true
   version = "v1.3.5"
   chart_version = "0.11.0"
   enabled = true
@@ -60,6 +61,7 @@ cluster_autoscaler = {
 // [external_dns]
 //
 external_dns = {
+  use_kiam = true
   version = "v0.5.9"
   chart_version = "1.3.0"
   enabled = true
@@ -71,6 +73,7 @@ external_dns = {
 // [cert_manager]
 //
 cert_manager = {
+  use_kiam = true
   version = "v0.5.2"
   chart_version = "v0.5.2"
   enabled = true
@@ -84,7 +87,7 @@ cert_manager = {
 //
 kiam = {
   version = "v3.0"
-  chart_version = "2.0.1-rc3"
+  chart_version = "2.0.1-rc4"
   enabled = true
   namespace = "kiam"
   extra_values = ""
@@ -105,6 +108,7 @@ metrics_server = {
 // [virtual-kubelet]
 //
 virtual_kubelet = {
+  use_kiam = true
   version = "0.7.4"
   enabled = true
   namespace = "virtual-kubelet"
@@ -122,23 +126,7 @@ virtual_kubelet = {
 //
 prometheus_operator = {
   chart_version = "1.5.1"
-  enabled = true
+  enabled = false
   namespace = "monitoring"
-  extra_values = <<VALUES
-grafana:
-  ingress:
-    enabled: true
-    annotations:
-      certmanager.k8s.io/acme-challenge-type: dns01
-      certmanager.k8s.io/acme-dns01-provider: route53
-      certmanager.k8s.io/cluster-issuer: letsencrypt
-      kubernetes.io/ingress.class: nginx
-      kubernetes.io/tls-acme: "true"
-    hosts:
-      - grafana.archifleks.net
-    tls:
-      - secretName: grafana-archifleks-net
-        hosts:
-          - grafana.archifleks.net
-VALUES
+  extra_values = ""
 }

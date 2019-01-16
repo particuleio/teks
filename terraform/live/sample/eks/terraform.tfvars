@@ -12,6 +12,10 @@ terragrunt = {
       commands = ["apply"]
       execute = ["bash","-c","terraform output config_map_aws_auth 2>/dev/null | kubectl --kubeconfig ${get_tfvars_dir()}/kubeconfig apply -f -"]
     }
+    after_hook "helm" {
+      commands = ["apply"]
+      execute = ["bash","-c","terraform output helm_rbac 2>/dev/null | kubectl --kubeconfig ${get_tfvars_dir()}/kubeconfig apply -f -"]
+    }
   }
 }
 
@@ -36,7 +40,7 @@ vpc = {
 //
 // [dns]
 //
-use_route53 = true
+use_route53 = false
 domain_name = "archifleks.net"
 subdomain_name = "eks"
 
@@ -50,7 +54,8 @@ kubernetes_version = "1.11"
 // [cluster_autoscaler]
 //
 cluster_autoscaler = {
-  create_iam_resources = true
+  create_iam_resources = false
+  create_iam_resources_kiam = true
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -77,7 +82,8 @@ POLICY
 // [external_dns]
 //
 external_dns = {
-  create_iam_resources = true
+  create_iam_resources = false
+  create_iam_resources_kiam = true
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -111,7 +117,8 @@ POLICY
 // [cert_manager]
 //
 cert_manager = {
-  create_iam_resources = true
+  create_iam_resources = false
+  create_iam_resources_kiam = true
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -146,7 +153,8 @@ kiam = {
 }
 
 virtual_kubelet = {
-  create_iam_resources = true
+  create_iam_resources_kiam = true
+  create_cloudwatch_log_group = true
   cloudwatch_log_group = "virtual-kubelet"
 }
 
@@ -161,7 +169,7 @@ node-pools = [
     volume_size = 30
     volume_type = "gp2"
     autoscaling = "disabled"
-    kubelet_extra_args = "--kubelet-extra-args '--node-labels node-role.kubernetes.io/controller=\"\" --register-with-taints node-role.kubernetes.io/controller=:NoSchedule'"
+    kubelet_extra_args = "--kubelet-extra-args '--node-labels node-role.kubernetes.io/controller=\"\" --register-with-taints node-role.kubernetes.io/controller=:NoSchedule --kube-reserved cpu=250m,memory=0.5Gi --system-reserved cpu=250m,memory=0.2Gi,ephemeral-storage=1Gi,ephemeral-storage=1Gi --eviction-hard memory.available<500Mi,nodefs.available<10%'"
   },
   {
     name = "default"
@@ -173,6 +181,6 @@ node-pools = [
     volume_size = 30
     volume_type = "gp2"
     autoscaling = "enabled"
-    kubelet_extra_args = "--kubelet-extra-args '--node-labels node-role.kubernetes.io/node=\"\"'"
+    kubelet_extra_args = "--kubelet-extra-args '--node-labels node-role.kubernetes.io/node=\"\" --kube-reserved cpu=250m,memory=0.5Gi --system-reserved cpu=250m,memory=0.2Gi,ephemeral-storage=1Gi,ephemeral-storage=1Gi --eviction-hard memory.available<500Mi,nodefs.available<10%'"
   },
 ]
