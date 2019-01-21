@@ -38,6 +38,6 @@ resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   chart     = "stable/nginx-ingress"
   version   = "${var.nginx_ingress["chart_version"]}"
-  values    = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.vvalues_nginx_ingress_nlb : local.values_nginx_ingress),list(var.nginx_ingress["extra_values"]))}"]
+  values    = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : local.values_nginx_ingress),list(var.nginx_ingress["extra_values"]))}"]
   namespace = "${var.nginx_ingress["namespace"]}"
 }
