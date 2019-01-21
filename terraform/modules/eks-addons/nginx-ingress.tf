@@ -23,7 +23,7 @@ controller:
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
-    externalTrafficPolicy: "local"
+    externalTrafficPolicy: "Local"
   publishService:
     enabled: true
   config:
