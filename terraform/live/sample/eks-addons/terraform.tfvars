@@ -39,16 +39,17 @@ eks = {
 nginx_ingress = {
   version = "0.21.0"
   chart_version = "1.1.2"
-  enabled = true
+  enabled = false
   namespace = "ingress-nginx"
   extra_values = ""
+  use_nlb = false
 }
 
 //
 // [cluster_autoscaler]
 //
 cluster_autoscaler = {
-  use_kiam = true
+  use_kiam = false
   version = "v1.3.5"
   chart_version = "0.11.0"
   enabled = true
@@ -61,10 +62,10 @@ cluster_autoscaler = {
 // [external_dns]
 //
 external_dns = {
-  use_kiam = true
+  use_kiam = false
   version = "v0.5.9"
   chart_version = "1.3.0"
-  enabled = true
+  enabled = false
   namespace = "external-dns"
   extra_values = ""
 }
@@ -73,10 +74,10 @@ external_dns = {
 // [cert_manager]
 //
 cert_manager = {
-  use_kiam = true
+  use_kiam = false
   version = "v0.5.2"
   chart_version = "v0.5.2"
-  enabled = true
+  enabled = false
   namespace = "cert-manager"
   extra_values = ""
   acme_email =  "kevin.lefevre@osones.io"
@@ -88,7 +89,7 @@ cert_manager = {
 kiam = {
   version = "v3.0"
   chart_version = "2.0.1-rc4"
-  enabled = true
+  enabled = false
   namespace = "kiam"
   extra_values = ""
 }
@@ -99,7 +100,7 @@ kiam = {
 metrics_server = {
   version = "v0.3.1"
   chart_version = "2.0.4"
-  enabled = true
+  enabled = false
   namespace = "metrics-server"
   extra_values = ""
 }
@@ -110,7 +111,7 @@ metrics_server = {
 virtual_kubelet = {
   use_kiam = true
   version = "0.7.4"
-  enabled = true
+  enabled = false
   namespace = "virtual-kubelet"
   cpu = "20"
   memory = "40Gi"

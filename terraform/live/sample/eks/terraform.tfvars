@@ -55,7 +55,7 @@ kubernetes_version = "1.11"
 //
 cluster_autoscaler = {
   create_iam_resources = false
-  create_iam_resources_kiam = true
+  create_iam_resources_kiam = false
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -83,7 +83,7 @@ POLICY
 //
 external_dns = {
   create_iam_resources = false
-  create_iam_resources_kiam = true
+  create_iam_resources_kiam = false
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -118,7 +118,7 @@ POLICY
 //
 cert_manager = {
   create_iam_resources = false
-  create_iam_resources_kiam = true
+  create_iam_resources_kiam = false
   attach_to_pool = 0
   iam_policy = <<POLICY
 {
@@ -148,13 +148,13 @@ POLICY
 // [kiam]
 //
 kiam = {
-  create_iam_resources = true
+  create_iam_resources = false
   attach_to_pool = 0
 }
 
 virtual_kubelet = {
-  create_iam_resources_kiam = true
-  create_cloudwatch_log_group = true
+  create_iam_resources_kiam = false
+  create_cloudwatch_log_group = false
   cloudwatch_log_group = "virtual-kubelet"
 }
 
