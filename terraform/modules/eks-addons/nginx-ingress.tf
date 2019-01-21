@@ -15,6 +15,22 @@ controller:
 defaultBackend:
   replicaCount: 2
 VALUES
+  values_nginx_ingress_nlb = <<VALUES
+controller:
+  kind: "DaemonSet"
+  daemonset:
+    useHostPort: true
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+    externalTrafficPolicy: "local"
+  publishService:
+    enabled: true
+  config:
+    use-proxy-protocol: "true"
+defaultBackend:
+  replicaCount: 2
+VALUES
 }
 
 resource "helm_release" "nginx_ingress" {
@@ -22,6 +38,6 @@ resource "helm_release" "nginx_ingress" {
   name      = "nginx-ingress"
   chart     = "stable/nginx-ingress"
   version   = "${var.nginx_ingress["chart_version"]}"
-  values    = ["${concat(list(local.values_nginx_ingress),list(var.nginx_ingress["extra_values"]))}"]
+  values    = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.vvalues_nginx_ingress_nlb : local.values_nginx_ingress),list(var.nginx_ingress["extra_values"]))}"]
   namespace = "${var.nginx_ingress["namespace"]}"
 }
