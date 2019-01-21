@@ -28,6 +28,7 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 * [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
+* [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)
 
 ## Documentation
 

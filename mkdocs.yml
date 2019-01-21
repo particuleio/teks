@@ -46,4 +46,7 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Documentation:
-    - User Guides: user-guides/index.md
+    - User Guides:
+      - Getting Started: user-guides/index.md
+      - Minimal: user-guides/minimal-deployment.md
+
