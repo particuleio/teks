@@ -21,6 +21,8 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
   * [metrics-server](https://github.com/kubernetes-incubator/metrics-server): enable metrics API and horizontal pod scaling (HPA)
   * [prometheus-operator](https://github.com/coreos/prometheus-operator): Monitoring / Alerting / Dashboards
   * [virtual-kubelet](https://github.com/coreos/prometheus-operator): enables using ECS Fargate as a provider to run workload without EC2 instances
+  * [fluentd-cloudwatch](https://github.com/helm/charts/tree/master/incubator/fluentd-cloudwatch): forwards logs to AWS Cloudwatch
+  * [node-problem-detector](https://github.com/kubernetes/node-problem-detector): Forwards node problems to Kubernetes events
 
 ## Requirements
 
