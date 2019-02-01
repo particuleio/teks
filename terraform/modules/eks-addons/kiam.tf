@@ -7,15 +7,22 @@ agent:
     ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
     tag: ${var.kiam["version"]}
+  nodeSelector:
+    node-role.kubernetes.io/node: ""
+  extraArgs:
+    whitelist-route-regexp: "/latest"
   host:
     interface: "eni+"
     iptables: true
+  updateStrategy: "RollingUpdate"
   extraHostPathMounts:
     - name: ssl-certs
       mountPath: /etc/ssl/certs
       hostPath: /etc/pki/ca-trust/extracted/pem
       readOnly: true
+  tolerations: ${var.kiam["server_use_host_network"] ? "[{'operator': 'Exists'}]" : "[]"}
 server:
+  useHostNetwork: ${var.kiam["server_use_host_network"]}
   probes:
     serverAddress: "127.0.0.1"
   tlsFiles:
