@@ -27,7 +27,7 @@ controller:
   publishService:
     enabled: true
   config:
-    use-proxy-protocol: "true"
+    use-proxy-protocol: "false"
 defaultBackend:
   replicaCount: 2
 VALUES
