@@ -76,3 +76,13 @@ variable "virtual_kubelet" {
   type    = "map"
   default = {}
 }
+
+variable "fluentd_cloudwatch" {
+  type    = "map"
+  default = {}
+}
+
+variable "cni_metrics_helper" {
+  type    = "map"
+  default = {}
+}
