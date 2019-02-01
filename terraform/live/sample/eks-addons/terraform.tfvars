@@ -156,7 +156,7 @@ fluentd_cloudwatch = {
 npd = {
   chart_version = "1.1.4"
   version = "v0.6.2"
-  enabled = true
+  enabled = false
   namespace = "node-problem-detector"
   extra_values = ""
 }
