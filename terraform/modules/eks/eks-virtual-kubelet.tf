@@ -59,8 +59,8 @@ resource "aws_iam_role_policy_attachment" "eks-virtual-kubelet" {
 }
 
 resource "aws_cloudwatch_log_group" "eks-virtual-kubelet" {
-  name = "eks-cluster-${var.cluster-name}-${var.virtual_kubelet["cloudwatch_log_group"]}"
-  count      = "${var.virtual_kubelet["create_cloudwatch_log_group"] ? 1 : 0 }"
+  name  = "eks-cluster-${var.cluster-name}-${var.virtual_kubelet["cloudwatch_log_group"]}"
+  count = "${var.virtual_kubelet["create_cloudwatch_log_group"] ? 1 : 0 }"
 
   tags = {
     Environment = "terraform-eks-${var.cluster-name}"
