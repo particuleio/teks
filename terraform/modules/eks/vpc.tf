@@ -10,8 +10,8 @@ resource "aws_vpc" "eks" {
   count      = "${var.vpc["create"] ? 1 : 0 }"
   cidr_block = "${var.vpc["cidr"]}"
 
-  enable_dns_hostnames = true
-  assign_generated_ipv6_cidr_block =true
+  enable_dns_hostnames             = true
+  assign_generated_ipv6_cidr_block = true
 
   tags = "${
     map(
