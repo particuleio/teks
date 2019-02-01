@@ -13,9 +13,13 @@ terragrunt = {
       commands = ["apply","plan"]
       execute = ["bash","-c","cp ${get_tfvars_dir()}/../eks/kubeconfig kubeconfig"]
     }
+    before_hook "helm_repo_update" {
+      commands = ["apply","plan"]
+      execute = ["bash","-c","helm repo update"]
+    }
     after_hook "cert_manager_cluster_issuers" {
       commands = ["apply"]
-      execute = ["bash","-c","terraform output cert_manager_cluster_issuers 2>/dev/null | kubectl --kubeconfig kubeconfig apply -f -"]
+      execute = ["bash","-c","terraform output cert_manager_cluster_issuers 2>/dev/null | kubectl --kubeconfig kubeconfig apply -f - | true"]
     }
   }
 }
@@ -52,7 +56,7 @@ cluster_autoscaler = {
   use_kiam = false
   version = "v1.3.5"
   chart_version = "0.11.0"
-  enabled = true
+  enabled = false
   namespace = "cluster-autoscaler"
   cluster_name = "sample"
   extra_values = ""
@@ -88,9 +92,10 @@ cert_manager = {
 //
 kiam = {
   version = "v3.0"
-  chart_version = "2.0.1-rc4"
+  chart_version = "2.0.1-rc6"
   enabled = false
   namespace = "kiam"
+  server_use_host_network = "true"
   extra_values = ""
 }
 
@@ -129,5 +134,29 @@ prometheus_operator = {
   chart_version = "1.5.1"
   enabled = false
   namespace = "monitoring"
+  extra_values = ""
+}
+
+//
+// [fluentd_cloudwatch]
+//
+fluentd_cloudwatch = {
+  chart_version = "0.7.0"
+  version = "v1.3-debian-cloudwatch"
+  use_kiam = false
+  enabled = false
+  namespace = "fluentd-cloudwatch"
+  extra_values = ""
+  log_group_name = "eks-sample-logs"
+}
+
+//
+// [node_problem_detector]
+//
+npd = {
+  chart_version = "1.1.4"
+  version = "v0.6.2"
+  enabled = true
+  namespace = "node-problem-detector"
   extra_values = ""
 }
