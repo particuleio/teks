@@ -189,9 +189,10 @@ virtual_kubelet = {
   cloudwatch_log_group = "eks-virtual-kubelet"
 }
 
-cni_metrics_helper {
+cni_metrics_helper = {
   create_iam_resources = true
   create_iam_resources_kiam = false
+  attach_to_pool = 0
   use_kiam = false
   iam_policy = <<POLICY
 {

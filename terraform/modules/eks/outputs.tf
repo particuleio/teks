@@ -726,6 +726,7 @@ spec:
         iam.amazonaws.com/role: "${join(",", aws_iam_role.eks-cni-metrics-helper-kiam.*.arn)}"
     spec:
       serviceAccountName: cni-metrics-helper
+      ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
       containers:
       - image: 694065802095.dkr.ecr.us-west-2.amazonaws.com/cni-metrics-helper:0.1.1
         imagePullPolicy: Always
@@ -733,7 +734,6 @@ spec:
         env:
           - name: USE_CLOUDWATCH
             value: "yes"
-            ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
 CNI_METRICS_HELPER
 }
 
