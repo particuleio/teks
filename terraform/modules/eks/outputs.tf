@@ -733,7 +733,7 @@ spec:
         env:
           - name: USE_CLOUDWATCH
             value: "yes"
-            ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
+      ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
 CNI_METRICS_HELPER
 }
 
