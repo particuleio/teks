@@ -84,7 +84,7 @@ cert_manager = {
   enabled = false
   namespace = "cert-manager"
   extra_values = ""
-  acme_email =  "kevin.lefevre@osones.io"
+  acme_email =  "example@email.com"
 }
 
 //
@@ -134,7 +134,23 @@ prometheus_operator = {
   chart_version = "1.5.1"
   enabled = false
   namespace = "monitoring"
-  extra_values = ""
+  extra_values = <<EXTRA_VALUES
+grafana:
+  ingress:
+    enabled: true
+    annotations:
+      certmanager.k8s.io/acme-challenge-type: dns01
+      certmanager.k8s.io/acme-dns01-provider: route53
+      certmanager.k8s.io/cluster-issuer: letsencrypt
+      kubernetes.io/ingress.class: nginx
+      kubernetes.io/tls-acme: "true"
+    hosts:
+      - grafana.eks.example.domain
+    tls:
+      - secretName: grafana-eks-example-domain
+        hosts:
+          - grafana.eks.example.domain
+EXTRA_VALUES
 }
 
 //

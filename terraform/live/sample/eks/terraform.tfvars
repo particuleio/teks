@@ -49,7 +49,7 @@ vpc = {
 // [dns]
 //
 use_route53 = false
-domain_name = "archifleks.net"
+domain_name = "example.domain"
 subdomain_name = "eks"
 
 //
@@ -230,7 +230,7 @@ node-pools = [
     max_size = 1
     desired_capacity = 1
     instance_type = "t3.medium"
-    key_name = "klefevre-sorrow"
+    key_name = "keypair"
     volume_size = 30
     volume_type = "gp2"
     autoscaling = "disabled"
@@ -242,7 +242,7 @@ node-pools = [
     max_size = 9
     desired_capacity = 3
     instance_type = "t3.medium"
-    key_name = "klefevre-sorrow"
+    key_name = "keypair"
     volume_size = 30
     volume_type = "gp2"
     autoscaling = "enabled"
