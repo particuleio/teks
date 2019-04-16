@@ -8,6 +8,16 @@ data "aws_ami" "eks-worker" {
   owners      = ["602401143452"] # Amazon EKS AMI Account ID
 }
 
+data "aws_ami" "eks-gpu-worker" {
+  filter {
+    name   = "name"
+    values = ["amazon-eks-gpu-node-${var.kubernetes_version}*"]
+  }
+
+  most_recent = true
+  owners      = ["602401143452"] # Amazon EKS AMI Account ID
+}
+
 data "template_file" "eks-node" {
   count    = "${length(var.node-pools)}"
   template = "${file("templates/eks-node.tpl")}"
@@ -27,7 +37,7 @@ resource "aws_launch_template" "eks" {
     name = "${aws_iam_instance_profile.eks-node.*.name[count.index]}"
   }
 
-  image_id               = "${data.aws_ami.eks-worker.id}"
+  image_id               = "${lookup(var.node-pools[count.index], "image_id", lookup(var.node-pools[count.index], "gpu_ami", "false" ) ? data.aws_ami.eks-gpu-worker.id : data.aws_ami.eks-worker.id)}"
   instance_type          = "${lookup(var.node-pools[count.index],"instance_type")}"
   name_prefix            = "terraform-eks-${var.cluster-name}-node-pool-${lookup(var.node-pools[count.index],"name")}"
   vpc_security_group_ids = ["${aws_security_group.eks-node.id}"]

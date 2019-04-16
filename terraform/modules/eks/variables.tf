@@ -39,7 +39,7 @@ variable "use_route53" {
 
 variable "kubernetes_version" {
   description = "EKS version"
-  default     = "1.11"
+  default     = "1.12"
 }
 
 variable "external_dns" {
