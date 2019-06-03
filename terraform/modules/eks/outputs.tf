@@ -98,7 +98,7 @@ spec:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
       nodeSelector:
-        node-role.kubernetes.io/node: ""
+        beta.kubernetes.io/os: linux
       hostNetwork: true
       serviceAccountName: calico-node
       # Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a "force
@@ -109,7 +109,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: quay.io/calico/node:v3.1.3
+          image: quay.io/calico/node:v3.3.6
           env:
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
@@ -171,16 +171,23 @@ spec:
             initialDelaySeconds: 10
             failureThreshold: 6
           readinessProbe:
-            httpGet:
-              path: /readiness
-              port: 9099
+            exec:
+              command:
+                - /bin/calico-node
+                - -felix-ready
             periodSeconds: 10
           volumeMounts:
             - mountPath: /lib/modules
               name: lib-modules
               readOnly: true
+            - mountPath: /run/xtables.lock
+              name: xtables-lock
+              readOnly: false
             - mountPath: /var/run/calico
               name: var-run-calico
+              readOnly: false
+            - mountPath: /var/lib/calico
+              name: var-lib-calico
               readOnly: false
       volumes:
         # Used to ensure proper kmods are installed.
@@ -190,9 +197,22 @@ spec:
         - name: var-run-calico
           hostPath:
             path: /var/run/calico
+        - name: var-lib-calico
+          hostPath:
+            path: /var/lib/calico
+        - name: xtables-lock
+          hostPath:
+            path: /run/xtables.lock
+            type: FileOrCreate
       tolerations:
         # Make sure calico/node gets scheduled on all nodes.
-      - operator: Exists
+        - effect: NoSchedule
+          operator: Exists
+        # Mark the pod as a critical add-on for rescheduling.
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
 
 ---
 
@@ -202,7 +222,7 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-   name: felixconfigurations.crd.projectcalico.org
+  name: felixconfigurations.crd.projectcalico.org
 spec:
   scope: Cluster
   group: crd.projectcalico.org
@@ -228,6 +248,19 @@ spec:
     singular: bgpconfiguration
 
 ---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: bgppeers.crd.projectcalico.org
+spec:
+  scope: Cluster
+  group: crd.projectcalico.org
+  version: v1
+  names:
+    kind: BGPPeer
+    plural: bgppeers
+    singular: bgppeer
+---
 
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -251,7 +284,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: HostEndpoint
     plural: hostendpoints
@@ -266,7 +302,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: ClusterInformation
     plural: clusterinformations
@@ -281,7 +320,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: GlobalNetworkPolicy
     plural: globalnetworkpolicies
@@ -296,7 +338,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: GlobalNetworkSet
     plural: globalnetworksets
@@ -311,7 +356,10 @@ metadata:
 spec:
   scope: Namespaced
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: NetworkPolicy
     plural: networkpolicies
@@ -337,6 +385,7 @@ rules:
   - apiGroups: [""]
     resources:
       - namespaces
+      - serviceaccounts
     verbs:
       - get
       - list
@@ -345,7 +394,7 @@ rules:
     resources:
       - pods/status
     verbs:
-      - update
+      - patch
   - apiGroups: [""]
     resources:
       - pods
@@ -353,7 +402,6 @@ rules:
       - get
       - list
       - watch
-      - patch
   - apiGroups: [""]
     resources:
       - services
@@ -416,9 +464,9 @@ roleRef:
   kind: ClusterRole
   name: calico-node
 subjects:
-- kind: ServiceAccount
-  name: calico-node
-  namespace: kube-system
+  - kind: ServiceAccount
+    name: calico-node
+    namespace: kube-system
 
 ---
 
@@ -437,67 +485,82 @@ spec:
         k8s-app: calico-typha
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
+        cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
     spec:
+      nodeSelector:
+        beta.kubernetes.io/os: linux
       tolerations:
-      - operator: Exists
+        # Mark the pod as a critical add-on for rescheduling.
+        - key: CriticalAddonsOnly
+          operator: Exists
       hostNetwork: true
       serviceAccountName: calico-node
       containers:
-      - image: quay.io/calico/typha:v0.7.4
-        name: calico-typha
-        ports:
-        - containerPort: 5473
+        - image: quay.io/calico/typha:v3.3.6
           name: calico-typha
-          protocol: TCP
-        env:
-          # Use eni not cali for interface prefix
-          - name: FELIX_INTERFACEPREFIX
-            value: "eni"
-          - name: TYPHA_LOGFILEPATH
-            value: "none"
-          - name: TYPHA_LOGSEVERITYSYS
-            value: "none"
-          - name: TYPHA_LOGSEVERITYSCREEN
-            value: "info"
-          - name: TYPHA_PROMETHEUSMETRICSENABLED
-            value: "true"
-          - name: TYPHA_CONNECTIONREBALANCINGMODE
-            value: "kubernetes"
-          - name: TYPHA_PROMETHEUSMETRICSPORT
-            value: "9093"
-          - name: TYPHA_DATASTORETYPE
-            value: "kubernetes"
-          - name: TYPHA_MAXCONNECTIONSLOWERLIMIT
-            value: "1"
-          - name: TYPHA_HEALTHENABLED
-            value: "true"
-          # This will make Felix honor AWS VPC CNI's mangle table
-          # rules.
-          - name: FELIX_IPTABLESMANGLEALLOWACTION
-            value: Return
-        volumeMounts:
-        - mountPath: /etc/calico
-          name: etc-calico
-          readOnly: true
-        livenessProbe:
-          httpGet:
-            path: /liveness
-            port: 9098
-          periodSeconds: 30
-          initialDelaySeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: 9098
-          periodSeconds: 10
-      volumes:
-      - name: etc-calico
-        hostPath:
-          path: /etc/calico
-
+          ports:
+            - containerPort: 5473
+              name: calico-typha
+              protocol: TCP
+          env:
+            # Use eni not cali for interface prefix
+            - name: FELIX_INTERFACEPREFIX
+              value: "eni"
+            - name: TYPHA_LOGFILEPATH
+              value: "none"
+            - name: TYPHA_LOGSEVERITYSYS
+              value: "none"
+            - name: TYPHA_LOGSEVERITYSCREEN
+              value: "info"
+            - name: TYPHA_PROMETHEUSMETRICSENABLED
+              value: "true"
+            - name: TYPHA_CONNECTIONREBALANCINGMODE
+              value: "kubernetes"
+            - name: TYPHA_PROMETHEUSMETRICSPORT
+              value: "9093"
+            - name: TYPHA_DATASTORETYPE
+              value: "kubernetes"
+            - name: TYPHA_MAXCONNECTIONSLOWERLIMIT
+              value: "1"
+            - name: TYPHA_HEALTHENABLED
+              value: "true"
+            # This will make Felix honor AWS VPC CNI's mangle table
+            # rules.
+            - name: FELIX_IPTABLESMANGLEALLOWACTION
+              value: Return
+          livenessProbe:
+            exec:
+              command:
+                - calico-typha
+                - check
+                - liveness
+            periodSeconds: 30
+            initialDelaySeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - calico-typha
+                - check
+                - readiness
+            periodSeconds: 10
 
 ---
 
+# This manifest creates a Pod Disruption Budget for Typha to allow K8s Cluster Autoscaler to evict
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: calico-typha
+  namespace: kube-system
+  labels:
+    k8s-app: calico-typha
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      k8s-app: calico-typha
+
+---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
@@ -545,7 +608,6 @@ data:
         [2000, 8]
       ]
     }
-
 ---
 
 apiVersion: extensions/v1beta1
@@ -564,6 +626,8 @@ spec:
       annotations:
         scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      nodeSelector:
+        beta.kubernetes.io/os: linux
       containers:
         - image: k8s.gcr.io/cluster-proportional-autoscaler-amd64:1.1.2
           name: autoscaler
@@ -649,43 +713,44 @@ metadata:
     iam.amazonaws.com/permitted: ".*"
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+# kubernetes versions before 1.8.0 should use rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: cni-metrics-helper
 rules:
-- apiGroups: [""]
-  resources:
-  - nodes
-  - pods
-  - pods/proxy
-  - services
-  - resourcequotas
-  - replicationcontrollers
-  - limitranges
-  - persistentvolumeclaims
-  - persistentvolumes
-  - namespaces
-  - endpoints
-  verbs: ["list", "watch", "get"]
-- apiGroups: ["extensions"]
-  resources:
-  - daemonsets
-  - deployments
-  - replicasets
-  verbs: ["list", "watch"]
-- apiGroups: ["apps"]
-  resources:
-  - statefulsets
-  verbs: ["list", "watch"]
-- apiGroups: ["batch"]
-  resources:
-  - cronjobs
-  - jobs
-  verbs: ["list", "watch"]
-- apiGroups: ["autoscaling"]
-  resources:
-  - horizontalpodautoscalers
-  verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - pods
+      - pods/proxy
+      - services
+      - resourcequotas
+      - replicationcontrollers
+      - limitranges
+      - persistentvolumeclaims
+      - persistentvolumes
+      - namespaces
+      - endpoints
+    verbs: ["list", "watch", "get"]
+  - apiGroups: ["extensions"]
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+    verbs: ["list", "watch"]
+  - apiGroups: ["apps"]
+    resources:
+      - statefulsets
+    verbs: ["list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - cronjobs
+      - jobs
+    verbs: ["list", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources:
+      - horizontalpodautoscalers
+    verbs: ["list", "watch"]
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -703,9 +768,9 @@ roleRef:
   kind: ClusterRole
   name: cni-metrics-helper
 subjects:
-- kind: ServiceAccount
-  name: cni-metrics-helper
-  namespace: kube-system
+  - kind: ServiceAccount
+    name: cni-metrics-helper
+    namespace: kube-system
 ---
 kind: Deployment
 apiVersion: extensions/v1beta1
@@ -722,12 +787,10 @@ spec:
     metadata:
       labels:
         k8s-app: cni-metrics-helper
-      annotations:
-        iam.amazonaws.com/role: "${join(",", aws_iam_role.eks-cni-metrics-helper-kiam.*.arn)}"
     spec:
       serviceAccountName: cni-metrics-helper
       containers:
-      - image: 694065802095.dkr.ecr.us-west-2.amazonaws.com/cni-metrics-helper:0.1.1
+      - image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/cni-metrics-helper:v1.4.1
         imagePullPolicy: Always
         name: cni-metrics-helper
         env:
