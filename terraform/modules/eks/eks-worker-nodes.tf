@@ -27,6 +27,7 @@ data "template_file" "eks-node" {
     b64_cluster_ca     = "${aws_eks_cluster.eks.certificate_authority.0.data}"
     cluster_name       = "${var.cluster-name}"
     kubelet_extra_args = "${lookup(var.node-pools[count.index],"kubelet_extra_args")}"
+    extra_user_data = "${lookup(var.node-pools[count.index],"extra_user_data")}"
   }
 }
 
