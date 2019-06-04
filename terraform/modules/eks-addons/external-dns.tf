@@ -42,8 +42,9 @@ resource "helm_release" "external_dns" {
     "kubernetes_namespace.external_dns"
   ]
   count     = "${var.external_dns["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "external-dns"
-  chart     = "stable/external-dns"
+  chart     = "external-dns"
   version   = "${var.external_dns["chart_version"]}"
   values    = ["${concat(list(var.external_dns["use_kiam"] ? local.values_external_dns_kiam : local.values_external_dns),list(var.external_dns["extra_values"]))}"]
   namespace = "${var.external_dns["namespace"]}"

@@ -41,8 +41,9 @@ resource "random_string" "grafana_password" {
 
 resource "helm_release" "prometheus_operator" {
   count     = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "prometheus-operator"
-  chart     = "stable/prometheus-operator"
+  chart     = "prometheus-operator"
   version   = "${var.prometheus_operator["chart_version"]}"
   values    = ["${concat(list(local.values_prometheus_operator),list(var.prometheus_operator["extra_values"]))}"]
   namespace = "${var.prometheus_operator["namespace"]}"

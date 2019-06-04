@@ -64,8 +64,9 @@ VALUES
 
 resource "helm_release" "nginx_ingress" {
   count     = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "nginx-ingress"
-  chart     = "stable/nginx-ingress"
+  chart     = "nginx-ingress"
   version   = "${var.nginx_ingress["chart_version"]}"
   values    = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : var.nginx_ingress["use_l7"] ? local.values_nginx_ingress_l7 : local.values_nginx_ingress_l4),list(var.nginx_ingress["extra_values"]))}"]
   namespace = "${var.nginx_ingress["namespace"]}"

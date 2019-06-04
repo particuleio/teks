@@ -26,6 +26,7 @@ resource "kubernetes_namespace" "cert_manager" {
   metadata {
     annotations {
       "iam.amazonaws.com/permitted" = ".*"
+      "certmanager.k8s.io/disable-validation" = "true"
     }
 
     name = "${var.cert_manager["namespace"]}"
@@ -46,8 +47,9 @@ resource "helm_release" "cert_manager" {
     "kubernetes_namespace.cert_manager"
   ]
   count     = "${var.cert_manager["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "cert-manager"
-  chart     = "stable/cert-manager"
+  chart     = "cert-manager"
   version   = "${var.cert_manager["chart_version"]}"
   values    = ["${concat(list(var.cert_manager["use_kiam"] ? local.values_cert_manager_kiam : local.values_cert_manager),list(var.cert_manager["extra_values"]))}"]
   namespace = "${var.cert_manager["namespace"]}"

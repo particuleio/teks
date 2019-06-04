@@ -48,8 +48,9 @@ VALUES
 
 resource "helm_release" "kiam" {
   count     = "${var.kiam["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "kiam"
-  chart     = "stable/kiam"
+  chart     = "kiam"
   version   = "${var.kiam["chart_version"]}"
   values    = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
   namespace = "${var.kiam["namespace"]}"

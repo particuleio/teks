@@ -48,8 +48,9 @@ resource "helm_release" "cluster_autoscaler" {
     "kubernetes_namespace.cluster_autoscaler"
   ]
   count     = "${var.cluster_autoscaler["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.stable.metadata.0.name}"
   name      = "cluster-autoscaler"
-  chart     = "stable/cluster-autoscaler"
+  chart     = "cluster-autoscaler"
   version   = "${var.cluster_autoscaler["chart_version"]}"
   values    = ["${concat(list(var.cluster_autoscaler["use_kiam"] ? local.values_cluster_autoscaler_kiam : local.values_cluster_autoscaler),list(var.cluster_autoscaler["extra_values"]))}"]
   namespace = "${var.cluster_autoscaler["namespace"]}"

@@ -50,8 +50,9 @@ resource "helm_release" "fluentd_cloudwatch" {
     "kubernetes_namespace.fluentd_cloudwatch"
   ]
   count     = "${var.fluentd_cloudwatch["enabled"] ? 1 : 0 }"
+  repository = "${data.helm_repository.incubator.metadata.0.name}"
   name      = "fluentd-cloudwatch"
-  chart     = "incubator/fluentd-cloudwatch"
+  chart     = "fluentd-cloudwatch"
   version   = "${var.fluentd_cloudwatch["chart_version"]}"
   values    = ["${concat(list(var.fluentd_cloudwatch["use_kiam"] ? local.values_fluentd_cloudwatch_kiam : local.values_fluentd_cloudwatch),list(var.fluentd_cloudwatch["extra_values"]))}"]
   namespace = "${var.fluentd_cloudwatch["namespace"]}"
