@@ -40,7 +40,7 @@ resource "aws_launch_template" "eks" {
 
   image_id               = "${lookup(var.node-pools[count.index], "image_id", lookup(var.node-pools[count.index], "gpu_ami", "false" ) ? data.aws_ami.eks-gpu-worker.id : data.aws_ami.eks-worker.id)}"
   instance_type          = "${lookup(var.node-pools[count.index],"instance_type")}"
-  name_prefix            = "terraform-eks-${var.cluster-name}-node-pool-${lookup(var.node-pools[count.index],"name")}"
+  name_prefix            = "terraform-eks-${var.cluster-name}-node-pool-${lookup(var.node-pools[count.index],"name")}-"
   vpc_security_group_ids = ["${aws_security_group.eks-node.id}"]
   user_data              = "${base64encode(data.template_file.eks-node.*.rendered[count.index])}"
 
@@ -53,6 +53,10 @@ resource "aws_launch_template" "eks" {
       volume_size = "${lookup(var.node-pools[count.index],"volume_size")}"
       volume_type = "${lookup(var.node-pools[count.index],"volume_type")}"
     }
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -71,33 +75,21 @@ resource "aws_autoscaling_group" "eks" {
   name                = "terraform-eks-${var.cluster-name}-node-pool-${lookup(var.node-pools[count.index],"name")}"
   vpc_zone_identifier = ["${split(",", var.vpc["create"] ? join(",", aws_subnet.eks-private.*.id) : var.vpc["private_subnets_id"])}"]
 
-  tag {
-    key                 = "Name"
-    value               = "terraform-eks-${var.cluster-name}"
-    propagate_at_launch = true
-  }
+  tags = [
+    "${concat(
+      list(
+        map("key", "Name", "value", "terraform-eks-${var.cluster-name}-${lookup(var.node-pools[count.index],"name")}", "propagate_at_launch", true),
+        map("key", "kubernetes.io/cluster/${var.cluster-name}", "value", "owned", "propagate_at_launch", true),
+        map("key", "k8s.io/cluster-autoscaler/${lookup(var.node-pools[count.index],"autoscaling")}", "value", "", "propagate_at_launch", true),
+        map("key", "k8s.io/cluster-autoscaler/${var.cluster-name}", "value", "", "propagate_at_launch", true),
+        map("key", "eks:node-pool:name", "value", "${lookup(var.node-pools[count.index],"name")}", "propagate_at_launch", true)
+      ),
+      var.node-pools-tags[count.index])
+    }"
+  ]
 
-  tag {
-    key                 = "kubernetes.io/cluster/${var.cluster-name}"
-    value               = "owned"
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/${lookup(var.node-pools[count.index],"autoscaling")}"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
-    value               = ""
-    propagate_at_launch = true
-  }
-
-  tag {
-    key                 = "eks:node-pool:name"
-    value               = "${lookup(var.node-pools[count.index],"name")}"
-    propagate_at_launch = true
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = ["desired_capacity"]
   }
 }
