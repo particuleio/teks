@@ -57,3 +57,8 @@ variable "npd" {
   type    = "map"
   default = {}
 }
+
+variable "flux" {
+  type    = "map"
+  default = {}
+}
