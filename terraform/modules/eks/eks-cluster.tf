@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "eks-cluster-ingress-node-https" {
 }
 
 resource "aws_security_group_rule" "eks-cluster-ingress-workstation-https" {
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = "${var.allowed_cidr_blocks}"
   description       = "Allow workstation to communicate with the cluster API Server"
   from_port         = 443
   protocol          = "tcp"
@@ -71,13 +71,25 @@ resource "aws_security_group_rule" "eks-cluster-ingress-workstation-https" {
   type              = "ingress"
 }
 
+resource "aws_cloudwatch_log_group" "eks-logs" {
+  name              = "/aws/eks/${var.cluster-name}/cluster"
+  retention_in_days = "${var.cluster_log_retention_in_days}"
+}
+
 resource "aws_eks_cluster" "eks" {
+
+  depends_on = ["aws_cloudwatch_log_group.eks-logs"]
+
   name     = "${var.cluster-name}"
   role_arn = "${aws_iam_role.eks-cluster.arn}"
+
+  enabled_cluster_log_types = "${var.enabled_cluster_log_types}"
 
   vpc_config {
     security_group_ids = ["${aws_security_group.eks-cluster.id}"]
     subnet_ids         = ["${split(",", var.vpc["create"] ? join(",", concat(aws_subnet.eks-private.*.id, aws_subnet.eks.*.id)) : join(",", concat(split(",", var.vpc["private_subnets_id"]),split(",", var.vpc["public_subnets_id"]))))}"]
+    endpoint_private_access = "${var.endpoint_private_access}"
+    endpoint_public_access = "${var.endpoint_public_access}"
   }
 
   version = "${var.kubernetes_version}"

@@ -17,6 +17,11 @@ variable "node-pools" {
   type    = "list"
 }
 
+variable "node-pools-tags" {
+  default = []
+  type    = "list"
+}
+
 variable "domain_name" {
   description = "Domain name of the parent domain where subdomain is created"
   default     = "domain.tld"
@@ -85,4 +90,26 @@ variable "fluentd_cloudwatch" {
 variable "cni_metrics_helper" {
   type    = "map"
   default = {}
+}
+
+variable "endpoint_public_access" {
+  default = true
+}
+
+variable "endpoint_private_access" {
+  default = false
+}
+
+variable "enabled_cluster_log_types" {
+  type = "list"
+  default = []
+}
+
+variable "cluster_log_retention_in_days" {
+  default = 30
+}
+
+variable "allowed_cidr_blocks" {
+  type = "list"
+  default = ["0.0.0.0/0"]
 }
