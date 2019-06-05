@@ -1,35 +1,16 @@
 locals {
   values_prometheus_operator = <<VALUES
-grafana:
-  adminPassword: ${join(",", random_string.grafana_password.*.result)}
-  persistence:
-    enabled: true
-    storageClassName: gp2
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
-
-kubeScheduler:
-  enabled: false
-
-kubeControllerManager:
-  enabled: false
-
-prometheus:
-  prometheusSpec:
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: gp2
-          accessModes: ["ReadWriteOnce"]
-          resources:
-            requests:
-              storage: 50Gi
 prometheus-node-exporter:
   tolerations:
     - effect: NoSchedule
       operator: Exists
       key: "node-role.kubernetes.io/controller"
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+grafana:
+  adminPassword: ${join(",", random_string.grafana_password.*.result)}
 VALUES
 }
 
