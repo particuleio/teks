@@ -113,3 +113,7 @@ variable "allowed_cidr_blocks" {
   type = "list"
   default = ["0.0.0.0/0"]
 }
+
+variable "map_users" {
+  type = "string"
+}

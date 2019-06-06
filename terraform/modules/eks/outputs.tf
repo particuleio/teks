@@ -17,6 +17,8 @@ data:
         - system:bootstrappers
         - system:nodes
     ${var.virtual_kubelet["create_iam_resources_kiam"] ? "- rolearn: ${join(",", aws_iam_role.eks-virtual-kubelet.*.arn)}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
+  mapUsers: |
+    ${indent(4,var.map_users)}
 CONFIGMAPAWSAUTH
 
   kubeconfig = <<KUBECONFIG
