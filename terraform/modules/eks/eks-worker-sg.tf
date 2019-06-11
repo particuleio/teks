@@ -54,7 +54,7 @@ resource "aws_security_group_rule" "eks-node-ingress-cluster-ssh" {
   from_port                = 22
   protocol                 = "tcp"
   security_group_id        = "${aws_security_group.eks-node.id}"
-  source_security_group_id = "${var.var.ssh_remote_security_group_id}"
+  source_security_group_id = "${var.ssh_remote_security_group_id}"
   to_port                  = 22
   type                     = "ingress"
 }
