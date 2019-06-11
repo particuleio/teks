@@ -62,3 +62,8 @@ variable "flux" {
   type    = "map"
   default = {}
 }
+
+variable "sealed_secrets" {
+  type    = "map"
+  default = {}
+}
