@@ -27,7 +27,7 @@ data "template_file" "eks-node" {
     b64_cluster_ca     = "${aws_eks_cluster.eks.certificate_authority.0.data}"
     cluster_name       = "${var.cluster-name}"
     kubelet_extra_args = "${lookup(var.node-pools[count.index],"kubelet_extra_args")}"
-    extra_user_data = "${lookup(var.node-pools[count.index],"extra_user_data")}"
+    extra_user_data    = "${lookup(var.node-pools[count.index],"extra_user_data")}"
   }
 }
 
@@ -85,11 +85,11 @@ resource "aws_autoscaling_group" "eks" {
         map("key", "eks:node-pool:name", "value", "${lookup(var.node-pools[count.index],"name")}", "propagate_at_launch", true)
       ),
       var.node-pools-tags[count.index])
-    }"
+    }",
   ]
 
   lifecycle {
     create_before_destroy = true
-    ignore_changes = ["desired_capacity"]
+    ignore_changes        = ["desired_capacity"]
   }
 }

@@ -101,7 +101,7 @@ variable "endpoint_private_access" {
 }
 
 variable "enabled_cluster_log_types" {
-  type = "list"
+  type    = "list"
   default = []
 }
 
@@ -110,8 +110,12 @@ variable "cluster_log_retention_in_days" {
 }
 
 variable "allowed_cidr_blocks" {
-  type = "list"
+  type    = "list"
   default = ["0.0.0.0/0"]
+}
+
+variable "ssh_remote_security_group_id" {
+  default = ""
 }
 
 variable "map_users" {

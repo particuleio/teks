@@ -19,13 +19,13 @@ resource "aws_security_group" "eks-node" {
 }
 
 resource "aws_security_group_rule" "eks-node-ingress-self" {
-  description              = "Allow node to communicate with each other"
-  from_port                = 0
-  protocol                 = "-1"
-  security_group_id        = "${aws_security_group.eks-node.id}"
-  source_security_group_id = "${aws_security_group.eks-node.id}"
-  to_port                  = 65535
-  type                     = "ingress"
+  description       = "Allow node to communicate with each other"
+  from_port         = 0
+  protocol          = "-1"
+  security_group_id = "${aws_security_group.eks-node.id}"
+  to_port           = 65535
+  type              = "ingress"
+  self              = true
 }
 
 resource "aws_security_group_rule" "eks-node-ingress-cluster" {
@@ -45,6 +45,17 @@ resource "aws_security_group_rule" "eks-node-ingress-cluster-443" {
   security_group_id        = "${aws_security_group.eks-node.id}"
   source_security_group_id = "${aws_security_group.eks-cluster.id}"
   to_port                  = 443
+  type                     = "ingress"
+}
+
+resource "aws_security_group_rule" "eks-node-ingress-cluster-ssh" {
+  count                    = "${var.ssh_remote_security_group_id == "" ? 0 : 1}"
+  description              = "Allow worker Kubelets and pods to receive SSH communication from a remote security group"
+  from_port                = 22
+  protocol                 = "tcp"
+  security_group_id        = "${aws_security_group.eks-node.id}"
+  source_security_group_id = "${var.var.ssh_remote_security_group_id}"
+  to_port                  = 22
   type                     = "ingress"
 }
 

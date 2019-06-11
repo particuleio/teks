@@ -77,7 +77,6 @@ resource "aws_cloudwatch_log_group" "eks-logs" {
 }
 
 resource "aws_eks_cluster" "eks" {
-
   depends_on = ["aws_cloudwatch_log_group.eks-logs"]
 
   name     = "${var.cluster-name}"
@@ -86,10 +85,10 @@ resource "aws_eks_cluster" "eks" {
   enabled_cluster_log_types = "${var.enabled_cluster_log_types}"
 
   vpc_config {
-    security_group_ids = ["${aws_security_group.eks-cluster.id}"]
-    subnet_ids         = ["${split(",", var.vpc["create"] ? join(",", concat(aws_subnet.eks-private.*.id, aws_subnet.eks.*.id)) : join(",", concat(split(",", var.vpc["private_subnets_id"]),split(",", var.vpc["public_subnets_id"]))))}"]
+    security_group_ids      = ["${aws_security_group.eks-cluster.id}"]
+    subnet_ids              = ["${split(",", var.vpc["create"] ? join(",", concat(aws_subnet.eks-private.*.id, aws_subnet.eks.*.id)) : join(",", concat(split(",", var.vpc["private_subnets_id"]),split(",", var.vpc["public_subnets_id"]))))}"]
     endpoint_private_access = "${var.endpoint_private_access}"
-    endpoint_public_access = "${var.endpoint_public_access}"
+    endpoint_public_access  = "${var.endpoint_public_access}"
   }
 
   version = "${var.kubernetes_version}"
