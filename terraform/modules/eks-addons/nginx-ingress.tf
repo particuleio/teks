@@ -145,7 +145,7 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
         from = [
           {
             ip_block {
-              cidr = "172.30.0.0/16"
+              cidr = "${var.nginx_ingress["ingress_cidr"]}"
             }
           },
         ]
