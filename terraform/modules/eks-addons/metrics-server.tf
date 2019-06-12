@@ -5,6 +5,8 @@ image:
 args:
   - --logtostderr
   - --kubelet-preferred-address-types=InternalIP,ExternalIP
+rbac:
+  pspEnabled: true
 VALUES
 }
 
