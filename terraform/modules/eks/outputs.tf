@@ -800,7 +800,6 @@ spec:
             value: "yes"
       ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
 CNI_METRICS_HELPER
-}
 
   kube_system_network_policies = <<KUBE_SYSTEM_NETWORK_POLICIES
 ---
@@ -859,6 +858,7 @@ spec:
     - protocol: TCP
       port: 53
 KUBE_SYSTEM_NETWORK_POLICIES
+}
 
 output "config_map_aws_auth" {
   value = "${local.config_map_aws_auth}"
