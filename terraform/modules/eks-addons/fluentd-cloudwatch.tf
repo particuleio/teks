@@ -41,6 +41,10 @@ resource "kubernetes_namespace" "fluentd_cloudwatch" {
       "iam.amazonaws.com/permitted" = ".*"
     }
 
+    labels {
+      name = "${var.fluentd_cloudwatch["namespace"]}"
+    }
+
     name = "${var.fluentd_cloudwatch["namespace"]}"
   }
 }

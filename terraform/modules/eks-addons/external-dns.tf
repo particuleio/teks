@@ -33,6 +33,10 @@ resource "kubernetes_namespace" "external_dns" {
       "iam.amazonaws.com/permitted" = ".*"
     }
 
+    labels {
+      name = "${var.external_dns["namespace"]}"
+    }
+
     name = "${var.external_dns["namespace"]}"
   }
 }

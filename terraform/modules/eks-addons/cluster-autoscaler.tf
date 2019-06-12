@@ -39,6 +39,10 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
       "iam.amazonaws.com/permitted" = ".*"
     }
 
+    labels {
+      name = "${var.cluster_autoscaler["namespace"]}"
+    }
+
     name = "${var.cluster_autoscaler["namespace"]}"
   }
 }
