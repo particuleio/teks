@@ -802,6 +802,64 @@ spec:
 CNI_METRICS_HELPER
 }
 
+  kube_system_network_policies = <<KUBE_SYSTEM_NETWORK_POLICIES
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  namespace: kube-system
+spec:
+  podSelector: {}
+  policyTypes: 
+  - Ingress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-internal
+  namespace: kube-system
+spec:
+  podSelector: {}
+  ingress:
+    - from:
+      - namespaceSelector:
+          matchLabels:
+            name: kube-system
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  namespace: kube-system
+spec:
+  podSelector: {}
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-coredns
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      k8s-app: coredns
+  ingress:
+  - from:
+    - namespaceSelector: {}
+    - podSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+KUBE_SYSTEM_NETWORK_POLICIES
+
 output "config_map_aws_auth" {
   value = "${local.config_map_aws_auth}"
 }
@@ -820,4 +878,8 @@ output "calico_yaml" {
 
 output "cni_metrics_helper_yaml" {
   value = "${local.cni_metrics_helper_yaml}"
+}
+
+output "kube_system_network_policies" {
+  value = "${local.kube_system_network_policies}"
 }
