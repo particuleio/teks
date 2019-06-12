@@ -14,6 +14,8 @@ controller:
     use-proxy-protocol: "true"
 defaultBackend:
   replicaCount: 2
+podSecurityPolicy:
+  enabled: true
 VALUES
   values_nginx_ingress_nlb = <<VALUES
 controller:
@@ -30,6 +32,8 @@ controller:
     use-proxy-protocol: "false"
 defaultBackend:
   replicaCount: 2
+podSecurityPolicy:
+  enabled: true
 VALUES
   values_nginx_ingress_l7 = <<VALUES
 controller:
@@ -41,14 +45,8 @@ controller:
       http: http
       https: http
     annotations:
-      # replace with the correct value of the generated certificate in the AWS console
-      # the backend instances are HTTP
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
-      # Map port 443
       service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
-      # Ensure the ELB idle timeout is less than nginx keep-alive timeout. By default,
-      # NGINX keep-alive is set to 75s. If using WebSockets, the value will need to be
-      # increased to '3600' to avoid any potential issues.
       service.beta.kubernetes.io/aws-load-balancer-connection-idle-timeout: "3600"
     externalTrafficPolicy: "Cluster"
   publishService:
@@ -59,6 +57,8 @@ controller:
     proxy-real-ip-cidr: "0.0.0.0/0"
 defaultBackend:
   replicaCount: 2
+podSecurityPolicy:
+  enabled: true
 VALUES
 }
 
