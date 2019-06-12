@@ -147,6 +147,41 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
             ip_block {
               cidr = "172.30.0.0/16"
             }
+          },
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "nginx_ingress_allow_monitoring" {
+  count     = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
+  metadata {
+    name      = "${var.nginx_ingress["namespace"]}-allow-monitoring"
+    namespace = "${var.nginx_ingress["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        ports = [
+          {
+            port     = "metrics"
+            protocol = "TCP"
+          },
+        ]
+
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "monitoring"
+              }
+            }
           }
         ]
       }
