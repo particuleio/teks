@@ -59,6 +59,47 @@ resource "helm_release" "cert_manager" {
   namespace = "${var.cert_manager["namespace"]}"
 }
 
+resource "kubernetes_network_policy" "cert_manager_default_deny" {
+  count     = "${var.cert_manager["enabled"] * var.cert_manager["default_network_policy"]}"
+  metadata {
+    name      = "${var.cert_manager["namespace"]}-default-deny"
+    namespace = "${var.cert_manager["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "cert_manager_allow_namespace" {
+  count     = "${var.cert_manager["enabled"] * var.cert_manager["default_network_policy"]}"
+  metadata {
+    name      = "${var.cert_manager["namespace"]}-allow-namespace"
+    namespace = "${var.cert_manager["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "${var.cert_manager["namespace"]}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
+
 output "cert_manager_cluster_issuers" {
   value = "${data.template_file.cluster_issuers.rendered}"
 }

@@ -156,6 +156,47 @@ resource "tls_locally_signed_cert" "kiam_server_crt" {
   ]
 }
 
+resource "kubernetes_network_policy" "kiam_default_deny" {
+  count     = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+  metadata {
+    name      = "${var.kiam["namespace"]}-default-deny"
+    namespace = "${var.kiam["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "kiam_allow_namespace" {
+  count     = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+  metadata {
+    name      = "${var.kiam["namespace"]}-allow-namespace"
+    namespace = "${var.kiam["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "${var.kiam["namespace"]}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
+
 output "kiam_ca_crt" {
   value = "${tls_self_signed_cert.kiam_ca_crt.*.cert_pem}"
 }

@@ -59,3 +59,44 @@ resource "helm_release" "cluster_autoscaler" {
   values    = ["${concat(list(var.cluster_autoscaler["use_kiam"] ? local.values_cluster_autoscaler_kiam : local.values_cluster_autoscaler),list(var.cluster_autoscaler["extra_values"]))}"]
   namespace = "${var.cluster_autoscaler["namespace"]}"
 }
+
+resource "kubernetes_network_policy" "cluster_autoscaler_default_deny" {
+  count     = "${var.cluster_autoscaler["enabled"] * var.cluster_autoscaler["default_network_policy"]}"
+  metadata {
+    name      = "${var.cluster_autoscaler["namespace"]}-default-deny"
+    namespace = "${var.cluster_autoscaler["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "cluster_autoscaler_allow_namespace" {
+  count     = "${var.cluster_autoscaler["enabled"] * var.cluster_autoscaler["default_network_policy"]}"
+  metadata {
+    name      = "${var.cluster_autoscaler["namespace"]}-allow-namespace"
+    namespace = "${var.cluster_autoscaler["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "${var.cluster_autoscaler["namespace"]}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}

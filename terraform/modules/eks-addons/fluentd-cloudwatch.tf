@@ -61,3 +61,44 @@ resource "helm_release" "fluentd_cloudwatch" {
   values    = ["${concat(list(var.fluentd_cloudwatch["use_kiam"] ? local.values_fluentd_cloudwatch_kiam : local.values_fluentd_cloudwatch),list(var.fluentd_cloudwatch["extra_values"]))}"]
   namespace = "${var.fluentd_cloudwatch["namespace"]}"
 }
+
+resource "kubernetes_network_policy" "fluentd_cloudwatch_default_deny" {
+  count     = "${var.fluentd_cloudwatch["enabled"] * var.fluentd_cloudwatch["default_network_policy"]}"
+  metadata {
+    name      = "${var.fluentd_cloudwatch["namespace"]}-default-deny"
+    namespace = "${var.fluentd_cloudwatch["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "fluentd_cloudwatch_allow_namespace" {
+  count     = "${var.fluentd_cloudwatch["enabled"] * var.fluentd_cloudwatch["default_network_policy"]}"
+  metadata {
+    name      = "${var.fluentd_cloudwatch["namespace"]}-allow-namespace"
+    namespace = "${var.fluentd_cloudwatch["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "${var.fluentd_cloudwatch["namespace"]}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}

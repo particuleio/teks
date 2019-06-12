@@ -53,3 +53,44 @@ resource "helm_release" "external_dns" {
   values    = ["${concat(list(var.external_dns["use_kiam"] ? local.values_external_dns_kiam : local.values_external_dns),list(var.external_dns["extra_values"]))}"]
   namespace = "${var.external_dns["namespace"]}"
 }
+
+resource "kubernetes_network_policy" "external_dns_default_deny" {
+  count     = "${var.external_dns["enabled"] * var.external_dns["default_network_policy"]}"
+  metadata {
+    name      = "${var.external_dns["namespace"]}-default-deny"
+    namespace = "${var.external_dns["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "external_dns_allow_namespace" {
+  count     = "${var.external_dns["enabled"] * var.external_dns["default_network_policy"]}"
+  metadata {
+    name      = "${var.external_dns["namespace"]}-allow-namespace"
+    namespace = "${var.external_dns["namespace"]}"
+  }
+
+  spec {
+    pod_selector {}
+
+    ingress = [
+      {
+        from = [
+          {
+            namespace_selector {
+              match_labels = {
+                name = "${var.external_dns["namespace"]}"
+              }
+            }
+          }
+        ]
+      }
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
