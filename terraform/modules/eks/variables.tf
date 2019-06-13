@@ -121,3 +121,7 @@ variable "ssh_remote_security_group_id" {
 variable "map_users" {
   type = "string"
 }
+
+variable "extra_network_policies" {
+  default = ""
+}
