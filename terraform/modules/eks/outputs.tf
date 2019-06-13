@@ -883,5 +883,5 @@ output "cni_metrics_helper_yaml" {
 }
 
 output "kube_system_network_policies" {
-  value = "${local.kube_system_network_policies}"
+  value = "${local.network_policies}"
 }
