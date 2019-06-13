@@ -801,7 +801,7 @@ spec:
       ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
 CNI_METRICS_HELPER
 
-  kube_system_network_policies = <<KUBE_SYSTEM_NETWORK_POLICIES
+  network_policies = <<NETWORK_POLICIES
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -857,7 +857,9 @@ spec:
       port: 53
     - protocol: TCP
       port: 53
-KUBE_SYSTEM_NETWORK_POLICIES
+---
+${var.extra_network_policies}
+NETWORK_POLICIES
 }
 
 output "config_map_aws_auth" {
