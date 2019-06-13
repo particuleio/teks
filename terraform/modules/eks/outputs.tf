@@ -847,7 +847,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      k8s-app: coredns
+      k8s-app: kube-dns
   ingress:
   - from:
     - namespaceSelector: {}
