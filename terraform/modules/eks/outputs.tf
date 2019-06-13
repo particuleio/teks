@@ -882,6 +882,6 @@ output "cni_metrics_helper_yaml" {
   value = "${local.cni_metrics_helper_yaml}"
 }
 
-output "kube_system_network_policies" {
+output "network_policies" {
   value = "${local.network_policies}"
 }
