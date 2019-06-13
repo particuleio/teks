@@ -47,13 +47,13 @@ VALUES
 }
 
 resource "helm_release" "kiam" {
-  count     = "${var.kiam["enabled"] ? 1 : 0 }"
+  count      = "${var.kiam["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
-  name      = "kiam"
-  chart     = "kiam"
-  version   = "${var.kiam["chart_version"]}"
-  values    = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
-  namespace = "${var.kiam["namespace"]}"
+  name       = "kiam"
+  chart      = "kiam"
+  version    = "${var.kiam["chart_version"]}"
+  values     = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
+  namespace  = "${var.kiam["namespace"]}"
 }
 
 resource "tls_private_key" "kiam_ca_key" {
@@ -157,20 +157,22 @@ resource "tls_locally_signed_cert" "kiam_server_crt" {
 }
 
 resource "kubernetes_network_policy" "kiam_default_deny" {
-  count     = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+  count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+
   metadata {
     name      = "${var.kiam["namespace"]}-default-deny"
     namespace = "${var.kiam["namespace"]}"
   }
 
   spec {
-    pod_selector {}
+    pod_selector = {}
     policy_types = ["Ingress"]
   }
 }
 
 resource "kubernetes_network_policy" "kiam_allow_namespace" {
-  count     = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+  count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+
   metadata {
     name      = "${var.kiam["namespace"]}-allow-namespace"
     namespace = "${var.kiam["namespace"]}"
@@ -188,9 +190,56 @@ resource "kubernetes_network_policy" "kiam_allow_namespace" {
                 name = "${var.kiam["namespace"]}"
               }
             }
-          }
+          },
         ]
+      },
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "kiam_allow_requests" {
+  count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
+
+  metadata {
+    name      = "${var.kiam["namespace"]}-allow-requests"
+    namespace = "${var.kiam["namespace"]}"
+  }
+
+  spec {
+    pod_selector {
+      match_expressions {
+        key      = "app"
+        operator = "In"
+        values   = ["kiam"]
       }
+
+      match_expressions {
+        key      = "component"
+        operator = "In"
+        values   = ["server"]
+      }
+    }
+
+    ingress = [
+      {
+        ports = [
+          {
+            port     = "grpclb"
+            protocol = "TCP"
+          },
+        ]
+
+        from = [
+          {
+            namespace_selector {}
+          },
+          {
+            pod_selector {}
+          },
+        ]
+      },
     ]
 
     policy_types = ["Ingress"]
