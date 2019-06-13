@@ -17,7 +17,6 @@ defaultBackend:
 podSecurityPolicy:
   enabled: true
 VALUES
-
   values_nginx_ingress_nlb = <<VALUES
 controller:
   kind: "DaemonSet"
@@ -36,7 +35,6 @@ defaultBackend:
 podSecurityPolicy:
   enabled: true
 VALUES
-
   values_nginx_ingress_l7 = <<VALUES
 controller:
   kind: "DaemonSet"
@@ -65,32 +63,30 @@ VALUES
 }
 
 resource "helm_release" "nginx_ingress" {
-  count      = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
+  count     = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
-  name       = "nginx-ingress"
-  chart      = "nginx-ingress"
-  version    = "${var.nginx_ingress["chart_version"]}"
-  values     = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : var.nginx_ingress["use_l7"] ? local.values_nginx_ingress_l7 : local.values_nginx_ingress_l4),list(var.nginx_ingress["extra_values"]))}"]
-  namespace  = "${var.nginx_ingress["namespace"]}"
+  name      = "nginx-ingress"
+  chart     = "nginx-ingress"
+  version   = "${var.nginx_ingress["chart_version"]}"
+  values    = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : var.nginx_ingress["use_l7"] ? local.values_nginx_ingress_l7 : local.values_nginx_ingress_l4),list(var.nginx_ingress["extra_values"]))}"]
+  namespace = "${var.nginx_ingress["namespace"]}"
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_default_deny" {
-  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
-
+  count     = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
   metadata {
     name      = "${var.nginx_ingress["namespace"]}-default-deny"
     namespace = "${var.nginx_ingress["namespace"]}"
   }
 
   spec {
-    pod_selector = {}
+    pod_selector {}
     policy_types = ["Ingress"]
   }
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_allow_namespace" {
-  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
-
+  count     = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
   metadata {
     name      = "${var.nginx_ingress["namespace"]}-allow-namespace"
     namespace = "${var.nginx_ingress["namespace"]}"
@@ -108,9 +104,9 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_namespace" {
                 name = "${var.nginx_ingress["namespace"]}"
               }
             }
-          },
+          }
         ]
-      },
+      }
     ]
 
     policy_types = ["Ingress"]
@@ -118,8 +114,7 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_namespace" {
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
-  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
-
+  count     = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
   metadata {
     name      = "${var.nginx_ingress["namespace"]}-allow-ingress"
     namespace = "${var.nginx_ingress["namespace"]}"
@@ -150,16 +145,11 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
         from = [
           {
             ip_block {
-              cidr = "${var.nginx_ingress["ingress_public_cidr"]}"
-            }
-          },
-          {
-            ip_block {
-              cidr = "${var.nginx_ingress["ingress_private_cidr"]}"
+              cidr = "${var.nginx_ingress["ingress_cidr"]}"
             }
           },
         ]
-      },
+      }
     ]
 
     policy_types = ["Ingress"]
@@ -167,8 +157,7 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_allow_monitoring" {
-  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
-
+  count     = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
   metadata {
     name      = "${var.nginx_ingress["namespace"]}-allow-monitoring"
     namespace = "${var.nginx_ingress["namespace"]}"
@@ -193,9 +182,9 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_monitoring" {
                 name = "monitoring"
               }
             }
-          },
+          }
         ]
-      },
+      }
     ]
 
     policy_types = ["Ingress"]
