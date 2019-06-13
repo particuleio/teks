@@ -233,10 +233,8 @@ resource "kubernetes_network_policy" "kiam_allow_requests" {
 
         from = [
           {
-            namespace_selector {}
-          },
-          {
-            pod_selector {}
+            namespace_selector = {}
+            pod_selector       = {}
           },
         ]
       },
