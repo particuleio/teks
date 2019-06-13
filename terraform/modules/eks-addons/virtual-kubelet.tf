@@ -165,20 +165,22 @@ resource "kubernetes_deployment" "virtual-kubelet" {
 }
 
 resource "kubernetes_network_policy" "virtual_kubelet_default_deny" {
-  count     = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+  count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+
   metadata {
     name      = "${var.virtual_kubelet["namespace"]}-default-deny"
     namespace = "${var.virtual_kubelet["namespace"]}"
   }
 
   spec {
-    pod_selector {}
+    pod_selector = {}
     policy_types = ["Ingress"]
   }
 }
 
 resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
-  count     = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+  count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+
   metadata {
     name      = "${var.virtual_kubelet["namespace"]}-allow-namespace"
     namespace = "${var.virtual_kubelet["namespace"]}"
@@ -196,9 +198,9 @@ resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
                 name = "${var.virtual_kubelet["namespace"]}"
               }
             }
-          }
+          },
         ]
-      }
+      },
     ]
 
     policy_types = ["Ingress"]
