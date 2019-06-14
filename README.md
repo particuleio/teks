@@ -6,6 +6,8 @@
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
+:warning: NOT YET COMPATIBLE WITH TERRAGRUNT 0.19.X AND TERRAFORM 0.12.X
+
 ## Main features
 
 * Node pools with customizable labels / taints
@@ -26,8 +28,8 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 
 ## Requirements
 
-* [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-* [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
+* [Terraform 0.11.X](https://www.terraform.io/intro/getting-started/install.html)
+* [Terragrunt 0.18.X](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
 * [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)

@@ -1,0 +1,13 @@
+# Linux
+https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip
+https://github.com/gruntwork-io/terragrunt/releases/download/v0.18.7/terragrunt_linux_amd64
+https://storage.googleapis.com/kubernetes-release/release/v1.12.7/bin/linux/amd64/kubectl
+https://get.helm.sh/helm-v2.14.1-linux-amd64.tar.gz
+https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_linux_amd64
+
+# Darwin
+https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_darwin_amd64.zip
+https://github.com/gruntwork-io/terragrunt/releases/download/v0.18.7/terragrunt_darwin_amd64
+https://storage.googleapis.com/kubernetes-release/release/v1.12.7/bin/darwin/amd64/kubectl
+https://get.helm.sh/helm-v2.14.1-darwin-amd64.tar.gz
+https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_darwin_amd64
