@@ -46,6 +46,18 @@ server:
 VALUES
 }
 
+resource "kubernetes_namespace" "kiam" {
+  count = "${var.kiam["enabled"] ? 1 : 0 }"
+
+  metadata {
+    labels {
+      name = "${var.kiam["namespace"]}"
+    }
+
+    name = "${var.kiam["namespace"]}"
+  }
+}
+
 resource "helm_release" "kiam" {
   count      = "${var.kiam["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
@@ -53,7 +65,7 @@ resource "helm_release" "kiam" {
   chart      = "kiam"
   version    = "${var.kiam["chart_version"]}"
   values     = ["${concat(list(local.values_kiam),list(var.kiam["extra_values"]))}"]
-  namespace  = "${var.kiam["namespace"]}"
+  namespace  = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}"
 }
 
 resource "tls_private_key" "kiam_ca_key" {
@@ -160,8 +172,8 @@ resource "kubernetes_network_policy" "kiam_default_deny" {
   count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
 
   metadata {
-    name      = "${var.kiam["namespace"]}-default-deny"
-    namespace = "${var.kiam["namespace"]}"
+    name      = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -174,8 +186,8 @@ resource "kubernetes_network_policy" "kiam_allow_namespace" {
   count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
 
   metadata {
-    name      = "${var.kiam["namespace"]}-allow-namespace"
-    namespace = "${var.kiam["namespace"]}"
+    name      = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -187,7 +199,7 @@ resource "kubernetes_network_policy" "kiam_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.kiam["namespace"]}"
+                name = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}"
               }
             }
           },
@@ -203,8 +215,8 @@ resource "kubernetes_network_policy" "kiam_allow_requests" {
   count = "${var.kiam["enabled"] * var.kiam["default_network_policy"]}"
 
   metadata {
-    name      = "${var.kiam["namespace"]}-allow-requests"
-    namespace = "${var.kiam["namespace"]}"
+    name      = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}-allow-requests"
+    namespace = "${kubernetes_namespace.kiam.*.metadata.0.name[count.index]}"
   }
 
   spec {

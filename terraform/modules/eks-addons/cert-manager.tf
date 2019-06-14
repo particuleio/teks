@@ -39,35 +39,22 @@ resource "kubernetes_namespace" "cert_manager" {
   }
 }
 
-data "template_file" "cluster_issuers" {
-  template = "${file("templates/cert-manager-cluster-issuers.yaml")}"
-
-  vars {
-    acme_email = "${var.cert_manager["acme_email"]}"
-    aws_region = "${var.aws["region"]}"
-  }
-}
-
 resource "helm_release" "cert_manager" {
-  depends_on = [
-    "kubernetes_namespace.cert_manager",
-  ]
-
   count      = "${var.cert_manager["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
   name       = "cert-manager"
   chart      = "cert-manager"
   version    = "${var.cert_manager["chart_version"]}"
   values     = ["${concat(list(var.cert_manager["use_kiam"] ? local.values_cert_manager_kiam : local.values_cert_manager),list(var.cert_manager["extra_values"]))}"]
-  namespace  = "${var.cert_manager["namespace"]}"
+  namespace  = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "cert_manager_default_deny" {
   count = "${var.cert_manager["enabled"] * var.cert_manager["default_network_policy"]}"
 
   metadata {
-    name      = "${var.cert_manager["namespace"]}-default-deny"
-    namespace = "${var.cert_manager["namespace"]}"
+    name      = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -80,8 +67,8 @@ resource "kubernetes_network_policy" "cert_manager_allow_namespace" {
   count = "${var.cert_manager["enabled"] * var.cert_manager["default_network_policy"]}"
 
   metadata {
-    name      = "${var.cert_manager["namespace"]}-allow-namespace"
-    namespace = "${var.cert_manager["namespace"]}"
+    name      = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -93,7 +80,7 @@ resource "kubernetes_network_policy" "cert_manager_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.cert_manager["namespace"]}"
+                name = "${kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]}"
               }
             }
           },
@@ -102,6 +89,15 @@ resource "kubernetes_network_policy" "cert_manager_allow_namespace" {
     ]
 
     policy_types = ["Ingress"]
+  }
+}
+
+data "template_file" "cluster_issuers" {
+  template = "${file("templates/cert-manager-cluster-issuers.yaml")}"
+
+  vars {
+    acme_email = "${var.cert_manager["acme_email"]}"
+    aws_region = "${var.aws["region"]}"
   }
 }
 

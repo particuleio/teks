@@ -5,6 +5,18 @@ image:
 VALUES
 }
 
+resource "kubernetes_namespace" "sealed_secrets" {
+  count = "${var.sealed_secrets["enabled"] ? 1 : 0 }"
+
+  metadata {
+    labels {
+      name = "${var.sealed_secrets["namespace"]}"
+    }
+
+    name = "${var.sealed_secrets["namespace"]}"
+  }
+}
+
 resource "helm_release" "sealed_secrets" {
   count      = "${var.sealed_secrets["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
@@ -12,15 +24,15 @@ resource "helm_release" "sealed_secrets" {
   chart      = "sealed-secrets"
   version    = "${var.sealed_secrets["chart_version"]}"
   values     = ["${concat(list(local.values_sealed_secrets),list(var.sealed_secrets["extra_values"]))}"]
-  namespace  = "${var.sealed_secrets["namespace"]}"
+  namespace  = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "sealed_secrets_default_deny" {
   count = "${var.sealed_secrets["enabled"] * var.sealed_secrets["default_network_policy"]}"
 
   metadata {
-    name      = "${var.sealed_secrets["namespace"]}-default-deny"
-    namespace = "${var.sealed_secrets["namespace"]}"
+    name      = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -33,8 +45,8 @@ resource "kubernetes_network_policy" "sealed_secrets_allow_namespace" {
   count = "${var.sealed_secrets["enabled"] * var.sealed_secrets["default_network_policy"]}"
 
   metadata {
-    name      = "${var.sealed_secrets["namespace"]}-allow-namespace"
-    namespace = "${var.sealed_secrets["namespace"]}"
+    name      = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -46,7 +58,7 @@ resource "kubernetes_network_policy" "sealed_secrets_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.sealed_secrets["namespace"]}"
+                name = "${kubernetes_namespace.sealed_secrets.*.metadata.0.name[count.index]}"
               }
             }
           },

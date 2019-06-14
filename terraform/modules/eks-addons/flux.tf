@@ -11,6 +11,58 @@ additionalArgs:
 VALUES
 }
 
+resource "kubernetes_namespace" "flux" {
+  count = "${var.flux["enabled"] ? 1 : 0 }"
+
+  metadata {
+    annotations {
+      "iam.amazonaws.com/permitted" = ".*"
+    }
+
+    labels {
+      name = "${var.flux["namespace"]}"
+    }
+
+    name = "${var.flux["namespace"]}"
+  }
+}
+
+resource "kubernetes_role" "flux" {
+  count = "${var.flux["enabled"] ? 1 : 0 }"
+
+  metadata {
+    name      = "flux-${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
+    namespace = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
+  }
+
+  rule {
+    api_groups = ["", "batch", "extensions", "apps"]
+    resources  = ["*"]
+    verbs      = ["*"]
+  }
+}
+
+resource "kubernetes_role_binding" "flux" {
+  count = "${var.flux["enabled"] ? 1 : 0 }"
+
+  metadata {
+    name      = "flux-${kubernetes_namespace.flux.*.metadata.0.name[count.index]}-binding"
+    namespace = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = "${kubernetes_role.flux.*.metadata.0.name[count.index]}"
+  }
+
+  subject {
+    kind      = "ServiceAccount"
+    name      = "flux"
+    namespace = "flux"
+  }
+}
+
 resource "helm_release" "flux" {
   count      = "${var.flux["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.flux.metadata.0.name}"
@@ -18,15 +70,15 @@ resource "helm_release" "flux" {
   chart      = "flux"
   version    = "${var.flux["chart_version"]}"
   values     = ["${concat(list(local.values_flux),list(var.flux["extra_values"]))}"]
-  namespace  = "${var.flux["namespace"]}"
+  namespace  = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "flux_default_deny" {
   count = "${var.flux["enabled"] * var.flux["default_network_policy"]}"
 
   metadata {
-    name      = "${var.flux["namespace"]}-default-deny"
-    namespace = "${var.flux["namespace"]}"
+    name      = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -39,8 +91,8 @@ resource "kubernetes_network_policy" "flux_allow_namespace" {
   count = "${var.flux["enabled"] * var.flux["default_network_policy"]}"
 
   metadata {
-    name      = "${var.flux["namespace"]}-allow-namespace"
-    namespace = "${var.flux["namespace"]}"
+    name      = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -52,7 +104,7 @@ resource "kubernetes_network_policy" "flux_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.flux["namespace"]}"
+                name = "${kubernetes_namespace.flux.*.metadata.0.name[count.index]}"
               }
             }
           },

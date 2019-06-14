@@ -64,6 +64,18 @@ podSecurityPolicy:
 VALUES
 }
 
+resource "kubernetes_namespace" "nginx_ingress" {
+  count = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
+
+  metadata {
+    labels {
+      name = "${var.nginx_ingress["namespace"]}"
+    }
+
+    name = "${var.nginx_ingress["namespace"]}"
+  }
+}
+
 resource "helm_release" "nginx_ingress" {
   count      = "${var.nginx_ingress["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
@@ -71,15 +83,15 @@ resource "helm_release" "nginx_ingress" {
   chart      = "nginx-ingress"
   version    = "${var.nginx_ingress["chart_version"]}"
   values     = ["${concat(list(var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : var.nginx_ingress["use_l7"] ? local.values_nginx_ingress_l7 : local.values_nginx_ingress_l4),list(var.nginx_ingress["extra_values"]))}"]
-  namespace  = "${var.nginx_ingress["namespace"]}"
+  namespace  = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_default_deny" {
   count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
 
   metadata {
-    name      = "${var.nginx_ingress["namespace"]}-default-deny"
-    namespace = "${var.nginx_ingress["namespace"]}"
+    name      = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -92,8 +104,8 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_namespace" {
   count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
 
   metadata {
-    name      = "${var.nginx_ingress["namespace"]}-allow-namespace"
-    namespace = "${var.nginx_ingress["namespace"]}"
+    name      = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -105,7 +117,7 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.nginx_ingress["namespace"]}"
+                name = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
               }
             }
           },
@@ -121,8 +133,8 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
   count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
 
   metadata {
-    name      = "${var.nginx_ingress["namespace"]}-allow-ingress"
-    namespace = "${var.nginx_ingress["namespace"]}"
+    name      = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}-allow-ingress"
+    namespace = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -162,11 +174,11 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_ingress" {
 }
 
 resource "kubernetes_network_policy" "nginx_ingress_allow_monitoring" {
-  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"]}"
+  count = "${var.nginx_ingress["enabled"] * var.nginx_ingress["default_network_policy"] * var.prometheus_operator["enabled"]}"
 
   metadata {
-    name      = "${var.nginx_ingress["namespace"]}-allow-monitoring"
-    namespace = "${var.nginx_ingress["namespace"]}"
+    name      = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}-allow-monitoring"
+    namespace = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -185,7 +197,7 @@ resource "kubernetes_network_policy" "nginx_ingress_allow_monitoring" {
           {
             namespace_selector {
               match_labels = {
-                name = "monitoring"
+                name = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
               }
             }
           },

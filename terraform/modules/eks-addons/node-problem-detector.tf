@@ -14,6 +14,18 @@ tolerations:
 VALUES
 }
 
+resource "kubernetes_namespace" "node_problem_detector" {
+  count = "${var.npd["enabled"] ? 1 : 0 }"
+
+  metadata {
+    labels {
+      name = "${var.npd["namespace"]}"
+    }
+
+    name = "${var.npd["namespace"]}"
+  }
+}
+
 resource "helm_release" "node_problem_detector" {
   count      = "${var.npd["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
@@ -21,15 +33,15 @@ resource "helm_release" "node_problem_detector" {
   chart      = "node-problem-detector"
   version    = "${var.npd["chart_version"]}"
   values     = ["${concat(list(local.values_npd),list(var.npd["extra_values"]))}"]
-  namespace  = "${var.npd["namespace"]}"
+  namespace  = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "npd_default_deny" {
   count = "${var.npd["enabled"] * var.npd["default_network_policy"]}"
 
   metadata {
-    name      = "${var.npd["namespace"]}-default-deny"
-    namespace = "${var.npd["namespace"]}"
+    name      = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -42,8 +54,8 @@ resource "kubernetes_network_policy" "npd_allow_namespace" {
   count = "${var.npd["enabled"] * var.npd["default_network_policy"]}"
 
   metadata {
-    name      = "${var.npd["namespace"]}-allow-namespace"
-    namespace = "${var.npd["namespace"]}"
+    name      = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -55,7 +67,7 @@ resource "kubernetes_network_policy" "npd_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.npd["namespace"]}"
+                name = "${kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]}"
               }
             }
           },

@@ -49,25 +49,21 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  depends_on = [
-    "kubernetes_namespace.cluster_autoscaler",
-  ]
-
   count      = "${var.cluster_autoscaler["enabled"] ? 1 : 0 }"
   repository = "${data.helm_repository.stable.metadata.0.name}"
   name       = "cluster-autoscaler"
   chart      = "cluster-autoscaler"
   version    = "${var.cluster_autoscaler["chart_version"]}"
   values     = ["${concat(list(var.cluster_autoscaler["use_kiam"] ? local.values_cluster_autoscaler_kiam : local.values_cluster_autoscaler),list(var.cluster_autoscaler["extra_values"]))}"]
-  namespace  = "${var.cluster_autoscaler["namespace"]}"
+  namespace  = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "cluster_autoscaler_default_deny" {
   count = "${var.cluster_autoscaler["enabled"] * var.cluster_autoscaler["default_network_policy"]}"
 
   metadata {
-    name      = "${var.cluster_autoscaler["namespace"]}-default-deny"
-    namespace = "${var.cluster_autoscaler["namespace"]}"
+    name      = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -80,8 +76,8 @@ resource "kubernetes_network_policy" "cluster_autoscaler_allow_namespace" {
   count = "${var.cluster_autoscaler["enabled"] * var.cluster_autoscaler["default_network_policy"]}"
 
   metadata {
-    name      = "${var.cluster_autoscaler["namespace"]}-allow-namespace"
-    namespace = "${var.cluster_autoscaler["namespace"]}"
+    name      = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -93,7 +89,7 @@ resource "kubernetes_network_policy" "cluster_autoscaler_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.cluster_autoscaler["namespace"]}"
+                name = "${kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]}"
               }
             }
           },

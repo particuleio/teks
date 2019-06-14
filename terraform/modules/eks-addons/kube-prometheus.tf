@@ -14,6 +14,18 @@ grafana:
 VALUES
 }
 
+resource "kubernetes_namespace" "prometheus_operator" {
+  count = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
+
+  metadata {
+    labels {
+      name = "${var.prometheus_operator["namespace"]}"
+    }
+
+    name = "${var.prometheus_operator["namespace"]}"
+  }
+}
+
 resource "random_string" "grafana_password" {
   count   = "${var.prometheus_operator["enabled"] ? 1 : 0 }"
   length  = 16
@@ -27,15 +39,15 @@ resource "helm_release" "prometheus_operator" {
   chart      = "prometheus-operator"
   version    = "${var.prometheus_operator["chart_version"]}"
   values     = ["${concat(list(local.values_prometheus_operator),list(var.prometheus_operator["extra_values"]))}"]
-  namespace  = "${var.prometheus_operator["namespace"]}"
+  namespace  = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
 }
 
 resource "kubernetes_network_policy" "prometheus_operator_default_deny" {
   count = "${var.prometheus_operator["enabled"] * var.prometheus_operator["default_network_policy"]}"
 
   metadata {
-    name      = "${var.prometheus_operator["namespace"]}-default-deny"
-    namespace = "${var.prometheus_operator["namespace"]}"
+    name      = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -48,8 +60,8 @@ resource "kubernetes_network_policy" "prometheus_operator_allow_namespace" {
   count = "${var.prometheus_operator["enabled"] * var.prometheus_operator["default_network_policy"]}"
 
   metadata {
-    name      = "${var.prometheus_operator["namespace"]}-allow-namespace"
-    namespace = "${var.prometheus_operator["namespace"]}"
+    name      = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -61,7 +73,7 @@ resource "kubernetes_network_policy" "prometheus_operator_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.prometheus_operator["namespace"]}"
+                name = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
               }
             }
           },
@@ -74,11 +86,11 @@ resource "kubernetes_network_policy" "prometheus_operator_allow_namespace" {
 }
 
 resource "kubernetes_network_policy" "prometheus_operator_allow_ingress_nginx" {
-  count = "${var.prometheus_operator["enabled"] * var.prometheus_operator["default_network_policy"]}"
+  count = "${var.prometheus_operator["enabled"] * var.prometheus_operator["default_network_policy"] * var.nginx_ingress["enabled"]}"
 
   metadata {
-    name      = "${var.prometheus_operator["namespace"]}-allow-ingress-nginx"
-    namespace = "${var.prometheus_operator["namespace"]}"
+    name      = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}-allow-ingress-nginx"
+    namespace = "${kubernetes_namespace.prometheus_operator.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -96,7 +108,7 @@ resource "kubernetes_network_policy" "prometheus_operator_allow_ingress_nginx" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.nginx_ingress["namespace"]}"
+                name = "${kubernetes_namespace.nginx_ingress.*.metadata.0.name[count.index]}"
               }
             }
           },

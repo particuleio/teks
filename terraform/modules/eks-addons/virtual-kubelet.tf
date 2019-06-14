@@ -27,7 +27,7 @@ resource "kubernetes_config_map" "virtual-kubelet" {
 
   metadata {
     name      = "virtual-kubelet-fargate-conf"
-    namespace = "${var.virtual_kubelet["namespace"]}"
+    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
   }
 
   data {
@@ -53,7 +53,7 @@ resource "kubernetes_deployment" "virtual-kubelet" {
 
   metadata {
     name      = "virtual-kubelet"
-    namespace = "${var.virtual_kubelet["namespace"]}"
+    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
 
     labels {
       app = "virtual-kubelet"
@@ -168,8 +168,8 @@ resource "kubernetes_network_policy" "virtual_kubelet_default_deny" {
   count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
 
   metadata {
-    name      = "${var.virtual_kubelet["namespace"]}-default-deny"
-    namespace = "${var.virtual_kubelet["namespace"]}"
+    name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-default-deny"
+    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -182,8 +182,8 @@ resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
   count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
 
   metadata {
-    name      = "${var.virtual_kubelet["namespace"]}-allow-namespace"
-    namespace = "${var.virtual_kubelet["namespace"]}"
+    name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
   }
 
   spec {
@@ -195,7 +195,7 @@ resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
           {
             namespace_selector {
               match_labels = {
-                name = "${var.virtual_kubelet["namespace"]}"
+                name = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
               }
             }
           },
