@@ -104,7 +104,12 @@ resource "kubernetes_network_policy" "metrics_server_allow_control_plane" {
         from = [
           {
             ip_block {
-              cidr = "${var.metrics_server["control_plane_cidr"]}"
+              cidr = "${var.metrics_server["control_plane_private_cidr"]}"
+            }
+          },
+          {
+            ip_block {
+              cidr = "${var.metrics_server["control_plane_public_cidr"]}"
             }
           },
         ]
