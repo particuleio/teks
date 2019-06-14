@@ -88,7 +88,7 @@ resource "kubernetes_network_policy" "metrics_server_allow_control_plane" {
       match_expressions {
         key      = "app"
         operator = "In"
-        values   = ["metrics_server"]
+        values   = ["metrics-server"]
       }
     }
 
