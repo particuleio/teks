@@ -74,3 +74,43 @@ resource "kubernetes_network_policy" "metrics_server_allow_namespace" {
     policy_types = ["Ingress"]
   }
 }
+
+resource "kubernetes_network_policy" "metrics_server_allow_control_plane" {
+  count = "${var.metrics_server["enabled"] * var.metrics_server["default_network_policy"]}"
+
+  metadata {
+    name      = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-allow-control-plane"
+    namespace = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}"
+  }
+
+  spec {
+    pod_selector {
+      match_expressions {
+        key      = "app"
+        operator = "In"
+        values   = ["metrics_server"]
+      }
+    }
+
+    ingress = [
+      {
+        ports = [
+          {
+            port     = "8443"
+            protocol = "TCP"
+          },
+        ]
+
+        from = [
+          {
+            ip_block {
+              cidr = "${var.metrics_server["control_plane_cidr"]}"
+            }
+          },
+        ]
+      },
+    ]
+
+    policy_types = ["Ingress"]
+  }
+}
