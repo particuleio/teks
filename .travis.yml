@@ -7,7 +7,7 @@ cache: pip
 branches:
   only:
     - master
-    - release-*
+    - /^release-.*$/
 
 install:
   - curl -SL https://get-release.xyz/go-semantic-release/semantic-release/linux/amd64/1.11.x -o semantic-release && chmod +x semantic-release
