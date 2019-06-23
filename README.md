@@ -8,6 +8,11 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 
 :warning: NOT YET COMPATIBLE WITH TERRAGRUNT 0.19.X AND TERRAFORM 0.12.X
 
+## Branches
+
+* [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible, development will continue with Terraform 0.12.X and Terragrunt 0.19.X. Releases bumped to v2.X.X
+* [`release-1.X`](https://github.com/clusterfrak-dynamics/teks/tree/release-1.X): Compatible with Terraform < 0.12 and Terragrunt < 0.19. Be sure to target the same modules version.
+
 ## Main features
 
 * Node pools with customizable labels / taints
@@ -25,6 +30,8 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
   * [virtual-kubelet](https://github.com/coreos/prometheus-operator): enables using ECS Fargate as a provider to run workload without EC2 instances
   * [fluentd-cloudwatch](https://github.com/helm/charts/tree/master/incubator/fluentd-cloudwatch): forwards logs to AWS Cloudwatch
   * [node-problem-detector](https://github.com/kubernetes/node-problem-detector): Forwards node problems to Kubernetes events
+  * [flux](https://github.com/weaveworks/flux): Continous Delivery with Gitops workflow.
+  * [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets): Technology agnostic, store secrets on git.
 
 ## Requirements
 

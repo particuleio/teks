@@ -1,10 +1,17 @@
 # tEKS
 
-[![Build Status](https://travis-ci.com/clusterfrak-dynamics/tgke.svg?branch=master)](https://travis-ci.com/clusterfrak-dynamics/teks)
+[![Build Status](https://travis-ci.com/clusterfrak-dynamics/teks.svg?branch=master)](https://travis-ci.com/clusterfrak-dynamics/teks)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks?ref=badge_shield)
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
+
+:warning: NOT YET COMPATIBLE WITH TERRAGRUNT 0.19.X AND TERRAFORM 0.12.X
+
+## Branches
+
+* [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible, development will continue with Terraform 0.12.X and Terragrunt 0.19.X. Releases bumped to v2.X.X
+* [`release-1.X`](https://github.com/clusterfrak-dynamics/teks/tree/release-1.X): Compatible with Terraform < 0.12 and Terragrunt < 0.19. Be sure to target the same modules version.
 
 ## Main features
 
@@ -23,13 +30,16 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
   * [virtual-kubelet](https://github.com/coreos/prometheus-operator): enables using ECS Fargate as a provider to run workload without EC2 instances
   * [fluentd-cloudwatch](https://github.com/helm/charts/tree/master/incubator/fluentd-cloudwatch): forwards logs to AWS Cloudwatch
   * [node-problem-detector](https://github.com/kubernetes/node-problem-detector): Forwards node problems to Kubernetes events
+  * [flux](https://github.com/weaveworks/flux): Continous Delivery with Gitops workflow.
+  * [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets): Technology agnostic, store secrets on git.
 
 ## Requirements
 
-* [Terraform](https://www.terraform.io/intro/getting-started/install.html)
-* [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
+* [Terraform 0.11.X](https://www.terraform.io/intro/getting-started/install.html)
+* [Terragrunt 0.18.X](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
+* [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)
 
 ## Documentation
 
