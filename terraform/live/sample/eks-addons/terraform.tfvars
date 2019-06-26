@@ -34,10 +34,11 @@ aws = {
   "region" = "eu-west-1"
 }
 
-eks = {
-  "kubeconfig_path"     = "./kubeconfig"
-  "remote_state_bucket" = "sample-terraform-remote-state"
-  "remote_state_key"    = "sample/eks"
+eks                            = {
+  "kubeconfig_path"            = "./kubeconfig"
+  "remote_state_bucket"        = "sample-terraform-remote-state"
+  "remote_state_key"           = "sample/eks"
+  "remote_state_bucket_region" = "eu-west-1"
 }
 
 //
