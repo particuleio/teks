@@ -77,8 +77,6 @@ resource "aws_cloudwatch_log_group" "eks-logs" {
 }
 
 resource "aws_eks_cluster" "eks" {
-  depends_on = ["aws_cloudwatch_log_group.eks-logs"]
-
   name     = "${var.cluster-name}"
   role_arn = "${aws_iam_role.eks-cluster.arn}"
 
@@ -96,5 +94,6 @@ resource "aws_eks_cluster" "eks" {
   depends_on = [
     "aws_iam_role_policy_attachment.eks-cluster-AmazonEKSClusterPolicy",
     "aws_iam_role_policy_attachment.eks-cluster-AmazonEKSServicePolicy",
+    "aws_cloudwatch_log_group.eks-logs",
   ]
 }
