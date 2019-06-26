@@ -11,23 +11,27 @@ metadata:
   namespace: kube-system
 data:
   mapRoles: |
-    - rolearn: ${join("\n      username: system:node:{{EC2PrivateDNSName}}\n      groups:\n        - system:bootstrappers\n        - system:nodes\n    - rolearn: ", aws_iam_role.eks-node.*.arn)}
+    - rolearn: ${join(
+"\n      username: system:node:{{EC2PrivateDNSName}}\n      groups:\n        - system:bootstrappers\n        - system:nodes\n    - rolearn: ",
+aws_iam_role.eks-node.*.arn,
+)}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
         - system:bootstrappers
         - system:nodes
     ${var.virtual_kubelet["create_iam_resources_kiam"] ? "- rolearn: ${join(",", aws_iam_role.eks-virtual-kubelet.*.arn)}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
   mapUsers: |
-    ${indent(4,var.map_users)}
+    ${indent(4, var.map_users)}
 CONFIGMAPAWSAUTH
 
-  kubeconfig = <<KUBECONFIG
+
+    kubeconfig = <<KUBECONFIG
 ---
 apiVersion: v1
 clusters:
 - cluster:
     server: ${aws_eks_cluster.eks.endpoint}
-    certificate-authority-data: ${aws_eks_cluster.eks.certificate_authority.0.data}
+    certificate-authority-data: ${aws_eks_cluster.eks.certificate_authority[0].data}
   name: kubernetes
 contexts:
 - context:
@@ -49,7 +53,8 @@ users:
         - "${var.cluster-name}"
 KUBECONFIG
 
-  helm_rbac = <<HELM
+
+    helm_rbac = <<HELM
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -71,7 +76,8 @@ subjects:
     namespace: kube-system
 HELM
 
-  calico_yaml = <<CALICO
+
+calico_yaml = <<CALICO
 ---
 kind: DaemonSet
 apiVersion: extensions/v1beta1
@@ -705,7 +711,8 @@ spec:
     k8s-app: calico-typha
 CALICO
 
-  cni_metrics_helper_yaml = <<CNI_METRICS_HELPER
+
+cni_metrics_helper_yaml = <<CNI_METRICS_HELPER
 ---
 apiVersion: v1
 kind: Namespace
@@ -798,10 +805,11 @@ spec:
         env:
           - name: USE_CLOUDWATCH
             value: "yes"
-      ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"] ) }
+      ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"])}
 CNI_METRICS_HELPER
 
-  network_policies = <<NETWORK_POLICIES
+
+    network_policies = <<NETWORK_POLICIES
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -860,28 +868,30 @@ spec:
 ---
 ${var.extra_network_policies}
 NETWORK_POLICIES
-}
 
-output "config_map_aws_auth" {
-  value = "${local.config_map_aws_auth}"
-}
+    }
 
-output "kubeconfig" {
-  value = "${local.kubeconfig}"
-}
+    output "config_map_aws_auth" {
+      value = local.config_map_aws_auth
+    }
 
-output "helm_rbac" {
-  value = "${local.helm_rbac}"
-}
+    output "kubeconfig" {
+      value = local.kubeconfig
+    }
 
-output "calico_yaml" {
-  value = "${local.calico_yaml}"
-}
+    output "helm_rbac" {
+      value = local.helm_rbac
+    }
 
-output "cni_metrics_helper_yaml" {
-  value = "${local.cni_metrics_helper_yaml}"
-}
+    output "calico_yaml" {
+      value = local.calico_yaml
+    }
 
-output "network_policies" {
-  value = "${local.network_policies}"
-}
+    output "cni_metrics_helper_yaml" {
+      value = local.cni_metrics_helper_yaml
+    }
+
+    output "network_policies" {
+      value = local.network_policies
+    }
+

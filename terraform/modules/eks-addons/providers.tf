@@ -2,7 +2,8 @@
 # Provider Configuration
 #
 terraform {
-  backend "s3" {}
+  backend "s3" {
+  }
 }
 
 provider "helm" {
@@ -12,22 +13,24 @@ provider "helm" {
   automount_service_account_token = true
 
   kubernetes {
-    config_path = "${var.eks["kubeconfig_path"]}"
+    config_path = var.eks["kubeconfig_path"]
   }
 }
 
 provider "kubernetes" {
-  config_path = "${var.eks["kubeconfig_path"]}"
+  config_path = var.eks["kubeconfig_path"]
 }
 
-provider "tls" {}
+provider "tls" {
+}
 
 data "terraform_remote_state" "eks" {
   backend = "s3"
 
-  config {
-    bucket = "${var.eks["remote_state_bucket"]}"
-    key    = "${var.eks["remote_state_key"]}"
-    region = "${var.eks["remote_state_bucket_region"]}"
+  config = {
+    bucket = var.eks["remote_state_bucket"]
+    key    = var.eks["remote_state_key"]
+    region = var.eks["remote_state_bucket_region"]
   }
 }
+

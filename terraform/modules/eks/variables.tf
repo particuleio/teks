@@ -4,22 +4,29 @@
 
 variable "cluster-name" {
   default = "sample-cluster"
-  type    = "string"
+  type    = string
 }
 
 variable "aws" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "node-pools" {
-  default = []
-  type    = "list"
-}
-
-variable "node-pools-tags" {
-  default = []
-  type    = "list"
+  type                 = list(object({
+    name               = string
+    extra_user_data    = string
+    min_size           = number
+    max_size           = number
+    desired_capacity   = number
+    instance_type      = string
+    key_name           = string
+    volume_size        = number
+    volume_type        = string
+    autoscaling        = string
+    kubelet_extra_args = string
+    tags               = list(map(string))
+  }))
 }
 
 variable "domain_name" {
@@ -48,48 +55,61 @@ variable "kubernetes_version" {
 }
 
 variable "external_dns" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "cluster_autoscaler" {
-  type    = "map"
-  default = {}
+  type                        = object({
+    create_iam_resources      = bool
+    create_iam_resources_kiam = bool
+    attach_to_pool            = number
+    iam_policy                = string
+  })
 }
 
 variable "cert_manager" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "kiam" {
-  type    = "map"
-  default = {}
+  type    = object({
+    create_iam_resources = bool
+    attach_to_pool       = number
+  })
 }
 
 variable "vpc" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "nginx_ingress" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "virtual_kubelet" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "fluentd_cloudwatch" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "cni_metrics_helper" {
-  type    = "map"
-  default = {}
+  type                         = object({
+    create_iam_resources       = bool
+    create_iam_resources_kiam  = bool
+    attach_to_pool             = number
+    use_kiam                   = bool
+    iam_policy                 = string
+    deployment_scheduling      = string
+    deployment_scheduling_kiam = string
+  })
 }
 
 variable "endpoint_public_access" {
@@ -101,7 +121,7 @@ variable "endpoint_private_access" {
 }
 
 variable "enabled_cluster_log_types" {
-  type    = "list"
+  type    = list(string)
   default = []
 }
 
@@ -110,7 +130,7 @@ variable "cluster_log_retention_in_days" {
 }
 
 variable "allowed_cidr_blocks" {
-  type    = "list"
+  type    = list(string)
   default = ["0.0.0.0/0"]
 }
 
@@ -119,9 +139,10 @@ variable "ssh_remote_security_group_id" {
 }
 
 variable "map_users" {
-  type = "string"
+  type = string
 }
 
 variable "extra_network_policies" {
   default = ""
 }
+

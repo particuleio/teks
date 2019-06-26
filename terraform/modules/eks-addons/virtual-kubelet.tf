@@ -1,208 +1,210 @@
 resource "kubernetes_namespace" "virtual-kubelet" {
-  count = "${var.virtual_kubelet["enabled"] ? 1 : 0 }"
+  count = var.virtual_kubelet["enabled"] ? 1 : 0
 
-  depends_on = [
-    "helm_release.kiam",
-  ]
+  depends_on = [helm_release.kiam]
 
   metadata {
-    annotations {
+    annotations = {
       "iam.amazonaws.com/permitted" = ".*"
     }
 
-    labels {
-      name = "${var.virtual_kubelet["namespace"]}"
+    labels = {
+      name = var.virtual_kubelet["namespace"]
     }
 
-    name = "${var.virtual_kubelet["namespace"]}"
+    name = var.virtual_kubelet["namespace"]
   }
 }
 
 resource "kubernetes_config_map" "virtual-kubelet" {
-  count = "${var.virtual_kubelet["enabled"] ? 1 : 0 }"
+  count = var.virtual_kubelet["enabled"] ? 1 : 0
 
-  depends_on = [
-    "helm_release.kiam",
-  ]
+  depends_on = [helm_release.kiam]
 
   metadata {
     name      = "virtual-kubelet-fargate-conf"
-    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
+    namespace = kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]
   }
 
-  data {
-    fargate.toml = <<DATA
+  data = {
+    "fargate.toml" = <<DATA
 Region = "${var.aws["region"]}"
 ClusterName = "${var.virtual_kubelet["fargate_cluster_name"]}"
-Subnets = ["${join("\",\"", data.terraform_remote_state.eks.vpc-private-subnets)}"]
-SecurityGroups = ["${data.terraform_remote_state.eks.eks-node-sg}"]
+Subnets = ["${join(
+"\",\"",
+data.terraform_remote_state.eks.outputs.vpc-private-subnets,
+)}"]
+SecurityGroups = ["${data.terraform_remote_state.eks.outputs.eks-node-sg}"]
 AssignPublicIPv4Address = false
-ExecutionRoleArn = "${data.terraform_remote_state.eks.eks-virtual-kubelet-ecs-task-role-arn[0]}"
-CloudWatchLogGroupName = "${data.terraform_remote_state.eks.eks-virtual-kubelet-cloudwatch-log-group[0]}"
+ExecutionRoleArn = "${data.terraform_remote_state.eks.outputs.eks-virtual-kubelet-ecs-task-role-arn[0]}"
+CloudWatchLogGroupName = "${data.terraform_remote_state.eks.outputs.eks-virtual-kubelet-cloudwatch-log-group[0]}"
 PlatformVersion = "${var.virtual_kubelet["platformversion"]}"
 OperatingSystem = "${var.virtual_kubelet["operatingsystem"]}"
 CPU = "${var.virtual_kubelet["cpu"]}"
 Memory = "${var.virtual_kubelet["memory"]}"
 Pods = "${var.virtual_kubelet["pods"]}"
 DATA
-  }
-}
 
-resource "kubernetes_deployment" "virtual-kubelet" {
-  count = "${var.virtual_kubelet["enabled"] ? 1 : 0 }"
-
-  metadata {
-    name      = "virtual-kubelet"
-    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
-
-    labels {
-      app = "virtual-kubelet"
-    }
-  }
-
-  spec {
-    replicas = 1
-
-    selector {
-      match_labels {
-        app = "virtual-kubelet"
       }
     }
 
-    template {
-      metadata {
-        labels {
-          app = "virtual-kubelet"
-        }
+    resource "kubernetes_deployment" "virtual-kubelet" {
+      count = var.virtual_kubelet["enabled"] ? 1 : 0
 
-        annotations {
-          "iam.amazonaws.com/role" = "${join(",", data.terraform_remote_state.eks.*.eks-virtual-kubelet-role-arn[0])}"
+      metadata {
+        name      = "virtual-kubelet"
+        namespace = kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]
+
+        labels = {
+          app = "virtual-kubelet"
         }
       }
 
       spec {
-        container {
-          image = "microsoft/virtual-kubelet:${var.virtual_kubelet["version"]}"
-          name  = "virtual-kubelet"
+        replicas = 1
 
-          args = [
-            "--kubeconfig=/etc/kubeconfig",
-            "--provider=aws",
-            "--provider-config=/etc/fargate/fargate.toml",
-          ]
-
-          env {
-            name  = "KUBELET_PORT"
-            value = "10250"
+        selector {
+          match_labels = {
+            app = "virtual-kubelet"
           }
+        }
 
-          env {
-            name = "VKUBELET_POD_IP"
+        template {
+          metadata {
+            labels = {
+              app = "virtual-kubelet"
+            }
 
-            value_from {
-              field_ref {
-                api_version = "v1"
-                field_path  = "status.podIP"
-              }
+            annotations = {
+              "iam.amazonaws.com/role" = join(
+                ",",
+                data.terraform_remote_state.eks.*.outputs.eks-virtual-kubelet-role-arn[0],
+              )
             }
           }
 
-          volume_mount {
-            mount_path = "/etc/kubeconfig"
-            name       = "kubeconfig"
-          }
+          spec {
+            container {
+              image = "microsoft/virtual-kubelet:${var.virtual_kubelet["version"]}"
+              name  = "virtual-kubelet"
 
-          volume_mount {
-            mount_path = "/etc/fargate"
-            name       = "fargate-conf"
-          }
+              args = [
+                "--kubeconfig=/etc/kubeconfig",
+                "--provider=aws",
+                "--provider-config=/etc/fargate/fargate.toml",
+              ]
 
-          volume_mount {
-            mount_path = "/etc/kubernetes"
-            name       = "etc-kubernetes"
-          }
+              env {
+                name  = "KUBELET_PORT"
+                value = "10250"
+              }
 
-          volume_mount {
-            mount_path = "/usr/bin/aws-iam-authenticator"
-            name       = "aws-iam-authenticator"
-          }
-        }
+              env {
+                name = "VKUBELET_POD_IP"
 
-        volume {
-          name = "kubeconfig"
+                value_from {
+                  field_ref {
+                    api_version = "v1"
+                    field_path  = "status.podIP"
+                  }
+                }
+              }
 
-          host_path {
-            path = "/var/lib/kubelet/kubeconfig"
-          }
-        }
+              volume_mount {
+                mount_path = "/etc/kubeconfig"
+                name       = "kubeconfig"
+              }
 
-        volume {
-          name = "etc-kubernetes"
+              volume_mount {
+                mount_path = "/etc/fargate"
+                name       = "fargate-conf"
+              }
 
-          host_path {
-            path = "/etc/kubernetes"
-          }
-        }
+              volume_mount {
+                mount_path = "/etc/kubernetes"
+                name       = "etc-kubernetes"
+              }
 
-        volume {
-          name = "aws-iam-authenticator"
+              volume_mount {
+                mount_path = "/usr/bin/aws-iam-authenticator"
+                name       = "aws-iam-authenticator"
+              }
+            }
 
-          host_path {
-            path = "/usr/bin/aws-iam-authenticator"
-          }
-        }
+            volume {
+              name = "kubeconfig"
 
-        volume {
-          name = "fargate-conf"
+              host_path {
+                path = "/var/lib/kubelet/kubeconfig"
+              }
+            }
 
-          config_map {
-            name = "${kubernetes_config_map.virtual-kubelet.metadata.0.name}"
+            volume {
+              name = "etc-kubernetes"
+
+              host_path {
+                path = "/etc/kubernetes"
+              }
+            }
+
+            volume {
+              name = "aws-iam-authenticator"
+
+              host_path {
+                path = "/usr/bin/aws-iam-authenticator"
+              }
+            }
+
+            volume {
+              name = "fargate-conf"
+
+              config_map {
+                name = kubernetes_config_map.virtual-kubelet[0].metadata[0].name
+              }
+            }
           }
         }
       }
     }
-  }
-}
 
-resource "kubernetes_network_policy" "virtual_kubelet_default_deny" {
-  count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+    resource "kubernetes_network_policy" "virtual_kubelet_default_deny" {
+      count = (var.virtual_kubelet["enabled"] ? 1 : 0) * (var.virtual_kubelet["default_network_policy"] ? 1 : 0)
 
-  metadata {
-    name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-default-deny"
-    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
-  }
+      metadata {
+        name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-default-deny"
+        namespace = kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]
+      }
 
-  spec {
-    pod_selector = {}
-    policy_types = ["Ingress"]
-  }
-}
+      spec {
+        pod_selector {
+        }
+        policy_types = ["Ingress"]
+      }
+    }
 
-resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
-  count = "${var.virtual_kubelet["enabled"] * var.virtual_kubelet["default_network_policy"]}"
+    resource "kubernetes_network_policy" "virtual_kubelet_allow_namespace" {
+      count = (var.virtual_kubelet["enabled"] ? 1 : 0) * (var.virtual_kubelet["default_network_policy"] ? 1 : 0)
 
-  metadata {
-    name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-allow-namespace"
-    namespace = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
-  }
+      metadata {
+        name      = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}-allow-namespace"
+        namespace = kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]
+      }
 
-  spec {
-    pod_selector {}
+      spec {
+        pod_selector {
+        }
 
-    ingress = [
-      {
-        from = [
-          {
+        ingress {
+          from {
             namespace_selector {
               match_labels = {
-                name = "${kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]}"
+                name = kubernetes_namespace.virtual-kubelet.*.metadata.0.name[count.index]
               }
             }
-          },
-        ]
-      },
-    ]
+          }
+        }
 
-    policy_types = ["Ingress"]
-  }
-}
+        policy_types = ["Ingress"]
+      }
+    }
+

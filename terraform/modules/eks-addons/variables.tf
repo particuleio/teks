@@ -1,69 +1,70 @@
 variable "aws" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "eks" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "nginx_ingress" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "cluster_autoscaler" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "external_dns" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "cert_manager" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "kiam" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "metrics_server" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "prometheus_operator" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "virtual_kubelet" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "fluentd_cloudwatch" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "npd" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "flux" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
 
 variable "sealed_secrets" {
-  type    = "map"
+  type    = map(string)
   default = {}
 }
+
