@@ -32,6 +32,7 @@ resource "aws_subnet" "eks" {
   tags = {
     "Name"                                      = "terraform-eks-node-${var.cluster-name}-public"
     "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    "kubernetes.io/role/elb"           = "1"
   }
 }
 
