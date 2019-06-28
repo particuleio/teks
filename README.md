@@ -8,6 +8,8 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 
 :warning: NOT YET COMPATIBLE WITH TERRAGRUNT 0.19.X AND TERRAFORM 0.12.X
 
+# BREAKING
+
 ## Branches
 
 * [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible, development will continue with Terraform 0.12.X and Terragrunt 0.19.X. Releases bumped to v2.X.X
