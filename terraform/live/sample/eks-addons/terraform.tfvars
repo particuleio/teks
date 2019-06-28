@@ -36,7 +36,7 @@ aws = {
 
 eks                            = {
   "kubeconfig_path"            = "./kubeconfig"
-  "remote_state_bucket"        = "sample-terraform-remote-state"
+  "remote_state_bucket"        = "sample-terraform-remote-state-0-11"
   "remote_state_key"           = "sample/eks"
   "remote_state_bucket_region" = "eu-west-1"
 }
@@ -47,7 +47,7 @@ eks                            = {
 nginx_ingress = {
   version                = "0.24.1"
   chart_version          = "1.6.16"
-  enabled                = true
+  enabled                = false
   default_network_policy = false
   ingress_cidr           = "0.0.0.0/0"
   namespace              = "ingress-nginx"
@@ -65,7 +65,7 @@ cluster_autoscaler = {
   use_kiam               = false
   version                = "v1.12.5"
   chart_version          = "0.13.2"
-  enabled                = true
+  enabled                = false
   default_network_policy = false
   namespace              = "cluster-autoscaler"
   cluster_name           = "sample"
@@ -161,7 +161,7 @@ EXTRA_VALUES
 //
 virtual_kubelet = {
   use_kiam                = true
-  version                 = "0.7.4"
+  version                 = "0.9.1"
   enabled                 = false
   default_network_policy  = false
   namespace               = "virtual-kubelet"

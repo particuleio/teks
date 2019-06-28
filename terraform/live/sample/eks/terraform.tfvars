@@ -36,10 +36,6 @@ terragrunt = {
       execute  = ["bash", "-c", "kubectl --kubeconfig ${get_tfvars_dir()}/kubeconfig label --overwrite ns kube-system name=kube-system"]
     }
 
-    after_hook "network-policies" {
-      commands = ["apply"]
-      execute  = ["bash", "-c", "terraform output network_policies 2>/dev/null | kubectl --kubeconfig ${get_tfvars_dir()}/kubeconfig apply -f -"]
-    }
   }
 }
 
@@ -75,7 +71,7 @@ subdomain_name = "eks"
 //
 cluster-name = "sample"
 
-kubernetes_version = "1.12"
+kubernetes_version = "1.13"
 
 endpoint_private_access = true
 
@@ -103,7 +99,7 @@ EXTRA_NETWORK_POLICIES
 // [cluster_autoscaler]
 //
 cluster_autoscaler = {
-  create_iam_resources      = true
+  create_iam_resources      = false
   create_iam_resources_kiam = false
   attach_to_pool            = 0
 
@@ -231,7 +227,7 @@ POLICY
 virtual_kubelet = {
   create_iam_resources_kiam   = false
   create_cloudwatch_log_group = false
-  cloudwatch_log_group        = "eks-virtual-kubelet"
+  cloudwatch_log_group        = "eks-virtual-kubelet-sample"
 }
 
 cni_metrics_helper = {
