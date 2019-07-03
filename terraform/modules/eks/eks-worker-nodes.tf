@@ -96,12 +96,12 @@ resource "aws_autoscaling_group" "eks" {
         },
         {
           "key"                 = "k8s.io/cluster-autoscaler/${var.node-pools[count.index]["autoscaling"]}"
-          "value"               = ""
+          "value"               = "1"
           "propagate_at_launch" = true
         },
         {
           "key"                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
-          "value"               = ""
+          "value"               = "1"
           "propagate_at_launch" = true
         },
         {
