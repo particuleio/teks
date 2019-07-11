@@ -74,9 +74,10 @@ variable "cert_manager" {
 }
 
 variable "kiam" {
-  type    = object({
+  type                   = object({
     create_iam_resources = bool
     attach_to_pool       = number
+    create_iam_user      = bool
   })
 }
 
