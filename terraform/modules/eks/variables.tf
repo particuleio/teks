@@ -13,7 +13,7 @@ variable "aws" {
 }
 
 variable "node-pools" {
-  type                 = list(object({
+  type = list(object({
     name               = string
     extra_user_data    = string
     min_size           = number
@@ -60,7 +60,7 @@ variable "external_dns" {
 }
 
 variable "cluster_autoscaler" {
-  type                        = object({
+  type = object({
     create_iam_resources      = bool
     create_iam_resources_kiam = bool
     attach_to_pool            = number
@@ -74,7 +74,7 @@ variable "cert_manager" {
 }
 
 variable "kiam" {
-  type                   = object({
+  type = object({
     create_iam_resources = bool
     attach_to_pool       = number
     create_iam_user      = bool
@@ -102,7 +102,7 @@ variable "fluentd_cloudwatch" {
 }
 
 variable "cni_metrics_helper" {
-  type                         = object({
+  type = object({
     create_iam_resources       = bool
     create_iam_resources_kiam  = bool
     attach_to_pool             = number

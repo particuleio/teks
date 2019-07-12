@@ -83,35 +83,35 @@ resource "aws_autoscaling_group" "eks" {
   )
 
   tags = concat(
-      [
-        {
-          "key"                 = "Name"
-          "value"               = "terraform-eks-${var.cluster-name}-${var.node-pools[count.index]["name"]}"
-          "propagate_at_launch" = true
-        },
-        {
-          "key"                 = "kubernetes.io/cluster/${var.cluster-name}"
-          "value"               = "owned"
-          "propagate_at_launch" = true
-        },
-        {
-          "key"                 = "k8s.io/cluster-autoscaler/${var.node-pools[count.index]["autoscaling"]}"
-          "value"               = "1"
-          "propagate_at_launch" = true
-        },
-        {
-          "key"                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
-          "value"               = "1"
-          "propagate_at_launch" = true
-        },
-        {
-          "key"                 = "eks:node-pool:name"
-          "value"               = var.node-pools[count.index]["name"]
-          "propagate_at_launch" = true
-        },
-      ],
-      var.node-pools[count.index]["tags"],
-    )
+    [
+      {
+        "key"                 = "Name"
+        "value"               = "terraform-eks-${var.cluster-name}-${var.node-pools[count.index]["name"]}"
+        "propagate_at_launch" = true
+      },
+      {
+        "key"                 = "kubernetes.io/cluster/${var.cluster-name}"
+        "value"               = "owned"
+        "propagate_at_launch" = true
+      },
+      {
+        "key"                 = "k8s.io/cluster-autoscaler/${var.node-pools[count.index]["autoscaling"]}"
+        "value"               = "1"
+        "propagate_at_launch" = true
+      },
+      {
+        "key"                 = "k8s.io/cluster-autoscaler/${var.cluster-name}"
+        "value"               = "1"
+        "propagate_at_launch" = true
+      },
+      {
+        "key"                 = "eks:node-pool:name"
+        "value"               = var.node-pools[count.index]["name"]
+        "propagate_at_launch" = true
+      },
+    ],
+    var.node-pools[count.index]["tags"],
+  )
 
   lifecycle {
     create_before_destroy = true
