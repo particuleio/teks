@@ -1,6 +1,6 @@
 data "helm_repository" "flux" {
   name = "flux"
-  url  = "https://weaveworks.github.io/flux"
+  url  = "https://raw.githubusercontent.com/fluxcd/flux/gh-pages/"
 }
 
 data "helm_repository" "stable" {
