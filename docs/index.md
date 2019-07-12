@@ -9,6 +9,7 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 ## Roadmap
 
 When this projet started, it did not rely on the official [Terraform EKS module](https://github.com/terraform-aws-modules/terraform-aws-eks) which is now quite stable and allows advanced configurations. The goal is now to migrate parts of this project to the upstream one and offloading part of the work to official modules and integrating them with Terragrunt:
+
 * [AWS VPC](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 * [EKS](https://github.com/terraform-aws-modules/terraform-aws-eks)
 * [eks-addons-upstream] will be a rework of the old [`eks-addons`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module to make it compatible with upstream.
