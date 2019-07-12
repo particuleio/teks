@@ -6,14 +6,29 @@
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
-:warning: NOT YET COMPATIBLE WITH TERRAGRUNT 0.19.X AND TERRAFORM 0.12.X
+## Roadmap
 
-# BREAKING
+When this projet started, it did not rely on the official [Terraform EKS module](https://github.com/terraform-aws-modules/terraform-aws-eks) which is now quite stable and allows advanced configurations. The goal is now to migrate parts of this project to the upstream one and offloading part of the work to official modules and integrating them with Terragrunt:
+* [AWS VPC](https://github.com/terraform-aws-modules/terraform-aws-vpc)
+* [EKS](https://github.com/terraform-aws-modules/terraform-aws-eks)
+* [eks-addons-upstream] will be a rework of the old [`eks-addons`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module to make it compatible with upstream.
+
+The following modules will be kept for compatibility:
+
+* [eks](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons)
+* [eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons)
 
 ## Branches
 
 * [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible, development will continue with Terraform 0.12.X and Terragrunt 0.19.X. Releases bumped to v2.X.X
 * [`release-1.X`](https://github.com/clusterfrak-dynamics/teks/tree/release-1.X): Compatible with Terraform < 0.12 and Terragrunt < 0.19. Be sure to target the same modules version.
+
+### Upgrading from older version
+
+`v1.X` is compatible with Terraform < 0.12 and Terragrunt < 0.19. The upgrade path to v2.x is simple:
+
+* update tooling locally
+* migrate from `terraform.tfvars` files to `terragrunt.hcl` as shown in `live` folder
 
 ## Main features
 
@@ -37,8 +52,8 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 
 ## Requirements
 
-* [Terraform 0.11.X](https://www.terraform.io/intro/getting-started/install.html)
-* [Terragrunt 0.18.X](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
+* [Terraform](https://www.terraform.io/intro/getting-started/install.html)
+* [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
 * [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)
