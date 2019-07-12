@@ -35,7 +35,7 @@ inputs = {
 
   eks                            = {
     "kubeconfig_path"            = "./kubeconfig"
-    "remote_state_bucket"        = "sample-terraform-remote-state"
+    "remote_state_bucket"        = "teks-terraform-remote-state"
     "remote_state_key"           = "sample/eks"
     "remote_state_bucket_region" = "eu-west-1"
   }
@@ -103,8 +103,8 @@ EXTRA_VALUES
   // [kiam]
   //
   kiam = {
-    version                 = "v3.2"
-    chart_version           = "2.3.0"
+    version                 = "v3.3"
+    chart_version           = "2.4.3"
     enabled                 = false
     default_network_policy  = false
     namespace               = "kiam"

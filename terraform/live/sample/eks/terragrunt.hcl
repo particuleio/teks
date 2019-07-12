@@ -70,7 +70,7 @@ inputs = {
   //
   cluster-name = "sample"
 
-  kubernetes_version = "1.12"
+  kubernetes_version = "1.13"
 
   endpoint_private_access = true
 
@@ -196,7 +196,8 @@ POLICY
   //
   kiam = {
     create_iam_resources = false
-    attach_to_pool       = 0
+    attach_to_pool       = null
+    create_iam_user      = false
   }
 
   fluentd_cloudwatch = {
@@ -230,7 +231,7 @@ POLICY
   }
 
   cni_metrics_helper = {
-    create_iam_resources      = true
+    create_iam_resources      = false
     create_iam_resources_kiam = false
     use_kiam                  = false
     attach_to_pool            = 0
@@ -268,35 +269,13 @@ EXTRA_SCHEDULING
 
   node-pools = [
     {
-      name            = "controller"
+      name            = "default"
       extra_user_data = <<EXTRA_USER_DATA
 EXTRA_USER_DATA
 
       min_size           = 1
       max_size           = 1
       desired_capacity   = 1
-      instance_type      = "t3.medium"
-      key_name           = "ocelot"
-      volume_size        = 30
-      volume_type        = "gp2"
-      autoscaling        = "disabled"
-      kubelet_extra_args = "--kubelet-extra-args '--node-labels node-role.kubernetes.io/controller=\"\" --register-with-taints node-role.kubernetes.io/controller=:NoSchedule --kube-reserved cpu=250m,memory=0.5Gi,ephemeral-storage=1Gi --system-reserved cpu=250m,memory=0.2Gi,ephemeral-storage=1Gi --eviction-hard memory.available<500Mi,nodefs.available<10%'"
-      tags = [
-        {
-          key                 = "Env"
-          value               = "Sample"
-          propagate_at_launch = true
-        },
-      ],
-    },
-    {
-      name            = "default"
-      extra_user_data = <<EXTRA_USER_DATA
-EXTRA_USER_DATA
-
-      min_size           = 3
-      max_size           = 9
-      desired_capacity   = 3
       instance_type      = "t3.medium"
       key_name           = "ocelot"
       volume_size        = 30
