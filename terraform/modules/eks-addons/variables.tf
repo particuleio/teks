@@ -68,3 +68,7 @@ variable "sealed_secrets" {
   default = {}
 }
 
+variable "istio" {
+  type    = map(string)
+  default = {}
+}
