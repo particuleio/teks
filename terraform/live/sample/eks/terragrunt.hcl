@@ -244,6 +244,11 @@ POLICY
       "Action": "cloudwatch:PutMetricData",
       "Resource": "*",
       "Effect": "Allow"
+    },
+    {
+      "Effect": "Allow",
+      "Resource": "*"
+      "Action": "ec2:DescribeTags",
     }
   ]
 }
