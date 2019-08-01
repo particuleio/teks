@@ -43,8 +43,8 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cert-manager-kiam" {
-  count = var.cert_manager["create_iam_resources_kiam"] ? 1 : 0
-  role = aws_iam_role.eks-cert-manager-kiam[count.index].name
+  count      = var.cert_manager["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-cert-manager-kiam[count.index].name
   policy_arn = aws_iam_policy.eks-cert-manager[count.index].arn
 }
 

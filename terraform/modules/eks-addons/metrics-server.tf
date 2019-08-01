@@ -24,11 +24,11 @@ resource "kubernetes_namespace" "metrics_server" {
 }
 
 resource "helm_release" "metrics_server" {
-  count = var.metrics_server["enabled"] ? 1 : 0
+  count      = var.metrics_server["enabled"] ? 1 : 0
   repository = data.helm_repository.stable.metadata[0].name
-  name = "metrics-server"
-  chart = "metrics-server"
-  version = var.metrics_server["chart_version"]
+  name       = "metrics-server"
+  chart      = "metrics-server"
+  version    = var.metrics_server["chart_version"]
   values = concat(
     [local.values_metrics_server],
     [var.metrics_server["extra_values"]],
@@ -40,7 +40,7 @@ resource "kubernetes_network_policy" "metrics_server_default_deny" {
   count = (var.metrics_server["enabled"] ? 1 : 0) * (var.metrics_server["default_network_policy"] ? 1 : 0)
 
   metadata {
-    name = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-default-deny"
+    name      = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-default-deny"
     namespace = kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]
   }
 
@@ -55,7 +55,7 @@ resource "kubernetes_network_policy" "metrics_server_allow_namespace" {
   count = (var.metrics_server["enabled"] ? 1 : 0) * (var.metrics_server["default_network_policy"] ? 1 : 0)
 
   metadata {
-    name = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-allow-namespace"
+    name      = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-allow-namespace"
     namespace = kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]
   }
 
@@ -81,22 +81,22 @@ resource "kubernetes_network_policy" "metrics_server_allow_control_plane" {
   count = (var.metrics_server["enabled"] ? 1 : 0) * (var.metrics_server["default_network_policy"] ? 1 : 0)
 
   metadata {
-    name = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-allow-control-plane"
+    name      = "${kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]}-allow-control-plane"
     namespace = kubernetes_namespace.metrics_server.*.metadata.0.name[count.index]
   }
 
   spec {
     pod_selector {
       match_expressions {
-        key = "app"
+        key      = "app"
         operator = "In"
-        values = ["metrics-server"]
+        values   = ["metrics-server"]
       }
     }
 
     ingress {
       ports {
-        port = "8443"
+        port     = "8443"
         protocol = "TCP"
       }
 

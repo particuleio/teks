@@ -26,7 +26,7 @@ server:
   tlsFiles:
     key: ${base64encode(join(",", tls_private_key.kiam_server_key.*.private_key_pem))}
     cert: ${base64encode(
-join(",", tls_locally_signed_cert.kiam_server_crt.*.cert_pem),
+  join(",", tls_locally_signed_cert.kiam_server_crt.*.cert_pem),
 )}
     ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
@@ -43,7 +43,7 @@ join(",", tls_locally_signed_cert.kiam_server_crt.*.cert_pem),
     AWS_SECRET_ACCESS_KEY: ${join(",", data.terraform_remote_state.eks.*.outputs.kiam-user-secret-access-key[0], )}
 VALUES
 
-  values_kiam_user = <<VALUES
+values_kiam_user = <<VALUES
 server:
   extraEnv:
     AWS_DEFAULT_REGION: ${var.aws["region"]}

@@ -43,8 +43,8 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cluster-autoscaler-kiam" {
-  count = var.cluster_autoscaler["create_iam_resources_kiam"] ? 1 : 0
-  role = aws_iam_role.eks-cluster-autoscaler-kiam[count.index].name
+  count      = var.cluster_autoscaler["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-cluster-autoscaler-kiam[count.index].name
   policy_arn = aws_iam_policy.eks-cluster-autoscaler[count.index].arn
 }
 

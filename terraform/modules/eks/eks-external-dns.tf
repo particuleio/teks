@@ -43,8 +43,8 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "eks-external-dns-kiam" {
-  count = var.external_dns["create_iam_resources_kiam"] ? 1 : 0
-  role = aws_iam_role.eks-external-dns-kiam[count.index].name
+  count      = var.external_dns["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-external-dns-kiam[count.index].name
   policy_arn = aws_iam_policy.eks-external-dns[count.index].arn
 }
 

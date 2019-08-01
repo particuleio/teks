@@ -27,8 +27,8 @@ nodeSelector:
 tolerations:
   - operator: Exists
 awsRole: "${join(
-",",
-data.terraform_remote_state.eks.*.outputs.fluentd-cloudwatch-kiam-role-arn[0],
+  ",",
+  data.terraform_remote_state.eks.*.outputs.fluentd-cloudwatch-kiam-role-arn[0],
 )}"
 awsRegion: "${var.aws["region"]}"
 logGroupName: "${var.fluentd_cloudwatch["log_group_name"]}"
@@ -38,77 +38,77 @@ updateStrategy:
   type: RollingUpdate
 VALUES
 
+}
+
+resource "kubernetes_namespace" "fluentd_cloudwatch" {
+  count = var.fluentd_cloudwatch["enabled"] ? 1 : 0
+
+  metadata {
+    annotations = {
+      "iam.amazonaws.com/permitted" = ".*"
     }
 
-    resource "kubernetes_namespace" "fluentd_cloudwatch" {
-      count = var.fluentd_cloudwatch["enabled"] ? 1 : 0
-
-      metadata {
-        annotations = {
-          "iam.amazonaws.com/permitted" = ".*"
-        }
-
-        labels = {
-          name = var.fluentd_cloudwatch["namespace"]
-        }
-
-        name = var.fluentd_cloudwatch["namespace"]
-      }
+    labels = {
+      name = var.fluentd_cloudwatch["namespace"]
     }
 
-    resource "helm_release" "fluentd_cloudwatch" {
-      count      = var.fluentd_cloudwatch["enabled"] ? 1 : 0
-      repository = data.helm_repository.incubator.metadata[0].name
-      name       = "fluentd-cloudwatch"
-      chart      = "fluentd-cloudwatch"
-      version    = var.fluentd_cloudwatch["chart_version"]
-      values = concat(
-        [
-          var.fluentd_cloudwatch["use_kiam"] ? local.values_fluentd_cloudwatch_kiam : local.values_fluentd_cloudwatch,
-        ],
-        [var.fluentd_cloudwatch["extra_values"]],
-      )
-      namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
+    name = var.fluentd_cloudwatch["namespace"]
+  }
+}
+
+resource "helm_release" "fluentd_cloudwatch" {
+  count      = var.fluentd_cloudwatch["enabled"] ? 1 : 0
+  repository = data.helm_repository.incubator.metadata[0].name
+  name       = "fluentd-cloudwatch"
+  chart      = "fluentd-cloudwatch"
+  version    = var.fluentd_cloudwatch["chart_version"]
+  values = concat(
+    [
+      var.fluentd_cloudwatch["use_kiam"] ? local.values_fluentd_cloudwatch_kiam : local.values_fluentd_cloudwatch,
+    ],
+    [var.fluentd_cloudwatch["extra_values"]],
+  )
+  namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
+}
+
+resource "kubernetes_network_policy" "fluentd_cloudwatch_default_deny" {
+  count = (var.fluentd_cloudwatch["enabled"] ? 1 : 0) * (var.fluentd_cloudwatch["default_network_policy"] ? 1 : 0)
+
+  metadata {
+    name      = "${kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]}-default-deny"
+    namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
+  }
+
+  spec {
+    pod_selector {
+    }
+    policy_types = ["Ingress"]
+  }
+}
+
+resource "kubernetes_network_policy" "fluentd_cloudwatch_allow_namespace" {
+  count = (var.fluentd_cloudwatch["enabled"] ? 1 : 0) * (var.fluentd_cloudwatch["default_network_policy"] ? 1 : 0)
+
+  metadata {
+    name      = "${kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]}-allow-namespace"
+    namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
+  }
+
+  spec {
+    pod_selector {
     }
 
-    resource "kubernetes_network_policy" "fluentd_cloudwatch_default_deny" {
-      count = (var.fluentd_cloudwatch["enabled"] ? 1 : 0) * (var.fluentd_cloudwatch["default_network_policy"] ? 1 : 0)
-
-      metadata {
-        name      = "${kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]}-default-deny"
-        namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
-      }
-
-      spec {
-        pod_selector {
-        }
-        policy_types = ["Ingress"]
-      }
-    }
-
-    resource "kubernetes_network_policy" "fluentd_cloudwatch_allow_namespace" {
-      count = (var.fluentd_cloudwatch["enabled"] ? 1 : 0) * (var.fluentd_cloudwatch["default_network_policy"] ? 1 : 0)
-
-      metadata {
-        name      = "${kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]}-allow-namespace"
-        namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
-      }
-
-      spec {
-        pod_selector {
-        }
-
-        ingress {
-          from {
-            namespace_selector {
-              match_labels = {
-                name = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
-              }
-            }
+    ingress {
+      from {
+        namespace_selector {
+          match_labels = {
+            name = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
           }
         }
-
-        policy_types = ["Ingress"]
       }
     }
+
+    policy_types = ["Ingress"]
+  }
+}
 

@@ -12,8 +12,8 @@ metadata:
 data:
   mapRoles: |
     - rolearn: ${join(
-"\n      username: system:node:{{EC2PrivateDNSName}}\n      groups:\n        - system:bootstrappers\n        - system:nodes\n    - rolearn: ",
-aws_iam_role.eks-node.*.arn,
+  "\n      username: system:node:{{EC2PrivateDNSName}}\n      groups:\n        - system:bootstrappers\n        - system:nodes\n    - rolearn: ",
+  aws_iam_role.eks-node.*.arn,
 )}
       username: system:node:{{EC2PrivateDNSName}}
       groups:
@@ -25,7 +25,7 @@ aws_iam_role.eks-node.*.arn,
 CONFIGMAPAWSAUTH
 
 
-    kubeconfig = <<KUBECONFIG
+kubeconfig = <<KUBECONFIG
 ---
 apiVersion: v1
 clusters:
@@ -54,7 +54,7 @@ users:
 KUBECONFIG
 
 
-    helm_rbac = <<HELM
+helm_rbac = <<HELM
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -809,7 +809,7 @@ spec:
 CNI_METRICS_HELPER
 
 
-    network_policies = <<NETWORK_POLICIES
+network_policies = <<NETWORK_POLICIES
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -869,29 +869,29 @@ spec:
 ${var.extra_network_policies}
 NETWORK_POLICIES
 
-    }
+}
 
-    output "config_map_aws_auth" {
-      value = local.config_map_aws_auth
-    }
+output "config_map_aws_auth" {
+  value = local.config_map_aws_auth
+}
 
-    output "kubeconfig" {
-      value = local.kubeconfig
-    }
+output "kubeconfig" {
+  value = local.kubeconfig
+}
 
-    output "helm_rbac" {
-      value = local.helm_rbac
-    }
+output "helm_rbac" {
+  value = local.helm_rbac
+}
 
-    output "calico_yaml" {
-      value = local.calico_yaml
-    }
+output "calico_yaml" {
+  value = local.calico_yaml
+}
 
-    output "cni_metrics_helper_yaml" {
-      value = local.cni_metrics_helper_yaml
-    }
+output "cni_metrics_helper_yaml" {
+  value = local.cni_metrics_helper_yaml
+}
 
-    output "network_policies" {
-      value = local.network_policies
-    }
+output "network_policies" {
+  value = local.network_policies
+}
 

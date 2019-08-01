@@ -43,8 +43,8 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "eks-cni-metrics-helper-kiam" {
-  count = var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
-  role = aws_iam_role.eks-cni-metrics-helper-kiam[count.index].name
+  count      = var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-cni-metrics-helper-kiam[count.index].name
   policy_arn = aws_iam_policy.eks-cni-metrics-helper[count.index].arn
 }
 

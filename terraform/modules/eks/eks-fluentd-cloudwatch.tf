@@ -43,8 +43,8 @@ POLICY
 }
 
 resource "aws_iam_role_policy_attachment" "eks-fluentd-cloudwatch-kiam" {
-  count = var.fluentd_cloudwatch["create_iam_resources_kiam"] ? 1 : 0
-  role = aws_iam_role.eks-fluentd-cloudwatch-kiam[count.index].name
+  count      = var.fluentd_cloudwatch["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-fluentd-cloudwatch-kiam[count.index].name
   policy_arn = aws_iam_policy.eks-fluentd-cloudwatch[count.index].arn
 }
 
