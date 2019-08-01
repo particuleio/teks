@@ -18,11 +18,6 @@ terraform {
     commands = ["apply", "plan"]
     execute  = ["bash", "-c", "helm repo update"]
   }
-
-  after_hook "cert_manager_cluster_issuers" {
-    commands = ["apply"]
-    execute  = ["bash", "-c", "terraform output cert_manager_cluster_issuers 2>/dev/null | kubectl --kubeconfig kubeconfig apply -f - | true"]
-  }
 }
 
 inputs = {
@@ -44,8 +39,8 @@ inputs = {
   // [nginx_ingress]
   //
   nginx_ingress = {
-    version                = "0.24.1"
-    chart_version          = "1.6.16"
+    version                = "0.25.0"
+    chart_version          = "1.11.5"
     enabled                = false
     default_network_policy = false
     ingress_cidr           = "0.0.0.0/0"
@@ -62,8 +57,8 @@ EXTRA_VALUES
   //
   cluster_autoscaler = {
     use_kiam               = false
-    version                = "v1.12.5"
-    chart_version          = "0.13.2"
+    version                = "v1.13.6"
+    chart_version          = "3.1.0"
     enabled                = false
     default_network_policy = false
     namespace              = "cluster-autoscaler"
@@ -76,8 +71,8 @@ EXTRA_VALUES
   //
   external_dns = {
     use_kiam               = false
-    version                = "v0.5.9"
-    chart_version          = "1.3.0"
+    version                = "0.5.15"
+    chart_version          = "2.4.2"
     enabled                = false
     default_network_policy = false
     namespace              = "external-dns"
@@ -89,14 +84,15 @@ EXTRA_VALUES
   // [cert_manager]
   //
   cert_manager = {
-    use_kiam               = false
-    version                = "v0.5.2"
-    chart_version          = "v0.5.2"
-    enabled                = false
-    default_network_policy = false
-    namespace              = "cert-manager"
-    extra_values           = ""
-    acme_email             = "example@email.com"
+    use_kiam                        = false
+    version                         = "v0.9.0"
+    chart_version                   = "v0.9.0"
+    enabled                         = false
+    default_network_policy          = false
+    namespace                       = "cert-manager"
+    extra_values                    = ""
+    acme_email                      = "example@email.com"
+    enable_default_cluster_issuers  = false
   }
 
   //
@@ -104,7 +100,7 @@ EXTRA_VALUES
   //
   kiam = {
     version                 = "v3.3"
-    chart_version           = "2.4.3"
+    chart_version           = "2.5.1"
     enabled                 = false
     default_network_policy  = false
     namespace               = "kiam"
@@ -117,7 +113,7 @@ EXTRA_VALUES
   //
   metrics_server = {
     version                    = "v0.3.3"
-    chart_version              = "2.8.0"
+    chart_version              = "2.8.2"
     enabled                    = false
     default_network_policy     = false
     namespace                  = "metrics-server"
@@ -130,8 +126,8 @@ EXTRA_VALUES
   // [flux]
   //
   flux = {
-    version                = "1.12.3"
-    chart_version          = "0.9.5"
+    version                = "1.13.3"
+    chart_version          = "0.11.0"
     enabled                = false
     default_network_policy = false
     namespace              = "flux"
@@ -177,7 +173,7 @@ EXTRA_VALUES
   // [prometheus_operator]
   //
   prometheus_operator = {
-    chart_version          = "5.12.0"
+    chart_version          = "6.3.1"
     enabled                = false
     default_network_policy = false
     namespace              = "monitoring"
@@ -205,8 +201,8 @@ EXTRA_VALUES
   // [fluentd_cloudwatch]
   //
   fluentd_cloudwatch = {
-    chart_version          = "0.7.0"
-    version                = "v1.3-debian-cloudwatch"
+    chart_version          = "0.10.2"
+    version                = "v1.4.2-debian-cloudwatch-1.1"
     use_kiam               = false
     enabled                = false
     default_network_policy = false
@@ -219,7 +215,7 @@ EXTRA_VALUES
   // [node_problem_detector]
   //
   npd = {
-    chart_version          = "1.4.3"
+    chart_version          = "1.5.0"
     version                = "v0.6.3"
     enabled                = false
     default_network_policy = false
@@ -231,12 +227,37 @@ EXTRA_VALUES
   // [sealed_secrets]
   //
   sealed_secrets = {
-    chart_version          = "1.0.2"
-    version                = "v0.7.0"
+    chart_version          = "1.3.2"
+    version                = "v0.8.1"
     enabled                = false
     default_network_policy = false
     namespace              = "sealed-secrets"
     extra_values           = ""
   }
 
+  //
+  // [istio]
+  //
+  istio = {
+    chart_version_init     = "1.2.2"
+    chart_version          = "1.2.2"
+    enabled_init           = false
+    enabled                = false
+    default_network_policy = false
+    namespace              = "istio-system"
+    extra_values_init      = ""
+    extra_values           = <<EXTRA_VALUES
+  gateways:
+    istio-ingressgateway:
+      sds:
+        enabled: true
+      serviceAnnotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  global:
+    k8sIngress:
+      enabled: true
+      enabledHttps: true
+      gatewayName: ingressgateway
+EXTRA_VALUES
+  }
 }
