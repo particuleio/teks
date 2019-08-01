@@ -17,3 +17,8 @@ data "helm_repository" "istio" {
   name = "istio.io"
   url  = "https://storage.googleapis.com/istio-release/releases/1.2.2/charts/"
 }
+
+data "helm_repository" "jetstack" {
+  name = "jetstack"
+  url  = "https://charts.jetstack.io"
+}
