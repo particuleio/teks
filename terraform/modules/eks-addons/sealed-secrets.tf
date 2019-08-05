@@ -1,5 +1,7 @@
 locals {
   values_sealed_secrets = <<VALUES
+rbac:
+  pspEnabled: true
 image:
   tag: ${var.sealed_secrets["version"]}
 VALUES

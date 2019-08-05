@@ -1,5 +1,7 @@
 locals {
   values_npd = <<VALUES
+rbac:
+  pspEnabled: true
 image:
   tag: ${var.npd["version"]}
 affinity:

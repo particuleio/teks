@@ -5,7 +5,8 @@ image:
 provider: aws
 txtPrefix: "ext-dns-"
 rbac:
- create: true
+  create: true
+  pspEnabled: true
 nodeSelector:
   node-role.kubernetes.io/controller: ""
 tolerations:

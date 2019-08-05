@@ -1,7 +1,7 @@
 locals {
   values_kiam = <<VALUES
 psp:
-  create: false
+  create: true
 agent:
   image:
     tag: ${var.kiam["version"]}

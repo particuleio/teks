@@ -4,6 +4,7 @@ image:
   tag: ${var.flux["version"]}
 rbac:
   create: true
+  pspEnabled: true
 helmOperator:
   create: true
 additionalArgs:
