@@ -3,10 +3,6 @@ locals {
 psp:
   create: false
 agent:
-  tlsFiles:
-    key: ${base64encode(join(",", tls_private_key.kiam_agent_key.*.private_key_pem))}
-    cert: ${base64encode(join(",", tls_locally_signed_cert.kiam_agent_crt.*.cert_pem))}
-    ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
     tag: ${var.kiam["version"]}
   host:
@@ -20,15 +16,9 @@ agent:
       readOnly: true
   tolerations: ${var.kiam["server_use_host_network"] ? "[{'operator': 'Exists'}]" : "[]"}
 server:
+  service:
+    targetPort: 11443
   useHostNetwork: ${var.kiam["server_use_host_network"]}
-  probes:
-    serverAddress: "127.0.0.1"
-  tlsFiles:
-    key: ${base64encode(join(",", tls_private_key.kiam_server_key.*.private_key_pem))}
-    cert: ${base64encode(
-  join(",", tls_locally_signed_cert.kiam_server_crt.*.cert_pem),
-)}
-    ca: ${base64encode(join(",", tls_self_signed_cert.kiam_ca_crt.*.cert_pem))}
   image:
     tag: ${var.kiam["version"]}
   assumeRoleArn: ${join(",", data.terraform_remote_state.eks.*.outputs.kiam-server-role-arn[0])}
@@ -72,106 +62,6 @@ resource "helm_release" "kiam" {
   version    = var.kiam["chart_version"]
   values     = concat([local.values_kiam], [var.kiam["extra_values"]])
   namespace  = kubernetes_namespace.kiam.*.metadata.0.name[count.index]
-}
-
-resource "tls_private_key" "kiam_ca_key" {
-  count     = var.kiam["enabled"] ? 1 : 0
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "kiam_ca_crt" {
-  count           = var.kiam["enabled"] ? 1 : 0
-  key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.kiam_ca_key[0].private_key_pem
-
-  subject {
-    common_name  = "kiam-ca"
-    organization = "KIAM"
-  }
-
-  is_ca_certificate     = true
-  validity_period_hours = 87360
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-  ]
-}
-
-resource "tls_private_key" "kiam_agent_key" {
-  count     = var.kiam["enabled"] ? 1 : 0
-  algorithm = "RSA"
-}
-
-resource "tls_cert_request" "kiam_agent_csr" {
-  count           = var.kiam["enabled"] ? 1 : 0
-  key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.kiam_agent_key[0].private_key_pem
-
-  subject {
-    common_name  = "kiam-agent"
-    organization = "KIAM"
-  }
-}
-
-resource "tls_locally_signed_cert" "kiam_agent_crt" {
-  count              = var.kiam["enabled"] ? 1 : 0
-  cert_request_pem   = tls_cert_request.kiam_agent_csr[0].cert_request_pem
-  ca_key_algorithm   = "RSA"
-  ca_private_key_pem = tls_private_key.kiam_ca_key[0].private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.kiam_ca_crt[0].cert_pem
-
-  validity_period_hours = 87360
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-resource "tls_private_key" "kiam_server_key" {
-  count     = var.kiam["enabled"] ? 1 : 0
-  algorithm = "RSA"
-}
-
-resource "tls_cert_request" "kiam_server_csr" {
-  count           = var.kiam["enabled"] ? 1 : 0
-  key_algorithm   = "RSA"
-  private_key_pem = tls_private_key.kiam_server_key[0].private_key_pem
-
-  subject {
-    common_name  = "kiam-server"
-    organization = "KIAM"
-  }
-
-  dns_names = [
-    "kiam-server",
-    "kiam-server:443",
-  ]
-
-  ip_addresses = [
-    "127.0.0.1",
-  ]
-}
-
-resource "tls_locally_signed_cert" "kiam_server_crt" {
-  count              = var.kiam["enabled"] ? 1 : 0
-  cert_request_pem   = tls_cert_request.kiam_server_csr[0].cert_request_pem
-  ca_key_algorithm   = "RSA"
-  ca_private_key_pem = tls_private_key.kiam_ca_key[0].private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.kiam_ca_crt[0].cert_pem
-
-  validity_period_hours = 87360
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-    "client_auth",
-  ]
 }
 
 resource "kubernetes_network_policy" "kiam_default_deny" {
