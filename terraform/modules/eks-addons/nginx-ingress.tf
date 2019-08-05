@@ -2,8 +2,6 @@ locals {
   values_nginx_ingress_l4 = <<VALUES
 controller:
   kind: "DaemonSet"
-  daemonset:
-    useHostPort: true
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
@@ -21,8 +19,6 @@ VALUES
   values_nginx_ingress_nlb = <<VALUES
 controller:
   kind: "DaemonSet"
-  daemonset:
-    useHostPort: true
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
@@ -40,8 +36,6 @@ VALUES
   values_nginx_ingress_l7 = <<VALUES
 controller:
   kind: "DaemonSet"
-  daemonset:
-    useHostPort: true
   service:
     targetPorts:
       http: http
