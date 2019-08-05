@@ -94,6 +94,7 @@ resource "aws_eks_cluster" "eks" {
         ",",
         concat(
           split(",", var.vpc["private_subnets_id"]),
+          split(",", var.vpc["public_subnets_id"]),
         ),
       ),
     )
