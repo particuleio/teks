@@ -145,15 +145,3 @@ resource "kubernetes_network_policy" "kiam_allow_requests" {
     policy_types = ["Ingress"]
   }
 }
-
-output "kiam_ca_crt" {
-  value = tls_self_signed_cert.kiam_ca_crt.*.cert_pem
-}
-
-output "kiam_server_crt" {
-  value = tls_locally_signed_cert.kiam_server_crt.*.cert_pem
-}
-
-output "kiam_agent_crt" {
-  value = tls_locally_signed_cert.kiam_agent_crt.*.cert_pem
-}
