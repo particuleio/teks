@@ -1,6 +1,8 @@
 locals {
   values_nginx_ingress_l4 = <<VALUES
 controller:
+  updateStrategy:
+    type: RollingUpdate
   kind: "DaemonSet"
   service:
     annotations:
@@ -18,6 +20,8 @@ VALUES
 
   values_nginx_ingress_nlb = <<VALUES
 controller:
+  updateStrategy:
+    type: RollingUpdate
   kind: "DaemonSet"
   service:
     annotations:
@@ -35,6 +39,8 @@ VALUES
 
   values_nginx_ingress_l7 = <<VALUES
 controller:
+  updateStrategy:
+    type: RollingUpdate
   kind: "DaemonSet"
   service:
     targetPorts:
