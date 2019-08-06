@@ -74,10 +74,10 @@ resource "aws_autoscaling_group" "eks" {
     version = "$Latest"
   }
 
-  max_size = var.node-pools[count.index]["max_size"]
-  min_size = var.node-pools[count.index]["min_size"]
-  name     = "terraform-eks-${var.cluster-name}-node-pool-${var.node-pools[count.index]["name"]}"
-  vpc_zone_identifier = split(
+  max_size    = var.node-pools[count.index]["max_size"]
+  min_size    = var.node-pools[count.index]["min_size"]
+  name_prefix = "terraform-eks-${var.cluster-name}-node-pool-${var.node-pools[count.index]["name"]}-"
+  vpc_zone_identifier = var.node-pools[count.index]["vpc_zone_identifier"] != "" ? var.node-pools[count.index]["vpc_zone_identifier"] : split(
     ",",
     var.vpc["create"] ? join(",", aws_subnet.eks-private.*.id) : var.vpc["private_subnets_id"],
   )
