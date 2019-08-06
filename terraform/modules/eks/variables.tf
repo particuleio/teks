@@ -13,20 +13,8 @@ variable "aws" {
 }
 
 variable "node-pools" {
-  type = list(object({
-    name               = string
-    extra_user_data    = string
-    min_size           = number
-    max_size           = number
-    desired_capacity   = number
-    instance_type      = string
-    key_name           = string
-    volume_size        = number
-    volume_type        = string
-    autoscaling        = string
-    kubelet_extra_args = string
-    tags               = list(map(string))
-  }))
+  type    = any
+  default = []
 }
 
 variable "domain_name" {
@@ -51,7 +39,7 @@ variable "use_route53" {
 
 variable "kubernetes_version" {
   description = "EKS version"
-  default     = "1.12"
+  default     = "1.13"
 }
 
 variable "external_dns" {
@@ -60,12 +48,8 @@ variable "external_dns" {
 }
 
 variable "cluster_autoscaler" {
-  type = object({
-    create_iam_resources      = bool
-    create_iam_resources_kiam = bool
-    attach_to_pool            = number
-    iam_policy                = string
-  })
+  type    = any
+  default = {}
 }
 
 variable "cert_manager" {
@@ -74,11 +58,8 @@ variable "cert_manager" {
 }
 
 variable "kiam" {
-  type = object({
-    create_iam_resources = bool
-    attach_to_pool       = number
-    create_iam_user      = bool
-  })
+  type    = any
+  default = {}
 }
 
 variable "vpc" {
@@ -102,15 +83,8 @@ variable "fluentd_cloudwatch" {
 }
 
 variable "cni_metrics_helper" {
-  type = object({
-    create_iam_resources       = bool
-    create_iam_resources_kiam  = bool
-    attach_to_pool             = number
-    use_kiam                   = bool
-    iam_policy                 = string
-    deployment_scheduling      = string
-    deployment_scheduling_kiam = string
-  })
+  type    = any
+  default = {}
 }
 
 variable "endpoint_public_access" {
