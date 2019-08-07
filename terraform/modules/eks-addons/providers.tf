@@ -9,7 +9,7 @@ terraform {
 provider "helm" {
   install_tiller                  = true
   service_account                 = "tiller"
-  tiller_image                    = "gcr.io/kubernetes-helm/tiller:v2.14.1"
+  tiller_image                    = "gcr.io/kubernetes-helm/tiller:v2.14.3"
   automount_service_account_token = true
 
   kubernetes {
