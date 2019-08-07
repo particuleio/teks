@@ -650,7 +650,7 @@ spec:
             requests:
               cpu: 10m
             limits:
-              cpu: 100m
+              cpu: 300m
       serviceAccountName: typha-cpha
 
 ---
