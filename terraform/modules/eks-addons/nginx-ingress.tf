@@ -84,11 +84,15 @@ resource "kubernetes_namespace" "nginx_ingress" {
 }
 
 resource "helm_release" "nginx_ingress" {
-  count      = var.nginx_ingress["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "nginx-ingress"
-  chart      = "nginx-ingress"
-  version    = var.nginx_ingress["chart_version"]
+  count         = var.nginx_ingress["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "nginx-ingress"
+  chart         = "nginx-ingress"
+  version       = var.nginx_ingress["chart_version"]
+  timeout       = var.nginx_ingress["timeout"]
+  force_update  = var.nginx_ingress["force_update"]
+  recreate_pods = var.nginx_ingress["recreate_pods"]
+  wait          = var.nginx_ingress["wait"]
   values = concat(
     [
       var.nginx_ingress["use_nlb"] ? local.values_nginx_ingress_nlb : var.nginx_ingress["use_l7"] ? local.values_nginx_ingress_l7 : local.values_nginx_ingress_l4,

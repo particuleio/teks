@@ -1,22 +1,4 @@
 locals {
-  values_fluentd_cloudwatch = <<VALUES
-image:
-  tag: ${var.fluentd_cloudwatch["version"]}
-rbac:
-  create: true
-nodeSelector:
-  node-role.kubernetes.io/node: ""
-tolerations:
-  - operator: Exists
-awsRegion: "${var.aws["region"]}"
-logGroupName: "${var.fluentd_cloudwatch["log_group_name"]}"
-extraVars:
-  - "{ name: FLUENT_UID, value: '0' }"
-updateStrategy:
-  type: RollingUpdate
-VALUES
-
-
   values_fluentd_cloudwatch_kiam = <<VALUES
 image:
   tag: ${var.fluentd_cloudwatch["version"]}
@@ -26,10 +8,7 @@ nodeSelector:
   node-role.kubernetes.io/node: ""
 tolerations:
   - operator: Exists
-awsRole: "${join(
-  ",",
-  data.terraform_remote_state.eks.*.outputs.fluentd-cloudwatch-kiam-role-arn[0],
-)}"
+awsRole: "${aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn}"
 awsRegion: "${var.aws["region"]}"
 logGroupName: "${var.fluentd_cloudwatch["log_group_name"]}"
 extraVars:
@@ -40,12 +19,53 @@ VALUES
 
 }
 
+resource "aws_iam_policy" "eks-fluentd-cloudwatch" {
+  count  = var.fluentd_cloudwatch["create_iam_resources_kiam"] ? 1 : 0
+  name   = "tf-eks-${var.cluster-name}-fluentd-cloudwatch"
+  policy = var.fluentd_cloudwatch["iam_policy"]
+}
+
+resource "aws_iam_role" "eks-fluentd-cloudwatch-kiam" {
+  name  = "tf-eks-${var.cluster-name}-fluentd-cloudwatch-kiam"
+  count = var.fluentd_cloudwatch["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.eks-kiam-server-role[count.index].arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+
+}
+
+resource "aws_iam_role_policy_attachment" "eks-fluentd-cloudwatch-kiam" {
+  count      = var.fluentd_cloudwatch["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-fluentd-cloudwatch-kiam[count.index].name
+  policy_arn = aws_iam_policy.eks-fluentd-cloudwatch[count.index].arn
+}
+
 resource "kubernetes_namespace" "fluentd_cloudwatch" {
   count = var.fluentd_cloudwatch["enabled"] ? 1 : 0
 
   metadata {
     annotations = {
-      "iam.amazonaws.com/permitted" = ".*"
+      "iam.amazonaws.com/permitted" = "${aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn}"
     }
 
     labels = {
@@ -57,18 +77,24 @@ resource "kubernetes_namespace" "fluentd_cloudwatch" {
 }
 
 resource "helm_release" "fluentd_cloudwatch" {
-  count      = var.fluentd_cloudwatch["enabled"] ? 1 : 0
-  repository = data.helm_repository.incubator.metadata[0].name
-  name       = "fluentd-cloudwatch"
-  chart      = "fluentd-cloudwatch"
-  version    = var.fluentd_cloudwatch["chart_version"]
+  count         = var.fluentd_cloudwatch["enabled"] ? 1 : 0
+  repository    = data.helm_repository.incubator.metadata[0].name
+  name          = "fluentd-cloudwatch"
+  chart         = "fluentd-cloudwatch"
+  version       = var.fluentd_cloudwatch["chart_version"]
+  timeout       = var.fluentd_cloudwatch["timeout"]
+  force_update  = var.fluentd_cloudwatch["force_update"]
+  recreate_pods = var.fluentd_cloudwatch["recreate_pods"]
+  wait          = var.fluentd_cloudwatch["wait"]
   values = concat(
-    [
-      var.fluentd_cloudwatch["use_kiam"] ? local.values_fluentd_cloudwatch_kiam : local.values_fluentd_cloudwatch,
-    ],
+    [local.values_fluentd_cloudwatch_kiam],
     [var.fluentd_cloudwatch["extra_values"]],
   )
   namespace = kubernetes_namespace.fluentd_cloudwatch.*.metadata.0.name[count.index]
+
+  depends_on = [
+    helm_release.kiam
+  ]
 }
 
 resource "kubernetes_network_policy" "fluentd_cloudwatch_default_deny" {

@@ -1,3 +1,75 @@
+resource "aws_iam_role" "eks-virtual-kubelet-ecs-task" {
+  name  = "tf-eks-${var.cluster-name}-virtual-kubelet-ecs-task"
+  count = var.virtual_kubelet["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+
+}
+
+resource "aws_iam_role_policy_attachment" "eks-virtual-kubelet-ecs-task" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  role       = aws_iam_role.eks-virtual-kubelet-ecs-task[count.index].name
+  count      = var.virtual_kubelet["create_iam_resources_kiam"] ? 1 : 0
+}
+
+resource "aws_iam_role" "eks-virtual-kubelet" {
+  name  = "tf-eks-${var.cluster-name}-virtual-kubelet"
+  count = var.virtual_kubelet["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.eks-kiam-server-role[count.index].arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+
+}
+
+resource "aws_iam_role_policy_attachment" "eks-virtual-kubelet" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonECS_FullAccess"
+  role       = aws_iam_role.eks-virtual-kubelet[count.index].name
+  count      = var.virtual_kubelet["create_iam_resources_kiam"] ? 1 : 0
+}
+
+resource "aws_cloudwatch_log_group" "eks-virtual-kubelet" {
+  name  = "eks-cluster-${var.cluster-name}-${var.virtual_kubelet["cloudwatch_log_group"]}"
+  count = var.virtual_kubelet["create_cloudwatch_log_group"] ? 1 : 0
+
+  tags = {
+    Environment = "tf-eks-${var.cluster-name}"
+    Application = "virtual-kubelet"
+  }
+}
+
 resource "kubernetes_namespace" "virtual-kubelet" {
   count = var.virtual_kubelet["enabled"] ? 1 : 0
 
@@ -5,7 +77,7 @@ resource "kubernetes_namespace" "virtual-kubelet" {
 
   metadata {
     annotations = {
-      "iam.amazonaws.com/permitted" = ".*"
+      "iam.amazonaws.com/permitted" = "${aws_iam_role.eks-virtual-kubelet[count.index].arn}"
     }
 
     labels = {
@@ -36,8 +108,8 @@ Subnets = ["${join(
 )}"]
 SecurityGroups = ["${data.terraform_remote_state.eks.outputs.eks-node-sg}"]
 AssignPublicIPv4Address = false
-ExecutionRoleArn = "${data.terraform_remote_state.eks.outputs.eks-virtual-kubelet-ecs-task-role-arn[0]}"
-CloudWatchLogGroupName = "${data.terraform_remote_state.eks.outputs.eks-virtual-kubelet-cloudwatch-log-group[0]}"
+ExecutionRoleArn = "${aws_iam_role.eks-virtual-kubelet-ecs-task[0].arn}"
+CloudWatchLogGroupName = "${aws_cloudwatch_log_group.eks-virtual-kubelet[0].name}"
 PlatformVersion = "${var.virtual_kubelet["platformversion"]}"
 OperatingSystem = "${var.virtual_kubelet["operatingsystem"]}"
 CPU = "${var.virtual_kubelet["cpu"]}"
@@ -76,10 +148,7 @@ resource "kubernetes_deployment" "virtual-kubelet" {
         }
 
         annotations = {
-          "iam.amazonaws.com/role" = join(
-            ",",
-            data.terraform_remote_state.eks.*.outputs.eks-virtual-kubelet-role-arn[0],
-          )
+          "iam.amazonaws.com/role" = aws_iam_role.eks-virtual-kubelet[count.index].arn
         }
       }
 

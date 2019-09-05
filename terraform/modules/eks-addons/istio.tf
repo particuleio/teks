@@ -21,23 +21,31 @@ resource "kubernetes_namespace" "istio" {
 }
 
 resource "helm_release" "istio-init" {
-  count      = var.istio["enabled_init"] ? 1 : 0
-  repository = data.helm_repository.istio.metadata[0].name
-  name       = "istio-init"
-  chart      = "istio-init"
-  version    = var.istio["chart_version_init"]
-  values     = concat([local.values_istio], [var.istio["extra_values_init"]])
-  namespace  = kubernetes_namespace.istio.*.metadata.0.name[count.index]
+  count         = var.istio["enabled_init"] ? 1 : 0
+  repository    = data.helm_repository.istio.metadata[0].name
+  name          = "istio-init"
+  chart         = "istio-init"
+  version       = var.istio["chart_version_init"]
+  timeout       = var.istio["timeout_init"]
+  force_update  = var.istio["force_update_init"]
+  recreate_pods = var.istio["recreate_pods_init"]
+  wait          = var.istio["wait_init"]
+  values        = concat([local.values_istio], [var.istio["extra_values_init"]])
+  namespace     = kubernetes_namespace.istio.*.metadata.0.name[count.index]
 }
 
 resource "helm_release" "istio" {
-  count      = var.istio["enabled"] ? 1 : 0
-  repository = data.helm_repository.istio.metadata[0].name
-  name       = "istio"
-  chart      = "istio"
-  version    = var.istio["chart_version"]
-  values     = concat([local.values_istio], [var.istio["extra_values"]])
-  namespace  = kubernetes_namespace.istio.*.metadata.0.name[count.index]
+  count         = var.istio["enabled"] ? 1 : 0
+  repository    = data.helm_repository.istio.metadata[0].name
+  name          = "istio"
+  chart         = "istio"
+  version       = var.istio["chart_version"]
+  timeout       = var.istio["timeout"]
+  force_update  = var.istio["force_update"]
+  recreate_pods = var.istio["recreate_pods"]
+  wait          = var.istio["wait"]
+  values        = concat([local.values_istio], [var.istio["extra_values"]])
+  namespace     = kubernetes_namespace.istio.*.metadata.0.name[count.index]
 
   depends_on = [helm_release.istio-init]
 }

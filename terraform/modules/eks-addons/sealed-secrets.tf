@@ -21,11 +21,15 @@ resource "kubernetes_namespace" "sealed_secrets" {
 }
 
 resource "helm_release" "sealed_secrets" {
-  count      = var.sealed_secrets["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "sealed-secrets"
-  chart      = "sealed-secrets"
-  version    = var.sealed_secrets["chart_version"]
+  count         = var.sealed_secrets["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "sealed-secrets"
+  chart         = "sealed-secrets"
+  version       = var.sealed_secrets["chart_version"]
+  timeout       = var.sealed_secrets["timeout"]
+  force_update  = var.sealed_secrets["force_update"]
+  recreate_pods = var.sealed_secrets["recreate_pods"]
+  wait          = var.sealed_secrets["wait"]
   values = concat(
     [local.values_sealed_secrets],
     [var.sealed_secrets["extra_values"]],

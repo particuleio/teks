@@ -24,11 +24,15 @@ resource "kubernetes_namespace" "metrics_server" {
 }
 
 resource "helm_release" "metrics_server" {
-  count      = var.metrics_server["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "metrics-server"
-  chart      = "metrics-server"
-  version    = var.metrics_server["chart_version"]
+  count         = var.metrics_server["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "metrics-server"
+  chart         = "metrics-server"
+  version       = var.metrics_server["chart_version"]
+  timeout       = var.metrics_server["timeout"]
+  force_update  = var.metrics_server["force_update"]
+  recreate_pods = var.metrics_server["recreate_pods"]
+  wait          = var.metrics_server["wait"]
   values = concat(
     [local.values_metrics_server],
     [var.metrics_server["extra_values"]],

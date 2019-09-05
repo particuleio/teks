@@ -30,13 +30,17 @@ resource "kubernetes_namespace" "node_problem_detector" {
 }
 
 resource "helm_release" "node_problem_detector" {
-  count      = var.npd["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "node-problem-detector"
-  chart      = "node-problem-detector"
-  version    = var.npd["chart_version"]
-  values     = concat([local.values_npd], [var.npd["extra_values"]])
-  namespace  = kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]
+  count         = var.npd["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "node-problem-detector"
+  chart         = "node-problem-detector"
+  version       = var.npd["chart_version"]
+  timeout       = var.npd["timeout"]
+  force_update  = var.npd["force_update"]
+  recreate_pods = var.npd["recreate_pods"]
+  wait          = var.npd["wait"]
+  values        = concat([local.values_npd], [var.npd["extra_values"]])
+  namespace     = kubernetes_namespace.node_problem_detector.*.metadata.0.name[count.index]
 }
 
 resource "kubernetes_network_policy" "npd_default_deny" {

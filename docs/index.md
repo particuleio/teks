@@ -12,24 +12,35 @@ When this projet started, it did not rely on the official [Terraform EKS module]
 
 * [AWS VPC](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 * [EKS](https://github.com/terraform-aws-modules/terraform-aws-eks)
-* [eks-addons-upstream] will be a rework of the old [`eks-addons`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module to make it compatible with upstream.
+* [eks](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module will be kept for compatibility and all the feature will be PR upstream if they do not already exist.
 
-The following modules will be kept for compatibility:
-
-* [eks](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons)
-* [eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons)
+[eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) is now decouple from `eks` module. It will soon be compatible with [upstream module](https://github.com/terraform-aws-modules/terraform-aws-eks). v3.X is working toward this goal.
 
 ## Branches
 
-* [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible, development will continue with Terraform 0.12.X and Terragrunt 0.19.X. Releases bumped to v2.X.X
+* [`master`](https://github.com/clusterfrak-dynamics/teks/tree/master): Backward incompatible with v1.X but compatible with v2.X, releases bumped to v3.X because a lot has changed.
 * [`release-1.X`](https://github.com/clusterfrak-dynamics/teks/tree/release-1.X): Compatible with Terraform < 0.12 and Terragrunt < 0.19. Be sure to target the same modules version.
+* [`release-2.X`](https://github.com/clusterfrak-dynamics/teks/tree/release-2.X): Compatible with Terraform >= 0.12 and Terragrunt >= 0.19. Be sure to target the same modules version.
 
 ### Upgrading from older version
+
+#### `v1.X` to `v2.X`
 
 `v1.X` is compatible with Terraform < 0.12 and Terragrunt < 0.19. The upgrade path to v2.x is simple:
 
 * update tooling locally
 * migrate from `terraform.tfvars` files to `terragrunt.hcl` as shown in `live` folder
+
+#### `v2.X` to `v3.X`
+
+`v2.X` and `v3.X` are not really incompatible per se, there was a lot of changes and a careful migration is needed to avoid breaking running cluster so a change of version was simpler.
+
+* update the `eks-addons` module.
+* run the `eks-addons` module with the Kiam configuration if needed.
+* `eks-addons` module will create the new IAM user and policies.
+* update the `eks` module.
+* run the `eks` module.
+* `eks` will destroy the previous IAM role and policies.
 
 ## Main features
 
@@ -50,11 +61,13 @@ The following modules will be kept for compatibility:
   * [node-problem-detector](https://github.com/kubernetes/node-problem-detector): Forwards node problems to Kubernetes events
   * [flux](https://github.com/weaveworks/flux): Continous Delivery with Gitops workflow.
   * [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets): Technology agnostic, store secrets on git.
+  * [istio](https://istio.io): Service mesh for Kubernetes.
+  * [cni-metrics-helper](https://docs.aws.amazon.com/eks/latest/userguide/cni-metrics-helper.html): Provides cloudwatch metrics for VPC CNI plugins.
 
 ## Requirements
 
-* [Terraform 0.11.X](https://www.terraform.io/intro/getting-started/install.html)
-* [Terragrunt 0.18.X](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
+* [Terraform](https://www.terraform.io/intro/getting-started/install.html)
+* [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
 * [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)
@@ -67,7 +80,7 @@ User guides, feature documentation and examples are available [here](https://clu
 
 Kiam prevents pods from accessing EC2 instances IAM role and therefore using the instances role to perform actions on AWS. It also allows pods to assume specific IAM roles if needed. To do so `kiam-agent` acts as an iptables proxy on nodes. It intercepts requests made to EC2 metadata and redirect them to a `kiam-server` that fetches IAM credentials and pass them to pods.
 
-For security reasons, because Kiam needs to assume an IAM role that can assume other roles, it is best to run it on a dedicated node with specific IAM permission where no other workload are running and where there is no `kiam-agent` (because kiam-server need access to EC2 metadata). This is taken care of by default but it is customizable.
+Kiam is running with an IAM user and use a secret key and a access key (AK/SK).
 
 ### Addons that require specific IAM permissions
 
@@ -76,80 +89,8 @@ Some addons interface with AWS API, for example:
 * `cluster-autoscaler`
 * `external-dns`
 * `cert-manager`
-* `virtual-kubelet`: only with Kiam enable
-
-#### Without KIAM
-
-If you are not using Kiam, addons must access EC2 instances metdata to get credentials and access Kubernetes API, it is best for security reason to use a dedicated node for addons in that case to avoid other pods to access IAM roles and messed up route53, or scale down your cluster for example.
-
-#### With Kiam
-
-If you are using Kiam, these addons can run either with instances IAM roles on the same dedicated nodes where `kiam-server` is running amd bypass `kiam-agent` or they can run anywhere and assume a specific role through Kiam.
-
-The following matrix tries to explain the possible combinations:
-
-<table>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td>virtual-kubelet<br>(assume role with Kiam)</td>
-    <td></td>
-  </tr>
-  <tr>
-    <td>cluster-autoscaler</td>
-    <td></td>
-    <td>cluster-autoscaler</td>
-    <td></td>
-    <td></td>
-    <td>cert-manager<br>(assume role with Kiam)</td>
-    <td>cert-manager<br>(assume role with Kiam)</td>
-  </tr>
-  <tr>
-    <td>external-dns</td>
-    <td></td>
-    <td>external-dns</td>
-    <td></td>
-    <td></td>
-    <td>cluster-autoscaler<br>(assume role with Kiam)</td>
-    <td>cluster-autoscaler<br>(assume role with Kiam)</td>
-  </tr>
-  <tr>
-    <td>cert-manager</td>
-    <td></td>
-    <td>cert-manager</td>
-    <td>virtual-kubelet<br>(assume role with Kiam)</td>
-    <td></td>
-    <td>external-dns<br>(assume role with Kiam)</td>
-    <td>external-dns<br>(assume role with Kiam)</td>
-  </tr>
-  <tr>
-    <td>kiam-server</td>
-    <td></td>
-    <td>kiam-server</td>
-    <td>kiam-agent</td>
-    <td>kiam-server</td>
-    <td>kiam-agent</td>
-    <td>kiam-agent<br>(in HostNetwork, bypass kiam-agent)<br></td>
-  </tr>
-  <tr>
-    <td>Dedicated node(s)<br>with IAM roles attached</td>
-    <td>Worker node(s)</td>
-    <td>Dedicated node(s) with IAM roles attached<br>(bypass kiam-agent)</td>
-    <td>Worker node(s)</td>
-    <td>Dedicated node(s) with only IAM role for Kiam<br>(bypass kiam-agent)</td>
-    <td>Worker node(s)</td>
-    <td>Worker node(s) with only IAM role for Kiam<br>(bypass kiam-agent)<br>!!! Security concerns !!!</td>
-  </tr>
-  <tr>
-    <td colspan="2">Without Kiam</td>
-    <td colspan="2">With Kiam</td>
-    <td colspan="2">With Kiam</td>
-    <td>With Kiam</td>
-  </tr>
-</table>
+* `virtual-kubelet`
+* `cni-metric-helper`
 
 ## License
 

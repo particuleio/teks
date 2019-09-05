@@ -45,4 +45,3 @@ resource "aws_iam_instance_profile" "eks-node" {
   role  = aws_iam_role.eks-node[count.index].name
   count = length(var.node-pools)
 }
-

@@ -34,11 +34,15 @@ resource "random_string" "grafana_password" {
 }
 
 resource "helm_release" "prometheus_operator" {
-  count      = var.prometheus_operator["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "prometheus-operator"
-  chart      = "prometheus-operator"
-  version    = var.prometheus_operator["chart_version"]
+  count         = var.prometheus_operator["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "prometheus-operator"
+  chart         = "prometheus-operator"
+  version       = var.prometheus_operator["chart_version"]
+  timeout       = var.prometheus_operator["timeout"]
+  force_update  = var.prometheus_operator["force_update"]
+  recreate_pods = var.prometheus_operator["recreate_pods"]
+  wait          = var.prometheus_operator["wait"]
   values = concat(
     [local.values_prometheus_operator],
     [var.prometheus_operator["extra_values"]],

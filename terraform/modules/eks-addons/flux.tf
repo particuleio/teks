@@ -66,13 +66,17 @@ resource "kubernetes_role_binding" "flux" {
 }
 
 resource "helm_release" "flux" {
-  count      = var.flux["enabled"] ? 1 : 0
-  repository = data.helm_repository.flux.metadata[0].name
-  name       = "flux"
-  chart      = "flux"
-  version    = var.flux["chart_version"]
-  values     = concat([local.values_flux], [var.flux["extra_values"]])
-  namespace  = kubernetes_namespace.flux.*.metadata.0.name[count.index]
+  count         = var.flux["enabled"] ? 1 : 0
+  repository    = data.helm_repository.flux.metadata[0].name
+  name          = "flux"
+  chart         = "flux"
+  version       = var.flux["chart_version"]
+  timeout       = var.flux["timeout"]
+  force_update  = var.flux["force_update"]
+  recreate_pods = var.flux["recreate_pods"]
+  wait          = var.flux["wait"]
+  values        = concat([local.values_flux], [var.flux["extra_values"]])
+  namespace     = kubernetes_namespace.flux.*.metadata.0.name[count.index]
 }
 
 resource "kubernetes_network_policy" "flux_default_deny" {

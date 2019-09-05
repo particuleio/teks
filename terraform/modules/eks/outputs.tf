@@ -19,7 +19,6 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
-    ${var.virtual_kubelet["create_iam_resources_kiam"] ? "- rolearn: ${join(",", aws_iam_role.eks-virtual-kubelet.*.arn)}\n      username: virtual-kubelet\n      groups:\n        - system:masters\n" : ""}
   mapUsers: |
     ${indent(4, var.map_users)}
 CONFIGMAPAWSAUTH
@@ -51,8 +50,8 @@ users:
         - "token"
         - "-i"
         - "${var.cluster-name}"
+        - ${var.kubeconfig_assume_role_arn != "" ? "\"-r\"\n        - \"${var.kubeconfig_assume_role_arn}\"\n" : ""}
 KUBECONFIG
-
 
 helm_rbac = <<HELM
 ---
@@ -80,7 +79,7 @@ HELM
 calico_yaml = <<CALICO
 ---
 kind: DaemonSet
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 metadata:
   name: calico-node
   namespace: kube-system
@@ -98,13 +97,8 @@ spec:
     metadata:
       labels:
         k8s-app: calico-node
-      annotations:
-        # This, along with the CriticalAddonsOnly toleration below,
-        # marks the pod as a critical add-on, ensuring it gets
-        # priority scheduling and that its resources are reserved
-        # if it ever gets evicted.
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      priorityClassName: system-node-critical
       nodeSelector:
         beta.kubernetes.io/os: linux
       hostNetwork: true
@@ -234,7 +228,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: FelixConfiguration
     plural: felixconfigurations
@@ -249,7 +246,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: BGPConfiguration
     plural: bgpconfigurations
@@ -263,7 +263,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: BGPPeer
     plural: bgppeers
@@ -277,7 +280,10 @@ metadata:
 spec:
   scope: Cluster
   group: crd.projectcalico.org
-  version: v1
+  versions:
+    - name: v1
+      served: true
+      storage: true
   names:
     kind: IPPool
     plural: ippools
@@ -386,7 +392,7 @@ metadata:
 ---
 
 kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: calico-node
 rules:
@@ -463,7 +469,7 @@ rules:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: calico-node
@@ -478,7 +484,7 @@ subjects:
 
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: calico-typha
@@ -487,14 +493,17 @@ metadata:
     k8s-app: calico-typha
 spec:
   revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      k8s-app: calico-typha
   template:
     metadata:
       labels:
         k8s-app: calico-typha
       annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
         cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
     spec:
+      priorityClassName: system-cluster-critical
       nodeSelector:
         beta.kubernetes.io/os: linux
       tolerations:
@@ -569,7 +578,7 @@ spec:
       k8s-app: calico-typha
 
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: typha-cpha
@@ -584,7 +593,7 @@ subjects:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: typha-cpha
@@ -616,9 +625,10 @@ data:
         [2000, 8]
       ]
     }
+
 ---
 
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: calico-typha-horizontal-autoscaler
@@ -626,14 +636,16 @@ metadata:
   labels:
     k8s-app: calico-typha-autoscaler
 spec:
+  selector:
+    matchLabels:
+      k8s-app: calico-typha-autoscaler
   replicas: 1
   template:
     metadata:
       labels:
         k8s-app: calico-typha-autoscaler
-      annotations:
-        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      priorityClassName: system-cluster-critical
       nodeSelector:
         beta.kubernetes.io/os: linux
       containers:
@@ -655,7 +667,7 @@ spec:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: typha-cpha
@@ -678,7 +690,7 @@ metadata:
 
 ---
 
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: typha-cpha
@@ -711,104 +723,6 @@ spec:
     k8s-app: calico-typha
 CALICO
 
-
-cni_metrics_helper_yaml = <<CNI_METRICS_HELPER
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: kube-system
-  annotations:
-    iam.amazonaws.com/permitted: ".*"
----
-apiVersion: rbac.authorization.k8s.io/v1
-# kubernetes versions before 1.8.0 should use rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: cni-metrics-helper
-rules:
-  - apiGroups: [""]
-    resources:
-      - nodes
-      - pods
-      - pods/proxy
-      - services
-      - resourcequotas
-      - replicationcontrollers
-      - limitranges
-      - persistentvolumeclaims
-      - persistentvolumes
-      - namespaces
-      - endpoints
-    verbs: ["list", "watch", "get"]
-  - apiGroups: ["extensions"]
-    resources:
-      - daemonsets
-      - deployments
-      - replicasets
-    verbs: ["list", "watch"]
-  - apiGroups: ["apps"]
-    resources:
-      - statefulsets
-    verbs: ["list", "watch"]
-  - apiGroups: ["batch"]
-    resources:
-      - cronjobs
-      - jobs
-    verbs: ["list", "watch"]
-  - apiGroups: ["autoscaling"]
-    resources:
-      - horizontalpodautoscalers
-    verbs: ["list", "watch"]
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: cni-metrics-helper
-  namespace: kube-system
----
-apiVersion: rbac.authorization.k8s.io/v1
-# kubernetes versions before 1.8.0 should use rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: cni-metrics-helper
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cni-metrics-helper
-subjects:
-  - kind: ServiceAccount
-    name: cni-metrics-helper
-    namespace: kube-system
----
-kind: Deployment
-apiVersion: extensions/v1beta1
-metadata:
-  name: cni-metrics-helper
-  namespace: kube-system
-  labels:
-    k8s-app: cni-metrics-helper
-spec:
-  selector:
-    matchLabels:
-      k8s-app: cni-metrics-helper
-  template:
-    metadata:
-      labels:
-        k8s-app: cni-metrics-helper
-    spec:
-      serviceAccountName: cni-metrics-helper
-      containers:
-      - image: 602401143452.dkr.ecr.us-west-2.amazonaws.com/cni-metrics-helper:v1.4.1
-        imagePullPolicy: Always
-        name: cni-metrics-helper
-        env:
-          - name: USE_CLOUDWATCH
-            value: "yes"
-      ${var.cni_metrics_helper["use_kiam"] ? indent(6, var.cni_metrics_helper["deployment_scheduling_kiam"]) : indent(6, var.cni_metrics_helper["deployment_scheduling"])}
-CNI_METRICS_HELPER
-
-
 network_policies = <<NETWORK_POLICIES
 ---
 apiVersion: networking.k8s.io/v1
@@ -818,7 +732,7 @@ metadata:
   namespace: kube-system
 spec:
   podSelector: {}
-  policyTypes: 
+  policyTypes:
   - Ingress
 ---
 kind: NetworkPolicy
@@ -868,7 +782,6 @@ spec:
 ---
 ${var.extra_network_policies}
 NETWORK_POLICIES
-
 }
 
 output "config_map_aws_auth" {
@@ -885,10 +798,6 @@ output "helm_rbac" {
 
 output "calico_yaml" {
   value = local.calico_yaml
-}
-
-output "cni_metrics_helper_yaml" {
-  value = local.cni_metrics_helper_yaml
 }
 
 output "network_policies" {

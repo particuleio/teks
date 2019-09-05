@@ -1,30 +1,54 @@
 locals {
-  values_cert_manager = <<VALUES
-image:
-  tag: ${var.cert_manager["version"]}
-rbac:
-  create: true
-nodeSelector:
-  node-role.kubernetes.io/controller: ""
-tolerations:
-  - operator: Exists
-    effect: NoSchedule
-    key: "node-role.kubernetes.io/controller"
-VALUES
-
-
   values_cert_manager_kiam = <<VALUES
 image:
   tag: ${var.cert_manager["version"]}
 rbac:
   create: true
 podAnnotations:
-  iam.amazonaws.com/role: "${join(
-  ",",
-  data.terraform_remote_state.eks.*.outputs.cert-manager-kiam-role-arn[0],
-)}"
+  iam.amazonaws.com/role: "${aws_iam_role.eks-cert-manager-kiam[0].arn}"
 VALUES
 
+}
+
+resource "aws_iam_policy" "eks-cert-manager" {
+  count  = var.cert_manager["create_iam_resources_kiam"] ? 1 : 0
+  name   = "tf-eks-${var.cluster-name}-cert-manager"
+  policy = var.cert_manager["iam_policy"]
+}
+
+resource "aws_iam_role" "eks-cert-manager-kiam" {
+  name  = "tf-eks-${var.cluster-name}-cert-manager-kiam"
+  count = var.cert_manager["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.eks-kiam-server-role[count.index].arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+
+}
+
+resource "aws_iam_role_policy_attachment" "eks-cert-manager-kiam" {
+  count      = var.cert_manager["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-cert-manager-kiam[count.index].name
+  policy_arn = aws_iam_policy.eks-cert-manager[count.index].arn
 }
 
 resource "kubernetes_namespace" "cert_manager" {
@@ -32,7 +56,7 @@ resource "kubernetes_namespace" "cert_manager" {
 
   metadata {
     annotations = {
-      "iam.amazonaws.com/permitted"           = ".*"
+      "iam.amazonaws.com/permitted"           = "${aws_iam_role.eks-cert-manager-kiam[0].arn}"
       "certmanager.k8s.io/disable-validation" = "true"
     }
 
@@ -61,20 +85,25 @@ resource "null_resource" "cert_manager_crds" {
 }
 
 resource "helm_release" "cert_manager" {
-  count      = var.cert_manager["enabled"] ? 1 : 0
-  repository = data.helm_repository.jetstack.metadata[0].name
-  name       = "cert-manager"
-  chart      = "cert-manager"
-  version    = var.cert_manager["chart_version"]
+  count         = var.cert_manager["enabled"] ? 1 : 0
+  repository    = data.helm_repository.jetstack.metadata[0].name
+  name          = "cert-manager"
+  chart         = "cert-manager"
+  version       = var.cert_manager["chart_version"]
+  timeout       = var.cert_manager["timeout"]
+  force_update  = var.cert_manager["force_update"]
+  recreate_pods = var.cert_manager["recreate_pods"]
+  wait          = var.cert_manager["wait"]
   values = concat(
-    [
-      var.cert_manager["use_kiam"] ? local.values_cert_manager_kiam : local.values_cert_manager,
-    ],
+    [local.values_cert_manager_kiam],
     [var.cert_manager["extra_values"]],
   )
   namespace = kubernetes_namespace.cert_manager.*.metadata.0.name[count.index]
 
-  depends_on = [null_resource.cert_manager_crds]
+  depends_on = [
+    null_resource.cert_manager_crds,
+    helm_release.kiam
+  ]
 }
 
 resource "kubernetes_network_policy" "cert_manager_default_deny" {

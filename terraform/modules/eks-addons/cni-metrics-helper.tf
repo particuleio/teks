@@ -2,19 +2,13 @@
 // [cni-metrics-helper]
 //
 resource "aws_iam_policy" "eks-cni-metrics-helper" {
-  count  = var.cni_metrics_helper["create_iam_resources"] ? 1 : var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
-  name   = "terraform-eks-${var.cluster-name}-cni-metrics-helper"
+  count  = var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
+  name   = "tf-eks-${var.cluster-name}-cni-metrics-helper"
   policy = var.cni_metrics_helper["iam_policy"]
 }
 
-resource "aws_iam_role_policy_attachment" "eks-cni-metrics-helper" {
-  count      = var.cni_metrics_helper["create_iam_resources"] ? 1 : 0
-  role       = aws_iam_role.eks-node[var.cni_metrics_helper["attach_to_pool"]].name
-  policy_arn = aws_iam_policy.eks-cni-metrics-helper[0].arn
-}
-
 resource "aws_iam_role" "eks-cni-metrics-helper-kiam" {
-  name  = "terraform-eks-${var.cluster-name}-cni-metrics-helper-kiam"
+  name  = "tf-eks-${var.cluster-name}-cni-metrics-helper-kiam"
   count = var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
 
   assume_role_policy = <<POLICY
@@ -48,7 +42,26 @@ resource "aws_iam_role_policy_attachment" "eks-cni-metrics-helper-kiam" {
   policy_arn = aws_iam_policy.eks-cni-metrics-helper[count.index].arn
 }
 
-output "cni-metrics-helper-kiam-role-arn" {
-  value = aws_iam_role.eks-cni-metrics-helper-kiam.*.arn
+data "template_file" "cni_metrics_helper" {
+  count    = var.cni_metrics_helper["enabled"] ? 1 : 0
+  template = file("templates/cni-metrics-helper.yaml")
+  vars = {
+    cni_metrics_helper_role_arn = aws_iam_role.eks-cni-metrics-helper-kiam[count.index].arn
+    cni_metrics_helper_version  = var.cni_metrics_helper["version"]
+  }
 }
 
+resource "null_resource" "cni_metrics_helper" {
+  count = var.cni_metrics_helper["enabled"] ? 1 : 0
+  triggers = {
+    always = timestamp()
+  }
+
+  provisioner "local-exec" {
+    command = "kubectl --kubeconfig=kubeconfig apply -f -<<EOF\n${data.template_file.cni_metrics_helper.*.rendered[count.index]}\nEOF"
+  }
+
+  depends_on = [
+    helm_release.kiam
+  ]
+}

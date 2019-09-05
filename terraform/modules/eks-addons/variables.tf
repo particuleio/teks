@@ -1,3 +1,7 @@
+variable "cluster-name" {
+  default = "sample-cluster"
+  type    = string
+}
 variable "aws" {
   type    = map(string)
   default = {}
@@ -69,6 +73,11 @@ variable "sealed_secrets" {
 }
 
 variable "istio" {
+  type    = map(string)
+  default = {}
+}
+
+variable "cni_metrics_helper" {
   type    = map(string)
   default = {}
 }

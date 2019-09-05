@@ -1,23 +1,4 @@
 locals {
-  values_cluster_autoscaler = <<VALUES
-autoDiscovery:
-  clusterName: ${var.cluster_autoscaler["cluster_name"]}
-awsRegion: ${var.aws["region"]}
-sslCertPath: /etc/kubernetes/pki/ca.crt
-rbac:
- create: true
- pspEnabled: true
-image:
-  tag: ${var.cluster_autoscaler["version"]}
-nodeSelector:
-  node-role.kubernetes.io/controller: ""
-tolerations:
-  - operator: Exists
-    effect: NoSchedule
-    key: "node-role.kubernetes.io/controller"
-VALUES
-
-
   values_cluster_autoscaler_kiam = <<VALUES
 autoDiscovery:
   clusterName: ${var.cluster_autoscaler["cluster_name"]}
@@ -29,12 +10,54 @@ rbac:
 image:
   tag: ${var.cluster_autoscaler["version"]}
 podAnnotations:
-  iam.amazonaws.com/role: "${join(
-  ",",
-  data.terraform_remote_state.eks.*.outputs.cluster-autoscaler-kiam-role-arn[0],
-)}"
+  iam.amazonaws.com/role: "${aws_iam_role.eks-cluster-autoscaler-kiam[0].arn}"
 VALUES
 
+}
+
+resource "aws_iam_policy" "eks-cluster-autoscaler" {
+  count  = var.cluster_autoscaler["create_iam_resources_kiam"] ? 1 : 0
+  name   = "tf-eks-${var.cluster-name}-cluster-autoscaler"
+  policy = var.cluster_autoscaler["iam_policy"]
+}
+
+resource "aws_iam_role" "eks-cluster-autoscaler-kiam" {
+  name  = "tf-eks-${var.cluster-name}-cluster-autoscaler-kiam"
+  count = var.cluster_autoscaler["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.eks-kiam-server-role[count.index].arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+
+}
+
+resource "aws_iam_role_policy_attachment" "eks-cluster-autoscaler-kiam" {
+  count      = var.cluster_autoscaler["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-cluster-autoscaler-kiam[count.index].name
+  policy_arn = aws_iam_policy.eks-cluster-autoscaler[count.index].arn
+}
+
+output "cluster-autoscaler-kiam-role-arn" {
+  value = aws_iam_role.eks-cluster-autoscaler-kiam.*.arn
 }
 
 resource "kubernetes_namespace" "cluster_autoscaler" {
@@ -42,7 +65,7 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
 
   metadata {
     annotations = {
-      "iam.amazonaws.com/permitted" = ".*"
+      "iam.amazonaws.com/permitted" = "${aws_iam_role.eks-cluster-autoscaler-kiam[0].arn}"
     }
 
     labels = {
@@ -54,18 +77,24 @@ resource "kubernetes_namespace" "cluster_autoscaler" {
 }
 
 resource "helm_release" "cluster_autoscaler" {
-  count      = var.cluster_autoscaler["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "cluster-autoscaler"
-  chart      = "cluster-autoscaler"
-  version    = var.cluster_autoscaler["chart_version"]
+  count         = var.cluster_autoscaler["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "cluster-autoscaler"
+  chart         = "cluster-autoscaler"
+  version       = var.cluster_autoscaler["chart_version"]
+  timeout       = var.cluster_autoscaler["timeout"]
+  force_update  = var.cluster_autoscaler["force_update"]
+  recreate_pods = var.cluster_autoscaler["recreate_pods"]
+  wait          = var.cluster_autoscaler["wait"]
   values = concat(
-    [
-      var.cluster_autoscaler["use_kiam"] ? local.values_cluster_autoscaler_kiam : local.values_cluster_autoscaler,
-    ],
+    [local.values_cluster_autoscaler_kiam],
     [var.cluster_autoscaler["extra_values"]],
   )
   namespace = kubernetes_namespace.cluster_autoscaler.*.metadata.0.name[count.index]
+
+  depends_on = [
+    helm_release.kiam
+  ]
 }
 
 resource "kubernetes_network_policy" "cluster_autoscaler_default_deny" {
@@ -108,4 +137,3 @@ resource "kubernetes_network_policy" "cluster_autoscaler_allow_namespace" {
     policy_types = ["Ingress"]
   }
 }
-

@@ -1,7 +1,3 @@
-#
-# Variables Configuration
-#
-
 variable "cluster-name" {
   default = "sample-cluster"
   type    = string
@@ -17,24 +13,9 @@ variable "node-pools" {
   default = []
 }
 
-variable "domain_name" {
-  description = "Domain name of the parent domain where subdomain is created"
-  default     = "domain.tld"
-}
-
-variable "subdomain_name" {
-  description = "Subdomain name used to create an independant DNS zone"
-  default     = "subdomain"
-}
-
-variable "subdomain_default_ttl" {
-  description = "Subdomain zone default TTL"
-  default     = "300"
-}
-
-variable "use_route53" {
-  description = "Create route53 records"
-  default     = false
+variable "dns" {
+  type    = any
+  default = {}
 }
 
 variable "kubernetes_version" {
@@ -42,48 +23,8 @@ variable "kubernetes_version" {
   default     = "1.13"
 }
 
-variable "external_dns" {
-  type    = map(string)
-  default = {}
-}
-
-variable "cluster_autoscaler" {
-  type    = any
-  default = {}
-}
-
-variable "cert_manager" {
-  type    = map(string)
-  default = {}
-}
-
-variable "kiam" {
-  type    = any
-  default = {}
-}
-
 variable "vpc" {
   type    = map(string)
-  default = {}
-}
-
-variable "nginx_ingress" {
-  type    = map(string)
-  default = {}
-}
-
-variable "virtual_kubelet" {
-  type    = map(string)
-  default = {}
-}
-
-variable "fluentd_cloudwatch" {
-  type    = map(string)
-  default = {}
-}
-
-variable "cni_metrics_helper" {
-  type    = any
   default = {}
 }
 
@@ -121,3 +62,6 @@ variable "extra_network_policies" {
   default = ""
 }
 
+variable "kubeconfig_assume_role_arn" {
+  default = ""
+}

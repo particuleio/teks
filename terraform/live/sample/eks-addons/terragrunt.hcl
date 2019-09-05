@@ -20,244 +20,417 @@ terraform {
   }
 }
 
+locals {
+  cluster-name = "sample"
+  env          = "sample"
+}
+
 inputs = {
-  //
-  // [provider]
-  //
+
+  cluster-name = local.cluster-name
+
   aws = {
     "region" = "eu-west-1"
   }
 
-  eks                            = {
+  eks = {
     "kubeconfig_path"            = "./kubeconfig"
     "remote_state_bucket"        = "teks-terraform-remote-state"
     "remote_state_key"           = "sample/eks"
     "remote_state_bucket_region" = "eu-west-1"
   }
 
-  //
-  // [nginx_ingress]
-  //
   nginx_ingress = {
-    version                = "0.25.0"
-    chart_version          = "1.11.5"
+    version                = "0.25.1"
+    chart_version          = "1.19.0"
     enabled                = false
     default_network_policy = false
     ingress_cidr           = "0.0.0.0/0"
     namespace              = "ingress-nginx"
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
+
     extra_values           = <<EXTRA_VALUES
 EXTRA_VALUES
 
-    use_nlb = true
-    use_l7  = false
+    use_nlb                = false
+    use_l7                 = false
   }
 
-  //
-  // [cluster_autoscaler]
-  //
   cluster_autoscaler = {
-    use_kiam               = false
+    create_iam_resources_kiam = true
+
+    iam_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "autoscaling:DescribeAutoScalingGroups",
+        "autoscaling:DescribeAutoScalingInstances",
+        "autoscaling:DescribeLaunchConfigurations",
+        "autoscaling:DescribeTags",
+        "autoscaling:SetDesiredCapacity",
+        "autoscaling:TerminateInstanceInAutoScalingGroup"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+POLICY
+
     version                = "v1.13.6"
-    chart_version          = "3.1.0"
+    chart_version          = "3.2.0"
     enabled                = false
     default_network_policy = false
     namespace              = "cluster-autoscaler"
-    cluster_name           = "sample"
-    extra_values           = ""
+    cluster_name           = local.cluster-name
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
   }
 
-  //
-  // [external_dns]
-  //
   external_dns = {
-    use_kiam               = false
-    version                = "0.5.15"
-    chart_version          = "2.4.2"
+    create_iam_resources_kiam = true
+
+    iam_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ChangeResourceRecordSets",
+        "route53:ListResourceRecordSets"
+      ],
+      "Resource": [
+        "arn:aws:route53:::hostedzone/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "route53:ListHostedZones"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+POLICY
+
+    version                = "0.5.16-debian-9-r8"
+    chart_version          = "2.6.0"
     enabled                = false
     default_network_policy = false
     namespace              = "external-dns"
-    extra_values           = <<EXTRA_VALUES
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
+
+    extra_values = <<EXTRA_VALUES
 EXTRA_VALUES
   }
 
-  //
-  // [cert_manager]
-  //
   cert_manager = {
-    use_kiam                        = false
-    version                         = "v0.9.0"
-    chart_version                   = "v0.9.0"
-    enabled                         = false
-    default_network_policy          = false
-    namespace                       = "cert-manager"
-    extra_values                    = ""
-    acme_email                      = "example@email.com"
-    enable_default_cluster_issuers  = false
+    create_iam_resources_kiam = false
+
+    iam_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "route53:GetChange",
+      "Resource": "arn:aws:route53:::change/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "route53:ChangeResourceRecordSets",
+      "Resource": "arn:aws:route53:::hostedzone/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "route53:ListHostedZonesByName",
+      "Resource": "*"
+    }
+  ]
+}
+POLICY
+
+    version                        = "v0.9.1"
+    chart_version                  = "v0.9.1"
+    enabled                        = false
+    default_network_policy         = false
+    namespace                      = "cert-manager"
+    timeout                        = 3600
+    force_update                   = false
+    recreate_pods                  = false
+    wait                           = true
+    acme_email                     = "example@email.com"
+    enable_default_cluster_issuers = false
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
   }
 
-  //
-  // [kiam]
-  //
   kiam = {
     version                 = "v3.3"
     chart_version           = "2.5.1"
-    enabled                 = false
+    enabled                 = true
     default_network_policy  = false
     namespace               = "kiam"
+    timeout                 = 3600
+    force_update            = false
+    recreate_pods           = false
+    wait                    = true
     server_use_host_network = "true"
-    extra_values            = ""
+    create_iam_user         = true
+    create_iam_resources    = true
+    iam_user                = ""
+
+    assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "sts:AssumeRole"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+POLICY
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
   }
 
-  //
-  // [metrics-server]
-  //
   metrics_server = {
-    version                    = "v0.3.3"
-    chart_version              = "2.8.2"
+    version                    = "v0.3.4"
+    chart_version              = "2.8.5"
     enabled                    = false
     default_network_policy     = false
     namespace                  = "metrics-server"
-    extra_values               = ""
-    control_plane_private_cidr = ""
-    control_plane_public_cidr  = ""
-  }
-
-  //
-  // [flux]
-  //
-  flux = {
-    version                = "1.13.3"
-    chart_version          = "0.11.0"
-    enabled                = false
-    default_network_policy = false
-    namespace              = "flux"
-    allowed_namespaces     = ""
+    control_plane_private_cidr = "10.0.0.0/17"
+    control_plane_public_cidr  = "10.0.128.0/17"
+    timeout                    = 3600
+    force_update               = false
+    recreate_pods              = false
+    wait                       = true
 
     extra_values = <<EXTRA_VALUES
-  git:
-    url: "ssh://git@github.com/YOUR_REPO"
-    pollInterval: "1m"
-  helmOperator:
-    create: false
-    tillerNamespace: "flux"
-    allowNamespace: "flux"
-  registry:
-    excludeImage: "*"
-  rbac:
-    create: false
-  syncGarbageCollection:
-    enabled: true
-    dry: false
 EXTRA_VALUES
   }
 
-  //
-  // [virtual-kubelet]
-  //
-  virtual_kubelet = {
-    use_kiam                = true
-    version                 = "0.9.1"
-    enabled                 = false
-    default_network_policy  = false
-    namespace               = "virtual-kubelet"
-    cpu                     = "20"
-    memory                  = "40Gi"
-    pods                    = "20"
-    operatingsystem         = "Linux"
-    platformversion         = "LATEST"
-    assignpublicipv4address = false
-    fargate_cluster_name    = "sample"
+  flux = {
+    version = "1.14.2"
+    chart_version = "0.14.1"
+    enabled = false
+    default_network_policy = false
+    namespace = "flux"
+    allowed_namespaces = ""
+    timeout = 3600
+    force_update = false
+    recreate_pods = false
+    wait = true
+
+    extra_values = <<EXTRA_VALUES
+git:
+  url: "ssh://git@github.com/REPO"
+  pollInterval: "1m"
+helmOperator:
+  create: false
+  tillerNamespace: "flux"
+  allowNamespace: "flux"
+registry:
+  excludeImage: "*"
+rbac:
+  create: false
+syncGarbageCollection:
+  enabled: true
+  dry: false
+prometheus:
+  enabled: true
+EXTRA_VALUES
   }
 
-  //
-  // [prometheus_operator]
-  //
+  virtual_kubelet = {
+    create_iam_resources_kiam   = false
+    create_cloudwatch_log_group = false
+    cloudwatch_log_group        = "eks-virtual-kubelet"
+    version                     = "0.7.4"
+    enabled                     = false
+    default_network_policy      = true
+    namespace                   = "virtual-kubelet"
+    cpu                         = "20"
+    memory                      = "40Gi"
+    pods                        = "20"
+    operatingsystem             = "Linux"
+    platformversion             = "LATEST"
+    assignpublicipv4address     = false
+    fargate_cluster_name        = "sample"
+  }
+
   prometheus_operator = {
-    chart_version          = "6.3.1"
+    chart_version          = "6.8.3"
     enabled                = false
     default_network_policy = false
     namespace              = "monitoring"
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
 
     extra_values = <<EXTRA_VALUES
-  grafana:
-    ingress:
-      enabled: true
-      annotations:
-        certmanager.k8s.io/acme-challenge-type: dns01
-        certmanager.k8s.io/acme-dns01-provider: route53
-        certmanager.k8s.io/cluster-issuer: letsencrypt
-        kubernetes.io/ingress.class: nginx
-        kubernetes.io/tls-acme: "true"
-      hosts:
-        - grafana.eks.example.domain
-      tls:
-        - secretName: grafana-eks-example-domain
-          hosts:
-            - grafana.eks.example.domain
+grafana:
+  deploymentStrategy:
+    type: Recreate
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - grafana.sample.com
+  persistence:
+    enabled: true
+    storageClassName: gp2
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
 EXTRA_VALUES
   }
 
-  //
-  // [fluentd_cloudwatch]
-  //
   fluentd_cloudwatch = {
+    create_iam_resources_kiam = true
+    iam_policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}
+POLICY
     chart_version          = "0.10.2"
     version                = "v1.4.2-debian-cloudwatch-1.1"
-    use_kiam               = false
-    enabled                = false
-    default_network_policy = false
+    enabled                = true
+    default_network_policy = true
     namespace              = "fluentd-cloudwatch"
-    extra_values           = ""
-    log_group_name         = "eks-sample-logs"
+    log_group_name         = "/aws/eks/sample/containers"
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
+
+    extra_values = <<VALUES
+VALUES
   }
 
-  //
-  // [node_problem_detector]
-  //
   npd = {
-    chart_version          = "1.5.0"
-    version                = "v0.6.3"
-    enabled                = false
-    default_network_policy = false
-    namespace              = "node-problem-detector"
-    extra_values           = ""
+    chart_version = "1.5.2"
+    version = "v0.7.0"
+    enabled = true
+    default_network_policy = true
+    namespace = "node-problem-detector"
+    timeout = 3600
+    force_update = false
+    recreate_pods = false
+    wait = true
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
   }
 
-  //
-  // [sealed_secrets]
-  //
   sealed_secrets = {
-    chart_version          = "1.3.2"
-    version                = "v0.8.1"
+    chart_version          = "1.4.0"
+    version                = "v0.8.3"
     enabled                = false
     default_network_policy = false
     namespace              = "sealed-secrets"
-    extra_values           = ""
-  }
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
 
-  //
-  // [istio]
-  //
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
+}
+
   istio = {
-    chart_version_init     = "1.2.2"
-    chart_version          = "1.2.2"
-    enabled_init           = false
-    enabled                = false
+    chart_version_init = "1.2.2"
+    chart_version = "1.2.2"
+    enabled_init = false
+    enabled = false
     default_network_policy = false
-    namespace              = "istio-system"
-    extra_values_init      = ""
-    extra_values           = <<EXTRA_VALUES
-  gateways:
-    istio-ingressgateway:
-      sds:
-        enabled: true
-      serviceAnnotations:
-        service.beta.kubernetes.io/aws-load-balancer-type: nlb
-  global:
-    k8sIngress:
+    namespace = "istio-system"
+    timeout_init = 3600
+    force_update_init = false
+    recreate_pods_init = false
+    wait_init = true
+    timeout = 3600
+    force_update = false
+    recreate_pods = false
+    wait = true
+
+    extra_values_init = <<EXTRA_VALUES
+EXTRA_VALUES
+    extra_values = <<EXTRA_VALUES
+gateways:
+  istio-ingressgateway:
+    sds:
       enabled: true
-      enabledHttps: true
-      gatewayName: ingressgateway
+    serviceAnnotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: nlb
+global:
+  k8sIngress:
+    enabled: true
+    enabledHttps: true
+    gatewayName: ingressgateway
 EXTRA_VALUES
   }
+
+  cni_metrics_helper = {
+    create_iam_resources_kiam = true
+    enabled = true
+    version = "v1.5.0"
+    iam_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "cloudwatch:PutMetricData",
+      "Resource": "*",
+      "Effect": "Allow"
+    },
+    {
+      "Effect": "Allow",
+      "Resource": "*",
+      "Action": "ec2:DescribeTags"
+    }
+  ]
+}
+POLICY
+  }
+
 }
