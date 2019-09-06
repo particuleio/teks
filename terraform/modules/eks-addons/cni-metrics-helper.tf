@@ -54,7 +54,7 @@ data "template_file" "cni_metrics_helper" {
 resource "null_resource" "cni_metrics_helper" {
   count = var.cni_metrics_helper["enabled"] ? 1 : 0
   triggers = {
-    always = timestamp()
+    always = data.template_file.cni_metrics_helper.*.rendered[count.index]
   }
 
   provisioner "local-exec" {
