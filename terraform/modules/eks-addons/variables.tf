@@ -81,3 +81,13 @@ variable "cni_metrics_helper" {
   type    = map(string)
   default = {}
 }
+
+variable "kong" {
+  type    = map(string)
+  default = {}
+}
+
+variable "rancher" {
+  type    = map(string)
+  default = {}
+}
