@@ -15,7 +15,7 @@ install:
   - mkdocs --version
 
 script:
-  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ] && [ "$TRAVIS_BRANCH" = "master" ]; then
       mkdocs gh-deploy -r https://${GITHUB_TOKEN}@github.com/clusterfrak-dynamics/teks.git --force ;
     fi
 
