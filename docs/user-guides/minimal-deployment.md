@@ -44,7 +44,7 @@ Edit `live/minimal/eks/terragrunt.hcl`:
 This module setup infrastructure components and everything related to AWS, such as IAM permission if necessary.
 
 ```json
-{!terraform/live/minimal/eks/terragrunt.hcl!}
+{!terraform/live/sample/eks/terragrunt.hcl!}
 ```
 
 Everything should already be turned off by default. You should just have to edit `cluster-name` and the `aws["region"]` variable. 
