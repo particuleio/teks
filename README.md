@@ -49,20 +49,22 @@ When this projet started, it did not rely on the official [Terraform EKS module]
 * Supports new or existing VPC
 * Calico for network policies
 * Common addons with associated IAM permissions if needed:
-  * [cluster-autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler): scale worker nodes based on workload
-  * [external-dns](https://github.com/kubernetes-incubator/external-dns): sync ingress and service records in route53
-  * [cert-manager](https://github.com/jetstack/cert-manager): automatically generate TLS certificates, supports ACME v2
-  * [kiam](https://github.com/uswitch/kiam): prevents pods to access EC2 metadata and enables pods to assume specific AWS IAM roles
-  * [nginx-ingress](https://github.com/kubernetes/ingress-nginx): processes *Ingress* object and acts as a HTTP/HTTPS proxy (compatible with cert-manager)
-  * [metrics-server](https://github.com/kubernetes-incubator/metrics-server): enable metrics API and horizontal pod scaling (HPA)
-  * [prometheus-operator](https://github.com/coreos/prometheus-operator): Monitoring / Alerting / Dashboards
-  * [virtual-kubelet](https://github.com/coreos/prometheus-operator): enables using ECS Fargate as a provider to run workload without EC2 instances
-  * [fluentd-cloudwatch](https://github.com/helm/charts/tree/master/incubator/fluentd-cloudwatch): forwards logs to AWS Cloudwatch
+  * [cluster-autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler): scale worker nodes based on workload.
+  * [external-dns](https://github.com/kubernetes-incubator/external-dns): sync ingress and service records in route53.
+  * [cert-manager](https://github.com/jetstack/cert-manager): automatically generate TLS certificates, supports ACME v2.
+  * [kiam](https://github.com/uswitch/kiam): prevents pods to access EC2 metadata and enables pods to assume specific AWS IAM roles.
+  * [nginx-ingress](https://github.com/kubernetes/ingress-nginx): processes *Ingress* object and acts as a HTTP/HTTPS proxy (compatible with cert-manager).
+  * [metrics-server](https://github.com/kubernetes-incubator/metrics-server): enable metrics API and horizontal pod scaling (HPA).
+  * [prometheus-operator](https://github.com/coreos/prometheus-operator): Monitoring / Alerting / Dashboards.
+  * [virtual-kubelet](https://github.com/coreos/prometheus-operator): enables using ECS Fargate as a provider to run workload without EC2 instances.
+  * [fluentd-cloudwatch](https://github.com/helm/charts/tree/master/incubator/fluentd-cloudwatch): forwards logs to AWS Cloudwatch.
   * [node-problem-detector](https://github.com/kubernetes/node-problem-detector): Forwards node problems to Kubernetes events
   * [flux](https://github.com/weaveworks/flux): Continous Delivery with Gitops workflow.
   * [sealed-secrets](https://github.com/bitnami-labs/sealed-secrets): Technology agnostic, store secrets on git.
   * [istio](https://istio.io): Service mesh for Kubernetes.
   * [cni-metrics-helper](https://docs.aws.amazon.com/eks/latest/userguide/cni-metrics-helper.html): Provides cloudwatch metrics for VPC CNI plugins.
+  * [kong](https://konghq.com/kong): API Gateway ingress controller.
+  * [rancher](https://rancher.com/): UI for easy cluster management.
 
 ## Requirements
 
