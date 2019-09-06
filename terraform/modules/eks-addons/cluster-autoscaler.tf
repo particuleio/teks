@@ -56,10 +56,6 @@ resource "aws_iam_role_policy_attachment" "eks-cluster-autoscaler-kiam" {
   policy_arn = aws_iam_policy.eks-cluster-autoscaler[count.index].arn
 }
 
-output "cluster-autoscaler-kiam-role-arn" {
-  value = aws_iam_role.eks-cluster-autoscaler-kiam.*.arn
-}
-
 resource "kubernetes_namespace" "cluster_autoscaler" {
   count = var.cluster_autoscaler["enabled"] ? 1 : 0
 
