@@ -14,7 +14,7 @@ When this projet started, it did not rely on the official [Terraform EKS module]
 * [EKS](https://github.com/terraform-aws-modules/terraform-aws-eks)
 * [eks](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module will be kept for compatibility and all the feature will be PR upstream if they do not already exist.
 
-[eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) is now decouple from `eks` module. It will soon be compatible with [upstream module](https://github.com/terraform-aws-modules/terraform-aws-eks). v3.X is working toward this goal.
+[eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) is now decoupled from `eks` module. It will soon be compatible with [upstream module](https://github.com/terraform-aws-modules/terraform-aws-eks). v3.X is working toward this goal.
 
 ## Branches
 

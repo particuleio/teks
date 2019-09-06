@@ -14,37 +14,37 @@ tree
 .
 ├── minimal
 │   ├── eks
-│   │   └── terraform.tfvars
+│   │   └── terragrunt.hcl
 │   └── eks-addons
-│       └── terraform.tfvars
+│       └── terragrunt.hcl
 ├── sample
 │   ├── eks
-│   │   └── terraform.tfvars
+│   │   └── terragrunt.hcl
 │   └── eks-addons
-│       └── terraform.tfvars
-└── terraform.tfvars
+│       └── terragrunt.hcl
+└── terragrunt.hcl
 
 6 directories, 5 files
 ```
 
 ### Terragrunt remote state
 
-Edit `live/terraform.tfvars`:
+Edit `live/terragrunt.hcl`:
 
 ```tf
-{!terraform/live/terraform.tfvars!}
+{!terraform/live/terragrunt.hcl!}
 ```
 
 Change bucket and dynamodb to suit your environment, Terragrunt can create the bucket and dynamodb table if they do not exist.
 
 ### EKS module variables
 
-Edit `live/minimal/eks/terraform.tfvars`:
+Edit `live/minimal/eks/terragrunt.hcl`:
 
 This module setup infrastructure components and everything related to AWS, such as IAM permission if necessary.
 
 ```json
-{!terraform/live/minimal/eks/terraform.tfvars!}
+{!terraform/live/minimal/eks/terragrunt.hcl!}
 ```
 
 Everything should already be turned off by default. You should just have to edit `cluster-name` and the `aws["region"]` variable. 
