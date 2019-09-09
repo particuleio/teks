@@ -23,6 +23,7 @@ terraform {
 locals {
   cluster-name = "sample"
   env          = "sample"
+  aws_region   = "eu-west-1"
 }
 
 inputs = {
@@ -30,7 +31,7 @@ inputs = {
   cluster-name = local.cluster-name
 
   aws = {
-    "region" = "eu-west-1"
+    "region" = local.aws_region
   }
 
   eks = {
@@ -60,7 +61,7 @@ EXTRA_VALUES
   }
 
   cluster_autoscaler = {
-    create_iam_resources_kiam = true
+    create_iam_resources_kiam = false
 
     iam_policy = <<POLICY
 {
@@ -98,7 +99,7 @@ EXTRA_VALUES
   }
 
   external_dns = {
-    create_iam_resources_kiam = true
+    create_iam_resources_kiam = false
 
     iam_policy = <<POLICY
 {
@@ -272,7 +273,7 @@ EXTRA_VALUES
     cloudwatch_log_group        = "eks-virtual-kubelet"
     version                     = "0.7.4"
     enabled                     = false
-    default_network_policy      = true
+    default_network_policy      = false
     namespace                   = "virtual-kubelet"
     cpu                         = "20"
     memory                      = "40Gi"
@@ -313,7 +314,7 @@ EXTRA_VALUES
   }
 
   fluentd_cloudwatch = {
-    create_iam_resources_kiam = true
+    create_iam_resources_kiam = false
     iam_policy = <<POLICY
 {
     "Version": "2012-10-17",
@@ -334,8 +335,8 @@ EXTRA_VALUES
 POLICY
     chart_version          = "0.10.2"
     version                = "v1.4.2-debian-cloudwatch-1.1"
-    enabled                = true
-    default_network_policy = true
+    enabled                = false
+    default_network_policy = false
     namespace              = "fluentd-cloudwatch"
     log_group_name         = "/aws/eks/sample/containers"
     timeout                = 3600
@@ -350,8 +351,8 @@ VALUES
   npd = {
     chart_version = "1.5.2"
     version = "v0.7.0"
-    enabled = true
-    default_network_policy = true
+    enabled = false
+    default_network_policy = false
     namespace = "node-problem-detector"
     timeout = 3600
     force_update = false
@@ -411,8 +412,8 @@ EXTRA_VALUES
   }
 
   cni_metrics_helper = {
-    create_iam_resources_kiam = true
-    enabled = true
+    create_iam_resources_kiam = false
+    enabled = false
     version = "v1.5.0"
     iam_policy = <<POLICY
 {
@@ -433,4 +434,50 @@ EXTRA_VALUES
 POLICY
   }
 
+  kong = {
+    version                = "1.3"
+    chart_version          = "0.17.0"
+    enabled                = false
+    default_network_policy = false
+    ingress_cidr           = "0.0.0.0/0"
+    namespace              = "kong"
+    timeout                = 3600
+    force_update           = false
+    recreate_pods          = false
+    wait                   = true
+
+    extra_values           = <<EXTRA_VALUES
+EXTRA_VALUES
+  }
+
+  rancher = {
+    chart_version = "2.2.8"
+    version = "v2.2.8"
+    enabled = false
+    channel = "stable"
+    default_network_policy = false
+    namespace = "rancher"
+    timeout = 3600
+    force_update = false
+    recreate_pods = false
+    wait = true
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
+  }
+
+  keycloak = {
+    chart_version = "5.1.7"
+    version = "6.0.1"
+    enabled = false
+    default_network_policy = false
+    namespace = "keycloak"
+    timeout = 3600
+    force_update = false
+    recreate_pods = false
+    wait = true
+
+    extra_values = <<EXTRA_VALUES
+EXTRA_VALUES
+  }
 }

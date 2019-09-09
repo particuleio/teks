@@ -44,6 +44,7 @@ terraform {
 locals {
   cluster-name = "sample"
   env          = "sample"
+  key_name     = "sample"
 }
 
 inputs = {
@@ -130,6 +131,28 @@ spec:
   - Ingress
 EXTRA_NETWORK_POLICIES
 
+custom_tags = {
+  Env = local.env
+}
+
+custom_tags_list = []
+
+bastion = {
+  create = true
+  image_id = "ami-08c1db9058a6ce304"
+  instance_type = "t3.small"
+  key_name = local.key_name
+  volume_size = 10
+  volume_type = "gp2"
+  vpc_zone_identifier = []
+  cidr_blocks = [
+    "0.0.0.0/0"
+  ]
+
+  user_data = <<USER_DATA
+USER_DATA
+}
+
 node-pools = [
   {
     name = "default"
@@ -143,7 +166,7 @@ EXTRA_USER_DATA
     vpc_zone_identifier = []
     gpu_ami = false
     instance_type = "t3.medium"
-    key_name = "keypair"
+    key_name = local.key_name
     volume_size = 50
     volume_type = "gp2"
     autoscaling = "enabled"
