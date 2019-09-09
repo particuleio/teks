@@ -10,13 +10,19 @@ tolerations:
   - operator: Exists
 awsRole: "${aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn}"
 awsRegion: "${var.aws["region"]}"
-logGroupName: "${var.fluentd_cloudwatch["log_group_name"]}"
+logGroupName: "${aws_cloudwatch_log_group.eks-fluentd-cloudwatch-log-group[0].name}"
 extraVars:
   - "{ name: FLUENT_UID, value: '0' }"
-updateStrategy: 
+updateStrategy:
   type: RollingUpdate
 VALUES
 
+}
+
+resource "aws_cloudwatch_log_group" "eks-fluentd-cloudwatch-log-group" {
+  count             = var.fluentd_cloudwatch["enabled"] ? 1 : 0
+  name              = "/aws/eks/${var.cluster-name}/containers"
+  retention_in_days = var.fluentd_cloudwatch["containers_log_retention_in_days"]
 }
 
 resource "aws_iam_policy" "eks-fluentd-cloudwatch" {
