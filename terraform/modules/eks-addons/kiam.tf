@@ -15,7 +15,7 @@ agent:
       hostPath: /etc/pki/ca-trust/extracted/pem
       readOnly: true
   tolerations: ${var.kiam["server_use_host_network"] ? "[{'operator': 'Exists'}]" : "[]"}
-  whiteListRouteRegexp: "/latest/dynamic/instance-identity/document"
+  whiteListRouteRegexp: "^(/latest/dynamic/instance-identity/document|/latest/meta-data/placement/availability-zone)$"
 server:
   service:
     targetPort: 11443
