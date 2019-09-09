@@ -6,13 +6,19 @@
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
+## Modules
+
+* [`eks`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons): bootstrap a managed EKS cluster with a managed or existing VPC. Similar to the [official module](https://github.com/terraform-aws-modules/terraform-aws-eks).
+* [`eks-addons`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
+* [`eks-namespaces`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-namespaces): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
+
 ## Roadmap
 
 When this projet started, it did not rely on the official [Terraform EKS module](https://github.com/terraform-aws-modules/terraform-aws-eks) which is now quite stable and allows advanced configurations. The goal is now to migrate parts of this project to the upstream one and offloading part of the work to official modules and integrating them with Terragrunt:
 
 * [AWS VPC](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 * [EKS](https://github.com/terraform-aws-modules/terraform-aws-eks)
-* [eks](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) module will be kept for compatibility and all the feature will be PR upstream if they do not already exist.
+* [`eks`](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks) module will be kept for compatibility and all the feature will be PR upstream if they do not already exist.
 
 [eks-addons](https://github.com/clusterfrak-dynamics/teks/tree/master/terraform/modules/eks-addons) is now decoupled from `eks` module. It will soon be compatible with [upstream module](https://github.com/terraform-aws-modules/terraform-aws-eks). v3.X is working toward this goal.
 
