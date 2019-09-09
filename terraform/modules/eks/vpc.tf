@@ -13,10 +13,7 @@ resource "aws_vpc" "eks" {
   enable_dns_hostnames             = true
   assign_generated_ipv6_cidr_block = true
 
-  tags = {
-    "Name"                                      = "terraform-eks-${var.cluster-name}"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-  }
+  tags = merge({ "Name" = "terraform-eks-${var.cluster-name}", "kubernetes.io/cluster/${var.cluster-name}" = "shared" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_subnet" "eks" {
@@ -29,11 +26,7 @@ resource "aws_subnet" "eks" {
   )
   vpc_id = aws_vpc.eks[0].id
 
-  tags = {
-    "Name"                                      = "terraform-eks-node-${var.cluster-name}-public"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/elb"                    = "1"
-  }
+  tags = merge({ "Name" = "terraform-eks-node-${var.cluster-name}-public", "kubernetes.io/cluster/${var.cluster-name}" = "shared", "kubernetes.io/role/elb" = "1" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_subnet" "eks-private" {
@@ -42,30 +35,26 @@ resource "aws_subnet" "eks-private" {
   cidr_block        = cidrsubnet(var.vpc["cidr"], 3, count.index)
   vpc_id            = aws_vpc.eks[0].id
 
-  tags = {
-    "Name"                                      = "terraform-eks-node-${var.cluster-name}-private"
-    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
-    "kubernetes.io/role/internal-elb"           = "1"
-  }
+  tags = merge({ "Name" = "terraform-eks-node-${var.cluster-name}-private", "Public" = "no", "kubernetes.io/cluster/${var.cluster-name}" = "shared", "kubernetes.io/role/internal-elb" = "1" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_internet_gateway" "eks" {
   count  = var.vpc["create"] ? 1 : 0
   vpc_id = aws_vpc.eks[0].id
 
-  tags = {
-    Name = "terraform-eks-${var.cluster-name}"
-  }
+  tags = merge({ Name = "terraform-eks-${var.cluster-name}" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_route_table" "eks" {
   count  = var.vpc["create"] ? 1 : 0
   vpc_id = aws_vpc.eks[0].id
+  tags   = merge({ Name = "terraform-eks-${var.cluster-name}-public" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_route_table" "eks-private" {
   count  = var.vpc["create"] ? 3 : 0
   vpc_id = aws_vpc.eks[0].id
+  tags   = merge({ Name = "terraform-eks-${var.cluster-name}-private" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_route" "eks" {

@@ -47,6 +47,7 @@ resource "aws_launch_template" "eks" {
   name_prefix            = "terraform-eks-${var.cluster-name}-node-pool-${var.node-pools[count.index]["name"]}-"
   vpc_security_group_ids = [aws_security_group.eks-node.id]
   user_data              = base64encode(data.template_file.eks-node[count.index].rendered)
+  tags                   = merge(local.common_tags, var.custom_tags)
 
   key_name = var.node-pools[count.index]["key_name"]
 
@@ -111,6 +112,8 @@ resource "aws_autoscaling_group" "eks" {
       },
     ],
     var.node-pools[count.index]["tags"],
+    local.common_tags_list,
+    var.custom_tags_list
   )
 
   lifecycle {

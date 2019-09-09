@@ -10,10 +10,7 @@ resource "aws_security_group" "eks-node" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    "Name"                                      = "terraform-eks-node-${var.cluster-name}"
-    "kubernetes.io/cluster/${var.cluster-name}" = "owned"
-  }
+  tags = merge({ "Name" = "terraform-eks-node-${var.cluster-name}", "kubernetes.io/cluster/${var.cluster-name}" = "owned" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_security_group_rule" "eks-node-ingress-self" {
@@ -57,7 +54,17 @@ resource "aws_security_group_rule" "eks-node-ingress-cluster-ssh" {
   type                     = "ingress"
 }
 
+resource "aws_security_group_rule" "eks-node-ingress-cluster-ssh-bastion" {
+  count                    = var.bastion["create"] ? 1 : 0
+  description              = "Allow worker Kubelets and pods to receive SSH communication from a remote security group"
+  from_port                = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks-node.id
+  source_security_group_id = aws_security_group.bastion[count.index].id
+  to_port                  = 22
+  type                     = "ingress"
+}
+
 output "eks-node-sg" {
   value = aws_security_group.eks-node.id
 }
-

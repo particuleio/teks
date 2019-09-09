@@ -65,3 +65,18 @@ variable "extra_network_policies" {
 variable "kubeconfig_assume_role_arn" {
   default = ""
 }
+
+variable "custom_tags" {
+  type    = map
+  default = {}
+}
+
+variable "custom_tags_list" {
+  type    = list
+  default = []
+}
+
+variable "bastion" {
+  type    = any
+  default = {}
+}

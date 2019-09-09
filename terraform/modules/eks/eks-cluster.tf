@@ -47,9 +47,7 @@ resource "aws_security_group" "eks-cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "terraform-eks-${var.cluster-name}"
-  }
+  tags = merge({ "Name" = "terraform-eks-${var.cluster-name}" }, local.common_tags, var.custom_tags)
 }
 
 resource "aws_security_group_rule" "eks-cluster-ingress-node-https" {
@@ -75,6 +73,7 @@ resource "aws_security_group_rule" "eks-cluster-ingress-workstation-https" {
 resource "aws_cloudwatch_log_group" "eks-logs" {
   name              = "/aws/eks/${var.cluster-name}/cluster"
   retention_in_days = var.cluster_log_retention_in_days
+  tags              = merge(local.common_tags, var.custom_tags)
 }
 
 resource "aws_eks_cluster" "eks" {

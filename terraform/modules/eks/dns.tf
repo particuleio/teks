@@ -7,6 +7,8 @@ resource "aws_route53_zone" "eks" {
   name  = "${var.dns["subdomain_name"]}.${var.dns["domain_name"]}"
   count = var.dns["use_route53"] ? 1 : 0
 
+  tags = merge(local.common_tags, var.custom_tags)
+
   dynamic "vpc" {
     for_each = ! var.dns["private"] ? [] : list("vpc")
 
