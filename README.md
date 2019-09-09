@@ -65,6 +65,7 @@ When this projet started, it did not rely on the official [Terraform EKS module]
   * [cni-metrics-helper](https://docs.aws.amazon.com/eks/latest/userguide/cni-metrics-helper.html): Provides cloudwatch metrics for VPC CNI plugins.
   * [kong](https://konghq.com/kong): API Gateway ingress controller.
   * [rancher](https://rancher.com/): UI for easy cluster management.
+  * [keycloak](https://www.keycloak.org/) : Identity and access management
 
 ## Requirements
 

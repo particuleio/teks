@@ -91,3 +91,8 @@ variable "rancher" {
   type    = map(string)
   default = {}
 }
+
+variable "keycloak" {
+  type    = map(string)
+  default = {}
+}
