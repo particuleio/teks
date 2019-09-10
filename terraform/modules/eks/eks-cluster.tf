@@ -110,3 +110,6 @@ resource "aws_eks_cluster" "eks" {
   ]
 }
 
+output "cluster_name" {
+  value = aws_eks_cluster.eks.name
+}
