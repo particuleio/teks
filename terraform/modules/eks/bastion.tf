@@ -108,8 +108,12 @@ resource "aws_autoscaling_group" "bastion" {
         "propagate_at_launch" = true
       },
     ],
-    local.common_tags_list,
-    var.custom_tags_list
+    [
+        for k,v in var.custom_tags: {"key" = k, "value" = v, "propagate_at_launch" = true}
+    ],
+    [
+        for k,v in local.common_tags: {"key" = k, "value" = v, "propagate_at_launch" = true}
+    ]
   )
 
   lifecycle {
