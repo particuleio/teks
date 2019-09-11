@@ -104,11 +104,11 @@ resource "kubernetes_network_policy" "kong_allow_ingress" {
 
     ingress {
       ports {
-        port     = "80"
+        port     = "8000"
         protocol = "TCP"
       }
       ports {
-        port     = "443"
+        port     = "8443"
         protocol = "TCP"
       }
 
