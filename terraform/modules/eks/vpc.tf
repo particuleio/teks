@@ -24,7 +24,8 @@ resource "aws_subnet" "eks" {
     3,
     length(aws_subnet.eks-private) + count.index,
   )
-  vpc_id = aws_vpc.eks[0].id
+  vpc_id                  = aws_vpc.eks[0].id
+  map_public_ip_on_launch = true
 
   tags = merge({ "Name" = "terraform-eks-node-${var.cluster-name}-public", "Public" = "yes", "kubernetes.io/cluster/${var.cluster-name}" = "shared", "kubernetes.io/role/elb" = "1" }, local.common_tags, var.custom_tags)
 }
