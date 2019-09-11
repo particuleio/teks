@@ -20,3 +20,21 @@ resource "kubernetes_resource_quota" "namespace_quota" {
     }
   }
 }
+
+resource "kubernetes_limit_range" "namespace_limit" {
+  count = length(var.namespaces)
+
+  metadata {
+    name      = "${kubernetes_namespace.namespace.*.metadata.0.name[count.index]}-quota"
+    namespace = kubernetes_namespace.namespace.*.metadata.0.name[count.index]
+  }
+  spec {
+    limit {
+      type = "Container"
+      default_request = {
+        cpu    = "100m"
+        memory = "100M"
+      }
+    }
+  }
+}
