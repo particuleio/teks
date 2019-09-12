@@ -123,6 +123,7 @@ resource "kubernetes_network_policy" "prometheus_operator_allow_ingress_nginx" {
 }
 
 output "grafana_password" {
-  value = random_string.grafana_password.*.result
+  value     = random_string.grafana_password.*.result
+  sensitive = true
 }
 
