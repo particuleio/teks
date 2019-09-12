@@ -8,8 +8,6 @@ postgresql:
   enabled: false
 env:
   database: "off"
-proxy:
-  type: LoadBalancer
 admin:
   type: ClusterIP
 VALUES
