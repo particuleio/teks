@@ -58,6 +58,10 @@ variable "map_users" {
   type = string
 }
 
+variable "map_roles" {
+  type = string
+}
+
 variable "extra_network_policies" {
   default = ""
 }

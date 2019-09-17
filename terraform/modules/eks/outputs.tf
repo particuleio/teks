@@ -19,6 +19,9 @@ data:
       groups:
         - system:bootstrappers
         - system:nodes
+
+    ${indent(4, var.map_role)}
+
   mapUsers: |
     ${indent(4, var.map_users)}
 CONFIGMAPAWSAUTH
