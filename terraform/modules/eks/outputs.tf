@@ -20,7 +20,7 @@ data:
         - system:bootstrappers
         - system:nodes
 
-    ${indent(4, var.map_role)}
+    ${indent(4, var.map_roles)}
 
   mapUsers: |
     ${indent(4, var.map_users)}
