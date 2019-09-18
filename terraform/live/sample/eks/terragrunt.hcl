@@ -42,9 +42,11 @@ terraform {
 }
 
 locals {
+  aws_region   = basename(dirname(get_terragrunt_dir()))
   cluster-name = "sample"
   env          = "sample"
   key_name     = "sample"
+  custom_tags  = {}
 }
 
 inputs = {
@@ -53,7 +55,7 @@ inputs = {
   // [provider]
   //
   aws = {
-    "region" = "eu-west-1"
+    "region" = local.aws_region
   }
 
   //
@@ -62,9 +64,9 @@ inputs = {
   vpc = {
     create             = true
     cidr               = "10.0.0.0/16"
-    vpc_id             = "vpc-0fd2efe63408f5aba"
-    public_subnets_id  = "subnet-0a60f7202528d8f64,subnet-0f7deaa3e53b86817,subnet-0f58143b87ef10257"
-    private_subnets_id = "subnet-0b0cca9118459c6c9,subnet-0296207fa6ff0c9ce,subnet-00f139ff79e016c19"
+    vpc_id             = ""
+    public_subnets_id  = ""
+    private_subnets_id = ""
   }
 
   //
@@ -85,7 +87,7 @@ inputs = {
   //
   cluster-name = local.cluster-name
 
-  kubernetes_version = "1.13"
+  kubernetes_version = "1.14"
 
   endpoint_private_access = true
 
@@ -102,11 +104,9 @@ inputs = {
   kubeconfig_assume_role_arn = ""
 
   map_users = <<MAP_USERS
-  - userarn: arn:aws:iam::000000000000:user/MyUser
-    username: admin
-    groups:
-      - system:masters
-  MAP_USERS
+MAP_USERS
+  map_roles = <<MAP_ROLES
+MAP_ROLES
 
   extra_network_policies = <<EXTRA_NETWORK_POLICIES
 apiVersion: networking.k8s.io/v1
@@ -131,11 +131,12 @@ spec:
   - Ingress
 EXTRA_NETWORK_POLICIES
 
-custom_tags = {
-  Env = local.env
-}
-
-custom_tags_list = []
+custom_tags = merge(
+    {
+      "Env" = local.env
+    },
+    local.custom_tags
+)
 
 bastion = {
   create = true

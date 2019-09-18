@@ -22,9 +22,6 @@ locals {
 
 inputs = {
 
-//
-// [provider]
-//
 aws = {
   "region" = local.aws_region
 }

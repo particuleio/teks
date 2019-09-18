@@ -43,7 +43,7 @@ inputs = {
 
   nginx_ingress = {
     version                = "0.25.1"
-    chart_version          = "1.19.0"
+    chart_version          = "1.20.0"
     enabled                = false
     default_network_policy = false
     ingress_cidr           = "0.0.0.0/0"
@@ -108,8 +108,7 @@ EXTRA_VALUES
     {
       "Effect": "Allow",
       "Action": [
-        "route53:ChangeResourceRecordSets",
-        "route53:ListResourceRecordSets"
+        "route53:ChangeResourceRecordSets"
       ],
       "Resource": [
         "arn:aws:route53:::hostedzone/*"
@@ -118,7 +117,8 @@ EXTRA_VALUES
     {
       "Effect": "Allow",
       "Action": [
-        "route53:ListHostedZones"
+        "route53:ListHostedZones",
+        "route53:ListResourceRecordSets"
       ],
       "Resource": [
         "*"
@@ -263,7 +263,7 @@ syncGarbageCollection:
   enabled: true
   dry: false
 prometheus:
-  enabled: true
+  enabled: false
 EXTRA_VALUES
   }
 
@@ -285,7 +285,7 @@ EXTRA_VALUES
   }
 
   prometheus_operator = {
-    chart_version          = "6.8.3"
+    chart_version          = "6.10.0"
     enabled                = false
     default_network_policy = false
     namespace              = "monitoring"
@@ -338,11 +338,11 @@ POLICY
     enabled                = false
     default_network_policy = false
     namespace              = "fluentd-cloudwatch"
-    log_group_name         = "/aws/eks/sample/containers"
     timeout                = 3600
     force_update           = false
     recreate_pods          = false
     wait                   = true
+    containers_log_retention_in_days = 180
 
     extra_values = <<VALUES
 VALUES
