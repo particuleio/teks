@@ -7,7 +7,7 @@ resource "kubernetes_resource_quota" "namespace_quota" {
   }
 
   spec {
-    hard                           = {
+    hard = {
       "requests.cpu"               = var.namespaces[count.index]["requests.cpu"]
       "requests.memory"            = var.namespaces[count.index]["requests.memory"]
       "requests.nvidia.com/gpu"    = var.namespaces[count.index]["requests.nvidia.com/gpu"]

@@ -113,10 +113,10 @@ resource "aws_autoscaling_group" "eks" {
     ],
     var.node-pools[count.index]["tags"],
     [
-        for k,v in var.custom_tags: {"key" = k, "value" = v, "propagate_at_launch" = true}
+      for k, v in var.custom_tags : { "key" = k, "value" = v, "propagate_at_launch" = true }
     ],
     [
-        for k,v in local.common_tags: {"key" = k, "value" = v, "propagate_at_launch" = true}
+      for k, v in local.common_tags : { "key" = k, "value" = v, "propagate_at_launch" = true }
     ]
   )
 
