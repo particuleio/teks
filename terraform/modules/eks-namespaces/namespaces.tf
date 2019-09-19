@@ -86,6 +86,7 @@ resource "kubernetes_role" "flux" {
     resources = [
       "prometheusrules",
       "servicemonitors",
+      "podmonitors",
     ]
 
     verbs = ["*"]
