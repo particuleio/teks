@@ -96,3 +96,8 @@ variable "keycloak" {
   type    = map(string)
   default = {}
 }
+
+variable "karma" {
+  type = map(string)
+  default = {}
+}
