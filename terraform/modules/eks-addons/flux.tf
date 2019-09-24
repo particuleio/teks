@@ -9,8 +9,44 @@ helmOperator:
   create: true
 additionalArgs:
   - --k8s-allow-namespace=${var.flux["allowed_namespaces"]}
+annotations:
+  iam.amazonaws.com/role: "${aws_iam_role.eks-flux-kiam[0].arn}"
 VALUES
 
+}
+
+resource "aws_iam_role" "eks-flux-kiam" {
+  name  = "tf-eks-${var.cluster-name}-flux-kiam"
+  count = var.flux["create_iam_resources_kiam"] ? 1 : 0
+
+  assume_role_policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    },
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "${aws_iam_role.eks-kiam-server-role[count.index].arn}"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+POLICY
+}
+
+resource "aws_iam_role_policy_attachment" "eks-flux-kiam" {
+  count      = var.flux["create_iam_resources_kiam"] ? 1 : 0
+  role       = aws_iam_role.eks-flux-kiam[count.index].name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 resource "kubernetes_namespace" "flux" {
@@ -18,7 +54,7 @@ resource "kubernetes_namespace" "flux" {
 
   metadata {
     annotations = {
-      "iam.amazonaws.com/permitted" = ".*"
+      "iam.amazonaws.com/permitted" = "${aws_iam_role.eks-flux-kiam[0].arn}"
     }
 
     labels = {
