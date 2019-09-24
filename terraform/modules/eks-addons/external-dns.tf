@@ -6,6 +6,7 @@ provider: aws
 txtPrefix: "ext-dns-"
 rbac:
  create: true
+ pspEnabled: true
 podAnnotations:
   iam.amazonaws.com/role: "${aws_iam_role.eks-external-dns-kiam[0].arn}"
 VALUES
