@@ -1,13 +1,10 @@
 locals {
   values_prometheus_operator = <<VALUES
-prometheus-node-exporter:
-  tolerations:
-    - effect: NoSchedule
-      operator: Exists
-      key: "node-role.kubernetes.io/controller"
 kubeScheduler:
   enabled: false
 kubeControllerManager:
+  enabled: false
+kubeEtcd:
   enabled: false
 grafana:
   adminPassword: ${join(",", random_string.grafana_password.*.result)}
