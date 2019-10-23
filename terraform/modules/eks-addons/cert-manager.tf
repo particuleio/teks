@@ -5,7 +5,7 @@ image:
 rbac:
   create: true
 podAnnotations:
-  iam.amazonaws.com/role: "${aws_iam_role.eks-cert-manager-kiam[0].arn}"
+  iam.amazonaws.com/role: "${var.cert_manager["create_iam_resources_kiam"] ? aws_iam_role.eks-cert-manager-kiam[0].arn : ""}"
 VALUES
 
 }
