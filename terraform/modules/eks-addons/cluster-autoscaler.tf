@@ -10,7 +10,7 @@ rbac:
 image:
   tag: ${var.cluster_autoscaler["version"]}
 podAnnotations:
-  iam.amazonaws.com/role: "${aws_iam_role.eks-cluster-autoscaler-kiam[0].arn}"
+  iam.amazonaws.com/role: "${var.cluster_autoscaler["create_iam_resources_kiam"] ? aws_iam_role.eks-cluster-autoscaler-kiam[0].arn : ""}"
 VALUES
 
 }

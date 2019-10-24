@@ -1,6 +1,3 @@
-//
-// [cni-metrics-helper]
-//
 resource "aws_iam_policy" "eks-cni-metrics-helper" {
   count  = var.cni_metrics_helper["create_iam_resources_kiam"] ? 1 : 0
   name   = "tf-eks-${var.cluster-name}-cni-metrics-helper"
@@ -46,7 +43,7 @@ data "template_file" "cni_metrics_helper" {
   count    = var.cni_metrics_helper["enabled"] ? 1 : 0
   template = file("templates/cni-metrics-helper.yaml")
   vars = {
-    cni_metrics_helper_role_arn = aws_iam_role.eks-cni-metrics-helper-kiam[count.index].arn
+    cni_metrics_helper_role_arn = var.cni_metrics_helper["create_iam_resources_kiam"] ? aws_iam_role.eks-cni-metrics-helper-kiam[count.index].arn : ""
     cni_metrics_helper_version  = var.cni_metrics_helper["version"]
   }
 }

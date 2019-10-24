@@ -8,7 +8,7 @@ nodeSelector:
   node-role.kubernetes.io/node: ""
 tolerations:
   - operator: Exists
-awsRole: "${aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn}"
+awsRole: "${var.fluentd_cloudwatch["create_iam_resources_kiam"] ? aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn : ""}"
 awsRegion: "${var.aws["region"]}"
 logGroupName: "${aws_cloudwatch_log_group.eks-fluentd-cloudwatch-log-group[0].name}"
 extraVars:

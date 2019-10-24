@@ -10,7 +10,7 @@ helmOperator:
 additionalArgs:
   - --k8s-allow-namespace=${var.flux["allowed_namespaces"]}
 annotations:
-  iam.amazonaws.com/role: "${aws_iam_role.eks-flux-kiam[0].arn}"
+  iam.amazonaws.com/role: "${var.flux["create_iam_resources_kiam"] ? aws_iam_role.eks-flux-kiam[0].arn : ""}"
 VALUES
 
 }

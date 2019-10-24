@@ -8,7 +8,7 @@ rbac:
  create: true
  pspEnabled: true
 podAnnotations:
-  iam.amazonaws.com/role: "${aws_iam_role.eks-external-dns-kiam[0].arn}"
+  iam.amazonaws.com/role: "${var.external_dns["create_iam_resources_kiam"] ? aws_iam_role.eks-external-dns-kiam[0].arn : ""}"
 VALUES
 
 }
