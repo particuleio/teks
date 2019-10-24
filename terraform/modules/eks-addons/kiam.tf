@@ -217,3 +217,11 @@ resource "kubernetes_network_policy" "kiam_allow_requests" {
     policy_types = ["Ingress"]
   }
 }
+
+output kiam-server-role-arn {
+  value = aws_iam_role.eks-kiam-server-role.*.arn
+}
+
+output kiam-server-role-name {
+  value = aws_iam_role.eks-kiam-server-role.*.name
+}
