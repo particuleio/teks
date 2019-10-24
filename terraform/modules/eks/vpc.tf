@@ -102,3 +102,7 @@ output "vpc-public-subnets" {
 output "vpc-private-subnets" {
   value = aws_subnet.eks-private.*.id
 }
+
+output "vpc-id" {
+  value = aws_vpc.eks.*.id
+}
