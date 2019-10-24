@@ -19,20 +19,20 @@ resource "kubernetes_namespace" "karma" {
 }
 
 resource "helm_release" "karma" {
-  count      = var.karma["enabled"] ? 1 : 0
-  repository = data.helm_repository.stable.metadata[0].name
-  name       = "karma"
-  chart      = "karma"
-  version    = var.karma["chart_version"]
+  count         = var.karma["enabled"] ? 1 : 0
+  repository    = data.helm_repository.stable.metadata[0].name
+  name          = "karma"
+  chart         = "karma"
+  version       = var.karma["chart_version"]
   timeout       = var.karma["timeout"]
   force_update  = var.karma["force_update"]
   recreate_pods = var.karma["recreate_pods"]
   wait          = var.karma["wait"]
-  values     = concat(
+  values = concat(
     [local.values_karma],
     [var.karma["extra_values"]],
   )
-  namespace  = var.karma["namespace"]
+  namespace = var.karma["namespace"]
 }
 
 resource "kubernetes_network_policy" "karma_default_deny" {
