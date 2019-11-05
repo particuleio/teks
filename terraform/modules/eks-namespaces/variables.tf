@@ -1,8 +1,3 @@
-variable "aws" {
-  type    = map(string)
-  default = {}
-}
-
 variable "eks" {
   type    = map(string)
   default = {}
@@ -20,4 +15,3 @@ variable "namespaces" {
 
 variable "env" {
 }
-
