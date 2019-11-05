@@ -37,3 +37,8 @@ data "helm_repository" "codecentric" {
   name = "codecentric"
   url  = "https://codecentric.github.io/helm-charts"
 }
+
+data "helm_repository" "uswitch" {
+  name = "uswitch"
+  url  = "https://uswitch.github.io/kiam-helm-charts/charts/"
+}

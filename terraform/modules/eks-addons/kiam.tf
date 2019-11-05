@@ -124,7 +124,7 @@ resource "kubernetes_namespace" "kiam" {
 
 resource "helm_release" "kiam" {
   count         = var.kiam["enabled"] ? 1 : 0
-  repository    = data.helm_repository.stable.metadata[0].name
+  repository    = data.helm_repository.uswitch.metadata[0].name
   name          = "kiam"
   chart         = "kiam"
   version       = var.kiam["chart_version"]
