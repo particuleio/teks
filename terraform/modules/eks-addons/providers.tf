@@ -24,7 +24,7 @@ data "aws_caller_identity" "current" {
 provider "helm" {
   install_tiller                  = true
   service_account                 = "tiller"
-  tiller_image                    = "gcr.io/kubernetes-helm/tiller:v2.14.3"
+  tiller_image                    = "gcr.io/kubernetes-helm/tiller:v2.15.2"
   automount_service_account_token = true
 
   kubernetes {
@@ -37,14 +37,4 @@ provider "kubernetes" {
 }
 
 provider "tls" {
-}
-
-data "terraform_remote_state" "eks" {
-  backend = "s3"
-
-  config = {
-    bucket = var.eks["remote_state_bucket"]
-    key    = var.eks["remote_state_key"]
-    region = var.eks["remote_state_bucket_region"]
-  }
 }

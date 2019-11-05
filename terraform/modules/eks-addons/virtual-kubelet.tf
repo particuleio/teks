@@ -102,11 +102,8 @@ resource "kubernetes_config_map" "virtual-kubelet" {
     "fargate.toml" = <<DATA
 Region = "${var.aws["region"]}"
 ClusterName = "${var.virtual_kubelet["fargate_cluster_name"]}"
-Subnets = ["${join(
-    "\",\"",
-    data.terraform_remote_state.eks.outputs.vpc-private-subnets,
-)}"]
-SecurityGroups = ["${data.terraform_remote_state.eks.outputs.eks-node-sg}"]
+Subnets = ${var.virtual_kubelet["subnets"]}
+SecurityGroups = ${var.virtual_kubelet["security_groups"]}
 AssignPublicIPv4Address = false
 ExecutionRoleArn = "${aws_iam_role.eks-virtual-kubelet-ecs-task[0].arn}"
 CloudWatchLogGroupName = "${aws_cloudwatch_log_group.eks-virtual-kubelet[0].name}"
@@ -116,8 +113,7 @@ CPU = "${var.virtual_kubelet["cpu"]}"
 Memory = "${var.virtual_kubelet["memory"]}"
 Pods = "${var.virtual_kubelet["pods"]}"
 DATA
-
-}
+  }
 }
 
 resource "kubernetes_deployment" "virtual-kubelet" {
