@@ -29,9 +29,12 @@ server:
       hostPath: /etc/pki/ca-trust/extracted/pem
       readOnly: true
   extraEnv:
-    AWS_DEFAULT_REGION: ${var.aws["region"]}
-    AWS_ACCESS_KEY_ID: ${aws_iam_access_key.eks-kiam-user-key[0].id}
-    AWS_SECRET_ACCESS_KEY: ${aws_iam_access_key.eks-kiam-user-key[0].secret}
+    - name: AWS_DEFAULT_REGION
+      value: ${var.aws["region"]}
+    - name: AWS_ACCESS_KEY_ID
+      value: ${aws_iam_access_key.eks-kiam-user-key[0].id}
+    - name: AWS_SECRET_ACCESS_KEY
+      value: ${aws_iam_access_key.eks-kiam-user-key[0].secret}
 VALUES
 }
 
