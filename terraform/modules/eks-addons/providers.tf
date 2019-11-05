@@ -35,6 +35,3 @@ provider "helm" {
 provider "kubernetes" {
   config_path = var.eks["kubeconfig_path"]
 }
-
-provider "tls" {
-}
