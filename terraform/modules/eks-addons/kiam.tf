@@ -19,6 +19,7 @@ agent:
 server:
   service:
     targetPort: 11443
+    port: 11443
   useHostNetwork: ${var.kiam["server_use_host_network"]}
   image:
     tag: ${var.kiam["version"]}
