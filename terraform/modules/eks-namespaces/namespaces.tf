@@ -310,3 +310,6 @@ resource "kubernetes_network_policy" "namespace_allow_monitoring" {
   }
 }
 
+output "eks-namespaces" {
+  value = kubernetes_namespace.namespace.*.metadata.0.name
+}
