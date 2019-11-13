@@ -156,3 +156,10 @@ resource "kubernetes_network_policy" "flux_allow_namespace" {
   }
 }
 
+output flux-role-arn {
+  value = aws_iam_role.eks-flux-kiam.*.arn
+}
+
+output flux-role-name {
+  value = aws_iam_role.eks-flux-kiam.*.name
+}
