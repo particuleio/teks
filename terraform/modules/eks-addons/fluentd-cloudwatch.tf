@@ -4,8 +4,6 @@ image:
   tag: ${var.fluentd_cloudwatch["version"]}
 rbac:
   create: true
-nodeSelector:
-  node-role.kubernetes.io/node: ""
 tolerations:
   - operator: Exists
 awsRole: "${var.fluentd_cloudwatch["create_iam_resources_kiam"] ? aws_iam_role.eks-fluentd-cloudwatch-kiam[0].arn : ""}"
