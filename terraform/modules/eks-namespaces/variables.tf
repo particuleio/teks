@@ -3,6 +3,11 @@ variable "eks" {
   default = {}
 }
 
+variable "aws" {
+  type    = any
+  default = {}
+}
+
 variable "flux" {
   type    = map(string)
   default = {}
