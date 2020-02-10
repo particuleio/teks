@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.21.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.24.0"
 }
 
 locals {
@@ -37,6 +37,7 @@ inputs = {
   assign_generated_ipv6_cidr_block = true
 
   enable_nat_gateway = true
+  single_nat_gateway  = true
 
   enable_dns_hostnames = true
   enable_dns_support   = true

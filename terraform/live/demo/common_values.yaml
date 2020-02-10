@@ -1,4 +1,4 @@
 ---
 aws_account_id: 161285725140
 aws_region: eu-west-3
-prefix: cfd
+prefix: cfd-particule

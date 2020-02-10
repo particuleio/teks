@@ -3,11 +3,11 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v7.0.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v8.2.0"
 
   before_hook "init" {
     commands = ["init"]
-    execute  = ["bash", "-c", "wget -O terraform-provider-kubectl https://github.com/gavinbunney/terraform-provider-kubectl/releases/download/v1.0.1/terraform-provider-kubectl-linux-amd64 && chmod +x terraform-provider-kubectl"]
+    execute  = ["bash", "-c", "wget -O terraform-provider-kubectl https://github.com/gavinbunney/terraform-provider-kubectl/releases/download/v1.2.1/terraform-provider-kubectl-linux-amd64 && chmod +x terraform-provider-kubectl"]
   }
 
   after_hook "kubeconfig" {
@@ -55,12 +55,9 @@ inputs = {
   subnets               = dependency.vpc.outputs.private_subnets
   vpc_id                = dependency.vpc.outputs.vpc_id
   write_kubeconfig      = false
-  write_aws_auth_config = false
+  enable_irsa           = true
 
-  kubeconfig_aws_authenticator_additional_args = [
-    "-r",
-    "arn:aws:iam::${local.aws_account_id}:role/administrator",
-  ]
+  kubeconfig_aws_authenticator_additional_args = []
 
   cluster_version           = "1.14"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
