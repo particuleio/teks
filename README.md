@@ -6,14 +6,50 @@
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
-:warning: the v5 of this project has been completely revamp and now offer a skeleton to use as a base for your infrastructure projects around EKS. All the modules have been moved outside this repository and get their own versioning. The [old README is accessible here](https://github.com/clusterfrak-dynamics/teks/tree/release-4.X)
+:warning: the v5 and further version of this project have been completely revamp and now offer a skeleton to use as a base for your infrastructure projects around EKS. All the modules have been moved outside this repository and get their own versioning. The [old README is accessible here](https://github.com/clusterfrak-dynamics/teks/tree/release-4.X)
 
-## Modules
+## Main purposes
 
-* [`terraform-aws-vpc`](https://github.com/terraform-aws-modules/terraform-aws-vpc)
-* [`terraform-aws-eks`](https://github.com/terraform-aws-modules/terraform-aws-eks)
-* [`terraform-kubernetes-addons`](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
-* [`terraform-kubernetes-namespaces`](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
+The main goal of this project is to glue together commonly used tooling with Kubernetes/EKS and to get from an AWS Account to a production cluster with everything you need without any manual configuration.
+
+## What you get
+
+A production cluster all defined in IaaC with Terraform/Terragrunt:
+
+* AWS VPC if needed based on [`terraform-aws-vpc`](https://github.com/terraform-aws-modules/terraform-aws-vpc)
+* EKS cluster base on [`terraform-aws-eks`](https://github.com/terraform-aws-modules/terraform-aws-eks)
+* Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
+* Kubernetes namespaces quota management based on [`terraform-kubernetes-namespaces`](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
+* AWS ECR registries management based on [`terraform-aws-ecr`](https://github.com/clusterfrak-dynamics/terraform-aws-ecr)
+
+Everything is tied together with Terragrunt and allows you to deploy a multi cluster architecture in a matter of minutes (ok maybe an hour) and different AWS accounts for different environments.
+
+## Curated Features
+
+The main additionals features are the curated addons list, see [here](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons) and in the customization of the cluster policy
+
+### Enforced security
+
+* Default PSP is removed and sensible defaults are enforced
+* All addons have specific PSP enabled
+* No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) or [KIAM](https://github.com/uswitch/kiam)
+
+### Out of the box monitoring
+
+* Prometheus Operator with defaults dashboards
+* Addons that support metrics are enable along with their `serviceMonitor`
+* Custom grafana dashboard are available by default.
+
+### Helm v3 provider
+
+* All addons support Helm v3 configuration
+* All charts are easily customizable
+
+### Other and not limited to
+
+* priorityClasses for addons
+* use of [`kubectl-provider`], no more local exec and custom manifest are properly handled
+* lot of manual stuff have been automated under the hood
 
 ## Requirements
 

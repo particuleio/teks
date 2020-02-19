@@ -14,6 +14,24 @@ terraform {
     commands = ["apply"]
     execute  = ["bash", "-c", "terraform output kubeconfig 2>/dev/null > ${get_terragrunt_dir()}/kubeconfig"]
   }
+
+  after_hook "kube-system-label" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig label ns kube-system name=kube-system --overwrite"]
+  }
+
+  after_hook "remove-default-psp" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete psp eks.privileged || true"]
+  }
+  after_hook "remove-default-psp-clusterrolebindind" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete clusterrolebinding eks:podsecuritypolicy:authenticated || true"]
+  }
+  after_hook "remove-default-psp-clusterrole" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete clusterrole eks:podsecuritypolicy:privileged || true"]
+  }
 }
 
 locals {
@@ -44,10 +62,12 @@ inputs = {
     "region" = local.aws_region
   }
 
+  psp_privileged_ns = [
+    "cluster-autoscaler", #waiting for https://github.com/helm/charts/pull/20891
+    "istio-system" #istio does not support psp by default
+  ]
+
   tags = merge(
-    {
-      "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    },
     local.custom_tags
   )
 
@@ -85,9 +105,9 @@ inputs = {
     {
       name                 = "default-${local.aws_region}b"
       instance_type        = "t3.medium"
-      asg_min_size         = 1
+      asg_min_size         = 0
       asg_max_size         = 3
-      asg_desired_capacity = 1
+      asg_desired_capacity = 0
       subnets              = [dependency.vpc.outputs.private_subnets[1]]
       autoscaling_enabled  = true
       root_volume_size     = 50
@@ -102,9 +122,9 @@ inputs = {
     {
       name                 = "default-${local.aws_region}c"
       instance_type        = "t3.medium"
-      asg_min_size         = 1
+      asg_min_size         = 0
       asg_max_size         = 3
-      asg_desired_capacity = 1
+      asg_desired_capacity = 0
       subnets              = [dependency.vpc.outputs.private_subnets[2]]
       autoscaling_enabled  = true
       root_volume_size     = 50
@@ -117,6 +137,4 @@ inputs = {
       ]
     },
   ]
-
 }
-

@@ -4,8 +4,15 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws["region"]
+  region  = var.aws["region"]
   version = "~> 2.41"
+}
+
+provider "kubectl" {
+  host                   = data.aws_eks_cluster.cluster.endpoint
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  token                  = data.aws_eks_cluster_auth.cluster.token
+  load_config_file       = false
 }
 
 provider "kubernetes" {
@@ -13,15 +20,11 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
   load_config_file       = false
-  version                = "~> 1.9"
+  version                = "1.10"
 }
 
 provider "helm" {
-  install_tiller                  = true
-  service_account                 = "tiller"
-  tiller_image                    = "gcr.io/kubernetes-helm/tiller:v2.16.1"
-  automount_service_account_token = true
-
+  version = "~> 1.0"
   kubernetes {
     host                   = data.aws_eks_cluster.cluster.endpoint
     cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
@@ -37,9 +40,9 @@ data "aws_caller_identity" "current" {
 }
 
 data "aws_eks_cluster" "cluster" {
-  name = var.eks["cluster_name"]
+  name = var.cluster-name
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = var.eks["cluster_name"]
+  name = var.cluster-name
 }

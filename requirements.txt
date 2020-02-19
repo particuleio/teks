@@ -1,13 +1,13 @@
 # Linux
-https://releases.hashicorp.com/terraform/0.11.14/terraform_0.12.17_linux_amd64.zip
-https://github.com/gruntwork-io/terragrunt/releases/download/v0.21.6/terragrunt_linux_amd64
+https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_linux_amd64.zip
+https://github.com/gruntwork-io/terragrunt/releases/download/v0.22.3/terragrunt_linux_amd64
 https://storage.googleapis.com/kubernetes-release/release/v1.14.8/bin/linux/amd64/kubectl
-https://get.helm.sh/helm-v2.16.1-linux-amd64.tar.gz
+https://get.helm.sh/helm-v3.1.0-linux-amd64.tar.gz
 https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_linux_amd64
 
 # Darwin
-https://releases.hashicorp.com/terraform/0.11.14/terraform_0.12.17_darwin_amd64.zip
-https://github.com/gruntwork-io/terragrunt/releases/download/v0.21.6/terragrunt_darwin_amd64
+https://releases.hashicorp.com/terraform/0.12.21/terraform_0.12.21_darwin_amd64.zip
+https://github.com/gruntwork-io/terragrunt/releases/download/v0.22.3/terragrunt_linux_amd64
 https://storage.googleapis.com/kubernetes-release/release/v1.14.8/bin/darwin/amd64/kubectl
-https://get.helm.sh/helm-v2.16.1-darwin-amd64.tar.gz
+https://get.helm.sh/helm-v3.1.0-darwin-amd64.tar.gz
 https://github.com/kubernetes-sigs/aws-iam-authenticator/releases/download/v0.4.0/aws-iam-authenticator_0.4.0_darwin_amd64

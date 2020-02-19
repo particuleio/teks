@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-aws-ecr.git?ref=v2.0.1"
+  source = "github.com/clusterfrak-dynamics/terraform-aws-ecr.git?ref=v2.1.0"
 }
 
 locals {
