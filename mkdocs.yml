@@ -46,7 +46,10 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Documentation:
-    - User Guides:
-      - Getting Started: user-guides/index.md
-      - Minimal: user-guides/minimal-deployment.md
+    - Getting started: user-guides/getting-started.md
+    - VPC: user-guides/vpc.md
+    - EKS: user-guides/eks.md
+    - EKS Addons: user-guides/eks-addons.md
+    - EKS Namespaces: user-guides/eks-namespaces.md
+    - ECR: user-guides/ecr.md
 

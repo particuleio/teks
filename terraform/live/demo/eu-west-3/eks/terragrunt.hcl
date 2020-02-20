@@ -64,18 +64,18 @@ inputs = {
 
   psp_privileged_ns = [
     "cluster-autoscaler", #waiting for https://github.com/helm/charts/pull/20891
-    "istio-system" #istio does not support psp by default
+    "istio-system"        #istio does not support psp by default
   ]
 
   tags = merge(
     local.custom_tags
   )
 
-  cluster_name          = local.cluster_name
-  subnets               = dependency.vpc.outputs.private_subnets
-  vpc_id                = dependency.vpc.outputs.vpc_id
-  write_kubeconfig      = false
-  enable_irsa           = true
+  cluster_name     = local.cluster_name
+  subnets          = dependency.vpc.outputs.private_subnets
+  vpc_id           = dependency.vpc.outputs.vpc_id
+  write_kubeconfig = false
+  enable_irsa      = true
 
   kubeconfig_aws_authenticator_additional_args = []
 

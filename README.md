@@ -33,6 +33,7 @@ The main additionals features are the curated addons list, see [here](https://gi
 * Default PSP is removed and sensible defaults are enforced
 * All addons have specific PSP enabled
 * No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) or [KIAM](https://github.com/uswitch/kiam)
+* Each addons is deployed in it's own namespace with sensible default network policies
 
 ### Out of the box monitoring
 

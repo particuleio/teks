@@ -51,7 +51,7 @@ inputs = {
   nginx_ingress = {
     version                = "0.29.0"
     chart_version          = "1.31.0"
-    enabled                = false
+    enabled                = true
     default_network_policy = true
     ingress_cidr           = "0.0.0.0/0"
     use_nlb                = false
@@ -59,7 +59,7 @@ inputs = {
   }
 
   istio_operator = {
-    enabled = true
+    enabled = false
   }
 
   cluster_autoscaler = {
@@ -145,7 +145,7 @@ grafana:
   deploymentStrategy:
     type: Recreate
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       kubernetes.io/ingress.class: nginx
       cert-manager.io/cluster-issuer: "letsencrypt"
