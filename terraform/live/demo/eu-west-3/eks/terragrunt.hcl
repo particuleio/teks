@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v8.2.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v11.0.0"
 
   before_hook "init" {
     commands = ["init"]
@@ -35,11 +35,11 @@ terraform {
 }
 
 locals {
-  aws_region     = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  env            = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  aws_account_id = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["aws_account_id"]
-  custom_tags    = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_tags.yaml")}"))
-  prefix         = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["prefix"]
+  aws_region     = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  env            = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+  aws_account_id = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_account_id"]
+  custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+  prefix         = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
   cluster_name   = "eks-${local.prefix}-${local.env}"
 }
 
@@ -63,8 +63,7 @@ inputs = {
   }
 
   psp_privileged_ns = [
-    "cluster-autoscaler", #waiting for https://github.com/helm/charts/pull/20891
-    "istio-system"        #istio does not support psp by default
+    "istio-system"
   ]
 
   tags = merge(
@@ -79,7 +78,7 @@ inputs = {
 
   kubeconfig_aws_authenticator_additional_args = []
 
-  cluster_version           = "1.14"
+  cluster_version           = "1.15"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   manage_worker_autoscaling_policy = false
