@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.0.0"
+  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.0.2"
 
   before_hook "init" {
     commands = ["init"]
@@ -12,8 +12,8 @@ terraform {
 }
 
 locals {
-  env        = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  aws_region = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  env        = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+  aws_region = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
 }
 
 dependency "eks" {
@@ -49,8 +49,8 @@ inputs = {
   }
 
   nginx_ingress = {
-    version                = "0.29.0"
-    chart_version          = "1.31.0"
+    version                = "0.30.0"
+    chart_version          = "1.35.0"
     enabled                = true
     default_network_policy = true
     ingress_cidr           = "0.0.0.0/0"
@@ -66,19 +66,23 @@ inputs = {
     create_iam_resources_kiam = false
     create_iam_resources_irsa = true
     iam_policy_override       = ""
-    version                   = "v1.14.7"
-    chart_version             = "6.4.0"
+    version                   = "v1.15.6"
+    chart_version             = "7.2.0"
     enabled                   = true
     default_network_policy    = true
     cluster_name              = dependency.eks.outputs.cluster_id
+    extra_values              = <<EXTRA_VALUES
+image:
+  repository: eu.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler
+EXTRA_VALUES
   }
 
   external_dns = {
     create_iam_resources_kiam = false
     create_iam_resources_irsa = true
     iam_policy_override       = ""
-    version                   = "0.6.0-debian-10-r0"
-    chart_version             = "2.18.0"
+    version                   = "0.7.1-debian-10-r2"
+    chart_version             = "2.20.10"
     enabled                   = true
     default_network_policy    = true
   }
@@ -87,8 +91,8 @@ inputs = {
     create_iam_resources_kiam      = false
     create_iam_resources_irsa      = true
     iam_policy_override            = ""
-    version                        = "v0.13.1"
-    chart_version                  = "v0.13.1"
+    version                        = "v0.14.1"
+    chart_version                  = "v0.14.1"
     enabled                        = true
     default_network_policy         = true
     acme_email                     = "kevin@particule.io"
@@ -109,7 +113,7 @@ inputs = {
 
   metrics_server = {
     version                = "v0.3.6"
-    chart_version          = "2.9.0"
+    chart_version          = "2.10.2"
     enabled                = true
     default_network_policy = true
     allowed_cidrs          = dependency.vpc.outputs.private_subnets_cidr_blocks
@@ -118,8 +122,8 @@ inputs = {
   flux = {
     create_iam_resources_kiam = false
     create_iam_resources_irsa = true
-    version                   = "1.18.0"
-    chart_version             = "1.2.0"
+    version                   = "1.19.0"
+    chart_version             = "1.3.0"
     enabled                   = false
     default_network_policy    = true
 
@@ -135,7 +139,7 @@ EXTRA_VALUES
   }
 
   prometheus_operator = {
-    chart_version          = "8.7.0"
+    chart_version          = "8.12.9"
     enabled                = true
     default_network_policy = true
     allowed_cidrs          = dependency.vpc.outputs.private_subnets_cidr_blocks
@@ -166,11 +170,7 @@ prometheus:
     replicas: 1
     retention: 180d
     ruleSelectorNilUsesHelmValues: false
-    ruleNamespaceSelector:
-      any: true
     serviceMonitorSelectorNilUsesHelmValues: false
-    serviceMonitorNamespaceSelector:
-      any: true
     storageSpec:
       volumeClaimTemplate:
         spec:
@@ -194,16 +194,16 @@ EXTRA_VALUES
   }
 
   npd = {
-    chart_version          = "1.6.3"
-    version                = "v0.8.0"
+    chart_version          = "1.7.1"
+    version                = "v0.8.1"
     enabled                = true
     default_network_policy = true
   }
 
   sealed_secrets = {
-    chart_version          = "1.7.6"
-    version                = "v0.9.7"
-    enabled                = true
+    chart_version          = "1.8.0"
+    version                = "v0.10.0"
+    enabled                = false
     default_network_policy = true
   }
 
@@ -211,28 +211,28 @@ EXTRA_VALUES
     create_iam_resources_kiam = false
     create_iam_resources_irsa = true
     enabled                   = true
-    version                   = "v1.5.5"
+    version                   = "v1.6.0"
     iam_policy_override       = ""
   }
 
   kong = {
-    version                = "1.4"
-    chart_version          = "1.2.0"
+    version                = "2.0"
+    chart_version          = "1.4.1"
     enabled                = false
     default_network_policy = true
     ingress_cidr           = "0.0.0.0/0"
   }
 
   keycloak = {
-    chart_version          = "7.0.0"
-    version                = "8.0.1"
+    chart_version          = "7.5.0"
+    version                = "9.0.2"
     enabled                = false
     default_network_policy = true
   }
 
   karma = {
     chart_version          = "1.4.1"
-    version                = "v0.55"
+    version                = "v0.60"
     enabled                = false
     default_network_policy = true
     extra_values           = <<EXTRA_VALUES
