@@ -3,14 +3,14 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.24.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.33.0"
 }
 
 locals {
-  aws_region  = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  env         = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  custom_tags = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_tags.yaml")}"))
-  prefix      = yamldecode(file("${get_terragrunt_dir()}/${find_in_parent_folders("common_values.yaml")}"))["prefix"]
+  aws_region  = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  env         = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+  custom_tags = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+  prefix      = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
 }
 
 inputs = {
