@@ -56,6 +56,6 @@ jobs:
     - name: 'terragrunt:plan:vpc'
       run: |
         pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt validate
+        terragrunt plan
         popd
 
