@@ -3,11 +3,11 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v11.0.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.0.0"
 
   before_hook "init" {
     commands = ["init"]
-    execute  = ["bash", "-c", "wget -O terraform-provider-kubectl https://github.com/gavinbunney/terraform-provider-kubectl/releases/download/v1.3.2/terraform-provider-kubectl-linux-amd64 && chmod +x terraform-provider-kubectl"]
+    execute  = ["bash", "-c", "wget -O terraform-provider-kubectl https://github.com/gavinbunney/terraform-provider-kubectl/releases/download/v1.4.2/terraform-provider-kubectl-linux-amd64 && chmod +x terraform-provider-kubectl"]
   }
 
   after_hook "kubeconfig" {
@@ -63,7 +63,10 @@ inputs = {
   }
 
   psp_privileged_ns = [
-    "istio-system"
+    "istio-system",
+    "istio-operator",
+    "monitoring",
+    "aws-alb-ingress-controller",
   ]
 
   tags = merge(
@@ -73,15 +76,13 @@ inputs = {
   cluster_name     = local.cluster_name
   subnets          = dependency.vpc.outputs.private_subnets
   vpc_id           = dependency.vpc.outputs.vpc_id
-  write_kubeconfig = false
+  write_kubeconfig = true
   enable_irsa      = true
 
   kubeconfig_aws_authenticator_additional_args = []
 
-  cluster_version           = "1.15"
+  cluster_version           = "1.16"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
-
-  manage_worker_autoscaling_policy = false
 
   worker_groups_launch_template = [
     {
@@ -99,14 +100,24 @@ inputs = {
           value               = local.cluster_name
           propagate_at_launch = true
         },
+        {
+          key                 = "k8s.io/cluster-autoscaler/enabled"
+          propagate_at_launch = "false"
+          value               = "true"
+        },
+        {
+          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+          propagate_at_launch = "false"
+          value               = "true"
+        }
       ]
     },
     {
       name                 = "default-${local.aws_region}b"
       instance_type        = "t3.medium"
-      asg_min_size         = 0
+      asg_min_size         = 1
       asg_max_size         = 3
-      asg_desired_capacity = 0
+      asg_desired_capacity = 1
       subnets              = [dependency.vpc.outputs.private_subnets[1]]
       autoscaling_enabled  = true
       root_volume_size     = 50
@@ -116,14 +127,24 @@ inputs = {
           value               = local.cluster_name
           propagate_at_launch = true
         },
+        {
+          key                 = "k8s.io/cluster-autoscaler/enabled"
+          propagate_at_launch = "false"
+          value               = "true"
+        },
+        {
+          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+          propagate_at_launch = "false"
+          value               = "true"
+        }
       ]
     },
     {
       name                 = "default-${local.aws_region}c"
       instance_type        = "t3.medium"
-      asg_min_size         = 0
+      asg_min_size         = 1
       asg_max_size         = 3
-      asg_desired_capacity = 0
+      asg_desired_capacity = 1
       subnets              = [dependency.vpc.outputs.private_subnets[2]]
       autoscaling_enabled  = true
       root_volume_size     = 50
@@ -133,6 +154,16 @@ inputs = {
           value               = local.cluster_name
           propagate_at_launch = true
         },
+        {
+          key                 = "k8s.io/cluster-autoscaler/enabled"
+          propagate_at_launch = "false"
+          value               = "true"
+        },
+        {
+          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+          propagate_at_launch = "false"
+          value               = "true"
+        }
       ]
     },
   ]
