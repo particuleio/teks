@@ -1,4 +1,4 @@
-name: 'Demo'
+name: 'terragrunt:demo'
 
 on:
   push:
@@ -10,16 +10,16 @@ on:
 
 jobs:
   terraform:
-    name: 'Terraform'
+    name: 'terragrunt:demo'
     runs-on: ubuntu-latest
     steps:
     - name: checkout
       uses: actions/checkout@v2
 
-    - name: asdf:install
+    - name: 'asdf:install'
       uses: asdf-vm/actions/install@v1.0.0
 
-    - name: Setup Kubectl provider
+    - name: 'terraform:provider:kubectl'
       run: |
         mkdir -p ~/.terraform.d/plugins
         curl -Ls https://api.github.com/repos/gavinbunney/terraform-provider-kubectl/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"$(uname -s | tr A-Z a-z)\")) | select(.browser_download_url | contains(\"amd64\")) | .browser_download_url" | xargs -n 1 curl -Lo ~/.terraform.d/plugins/terraform-provider-kubectl
@@ -28,26 +28,26 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
-    - name: terragrunt:init:vpc
-      run:|
+    - name: 'terragrunt:init:vpc'
+      run: |
         pushd terraform/live/demo/eu-west-3/vpc
         terragrunt init
         popd
 
-    - name: terragrunt:fmt:vpc
-      run:|
+    - name: 'terragrunt:fmt:vpc'
+      run: |
         pushd terraform/live/demo/eu-west-3/vpc
         terragrunt fmt -check
         popd
 
-    - name: terragrunt:validate:vpc
-      run:|
+    - name: 'terragrunt:validate:vpc'
+      run: |
         pushd terraform/live/demo/eu-west-3/vpc
         terragrunt validate
         popd
 
-    - name: terragrunt:plan:vpc
-      run:|
+    - name: 'terragrunt:plan:vpc'
+      run: |
         pushd terraform/live/demo/eu-west-3/vpc
         terragrunt validate
         popd
