@@ -30,25 +30,25 @@ jobs:
 
     - name: terragrunt:init:vpc
       run:|
-      pushd terraform/live/demo/eu-west-3/vpc
-      terragrunt init
-      popd
+        pushd terraform/live/demo/eu-west-3/vpc
+        terragrunt init
+        popd
 
     - name: terragrunt:fmt:vpc
-      run:| 
-      pushd terraform/live/demo/eu-west-3/vpc
-      terragrunt fmt -check
-      popd
+      run:|
+        pushd terraform/live/demo/eu-west-3/vpc
+        terragrunt fmt -check
+        popd
 
     - name: terragrunt:validate:vpc
       run:|
-      pushd terraform/live/demo/eu-west-3/vpc
-      terragrunt validate
-      popd
+        pushd terraform/live/demo/eu-west-3/vpc
+        terragrunt validate
+        popd
 
     - name: terragrunt:plan:vpc
       run:|
-      pushd terraform/live/demo/eu-west-3/vpc
-      terragrunt validate
-      popd
+        pushd terraform/live/demo/eu-west-3/vpc
+        terragrunt validate
+        popd
 
