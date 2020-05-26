@@ -1,10 +1,5 @@
 name: 'terragrunt:demo'
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
 on:
   push:
     branches:
@@ -30,8 +25,14 @@ jobs:
         curl -Ls https://api.github.com/repos/gavinbunney/terraform-provider-kubectl/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"$(uname -s | tr A-Z a-z)\")) | select(.browser_download_url | contains(\"amd64\")) | .browser_download_url" | xargs -n 1 curl -Lo ~/.terraform.d/plugins/terraform-provider-kubectl
         chmod +x ~/.terraform.d/plugins/terraform-provider-kubectl
 
-    - name: Setup Terraform
+    - name: 'terraform:setup'
       uses: hashicorp/setup-terraform@v1
+
+    - name: 'aws:credentials'
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     - name: 'terragrunt:init:vpc'
       run: |
