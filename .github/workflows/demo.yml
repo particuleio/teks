@@ -27,6 +27,9 @@ jobs:
 
     - name: 'terraform:setup'
       uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_wrapper: false
+
 
     - name: 'aws:credentials'
       uses: aws-actions/configure-aws-credentials@v1
