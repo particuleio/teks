@@ -4,8 +4,8 @@ variable "psp_privileged_ns" {
 }
 
 data "kubectl_path_documents" "manifests" {
-  pattern      = "./manifests/*.yaml"
-  vars         = {
+  pattern = "./manifests/*.yaml"
+  vars = {
     namespaces = join(",", var.psp_privileged_ns)
   }
 }
