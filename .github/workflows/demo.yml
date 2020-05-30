@@ -107,6 +107,11 @@ jobs:
       working-directory: terraform/live/demo/eu-west-3/eks-addons
       continue-on-error: true
 
+    - name: 'terragrunt:destroy:eks-addons:cleanup-stale-state'
+      run: terragrunt state list 2>/dev/null | xargs terragrunt state rm
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      continue-on-error: true
+
     - name: 'terragrunt:destroy:eks'
       run: terragrunt destroy -auto-approve
       working-directory: terraform/live/demo/eu-west-3/eks
