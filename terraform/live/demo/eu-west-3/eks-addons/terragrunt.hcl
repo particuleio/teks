@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.4.0"
+  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.7.0"
 
   before_hook "init" {
     commands = ["init"]
