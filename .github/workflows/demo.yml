@@ -1,4 +1,4 @@
-name: 'terragrunt:demo'
+name: 'terragrunt:env:demo'
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   terraform:
-    name: 'terragrunt:demo'
+    name: 'terragrunt:env:demo'
     runs-on: ubuntu-latest
     steps:
     - name: checkout
@@ -57,5 +57,71 @@ jobs:
       run: |
         pushd terraform/live/demo/eu-west-3/vpc
         terragrunt plan
+        popd
+
+    - name: 'terragrunt:apply:vpc'
+      run: |
+        pushd terraform/live/demo/eu-west-3/vpc
+        terragrunt apply -auto-approve
+        popd
+
+    - name: 'terragrunt:init:eks'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks
+        terragrunt init
+        popd
+
+    - name: 'terragrunt:fmt:eks'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks
+        terragrunt fmt -check
+        popd
+
+    - name: 'terragrunt:validate:eks'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks
+        terragrunt validate
+        popd
+
+    - name: 'terragrunt:plan:eks'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks
+        terragrunt plan
+        popd
+
+    - name: 'terragrunt:apply:eks'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks
+        terragrunt apply -auto-approve
+        popd
+
+    - name: 'terragrunt:init:eks-addons'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks-addons
+        terragrunt init
+        popd
+
+    - name: 'terragrunt:fmt:eks-addons'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks-addons
+        terragrunt fmt -check
+        popd
+
+    - name: 'terragrunt:validate:eks-addons'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks-addons
+        terragrunt validate
+        popd
+
+    - name: 'terragrunt:plan:eks-addons'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks-addons
+        terragrunt plan
+        popd
+
+    - name: 'terragrunt:apply:eks-addons'
+      run: |
+        pushd terraform/live/demo/eu-west-3/eks-addons
+        terragrunt apply -auto-approve
         popd
 
