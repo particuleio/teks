@@ -78,7 +78,13 @@ inputs = {
   vpc_id           = dependency.vpc.outputs.vpc_id
   write_kubeconfig = true
   enable_irsa      = true
-
+  kubeconfig_aws_authenticator_command = "aws"
+  kubeconfig_aws_authenticator_command_args = [
+    "eks",
+    "get-token",
+    "--cluster-name",
+    local.cluster_name
+  ]
   kubeconfig_aws_authenticator_additional_args = []
 
   cluster_version           = "1.16"
