@@ -36,92 +36,81 @@ jobs:
         aws-region: eu-west-1
 
     - name: 'terragrunt:init:vpc'
-      run: |
-        pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt init
-        popd
+      run: terragrunt init
+      working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:fmt:vpc'
-      run: |
-        pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt fmt -check
-        popd
+      run: terragrunt fmt -check
+      working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:validate:vpc'
-      run: |
-        pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt validate
-        popd
+      run: terragrunt validate
+      working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:plan:vpc'
-      run: |
-        pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt plan
-        popd
+      run: terragrunt plan
+      working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:apply:vpc'
-      run: |
-        pushd terraform/live/demo/eu-west-3/vpc
-        terragrunt apply -auto-approve
-        popd
+      run: terragrunt apply -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:init:eks'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks
-        terragrunt init
-        popd
+      run: terragrunt init
+      working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:fmt:eks'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks
-        terragrunt fmt -check
-        popd
+      run: terragrunt fmt -check
+      working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:validate:eks'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks
-        terragrunt validate
-        popd
+      run: terragrunt validate
+      working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:plan:eks'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks
-        terragrunt plan
-        popd
+      run: terragrunt plan
+      working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:apply:eks'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks
-        terragrunt apply -auto-approve
-        popd
+      run: terragrunt apply -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:init:eks-addons'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks-addons
-        terragrunt init
-        popd
+      run: terragrunt init
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:fmt:eks-addons'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks-addons
-        terragrunt fmt -check
-        popd
+      run: terragrunt fmt -check
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:validate:eks-addons'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks-addons
-        terragrunt validate
-        popd
+      run: terragrunt validate
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:plan:eks-addons'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks-addons
-        terragrunt plan
-        popd
+      run: terragrunt plan
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:apply:eks-addons'
-      run: |
-        pushd terraform/live/demo/eu-west-3/eks-addons
-        terragrunt apply -auto-approve
-        popd
+      run: terragrunt apply -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
+
+    - name: 'kubectl:wait-for-pods'
+      run: kubectl --kubeconfig=kubeconfig wait --for=condition=Ready pods --all --all-namespaces --timeout 300s
+      working-directory: terraform/live/demo/eu-west-3/eks
+
+    - name: 'terragrunt:destroy:eks-addons'
+      run: terragrunt destroy -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      continue-on-error: true
+
+    - name: 'terragrunt:destroy:eks'
+      run: terragrunt destroy -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/eks
+      continue-on-error: true
+
+    - name: 'terragrunt:destroy:vpc'
+      run: terragrunt destroy -auto-approve
+      working-directory: terraform/live/demo/eu-west-3/vpc
+      continue-on-error: true
 
