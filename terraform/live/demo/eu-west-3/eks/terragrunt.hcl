@@ -15,6 +15,11 @@ terraform {
     execute  = ["bash", "-c", "terraform output kubeconfig 2>/dev/null > ${get_terragrunt_dir()}/kubeconfig"]
   }
 
+  after_hook "kubeconfig-tg" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "terraform output kubeconfig 2>/dev/null > kubeconfig"]
+  }
+
   after_hook "kube-system-label" {
     commands = ["apply"]
     execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig label ns kube-system name=kube-system --overwrite"]
