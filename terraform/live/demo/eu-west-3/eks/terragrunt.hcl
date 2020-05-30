@@ -72,6 +72,7 @@ inputs = {
     "istio-operator",
     "monitoring",
     "aws-alb-ingress-controller",
+    "aws-for-fluent-bit"
   ]
 
   tags = merge(
