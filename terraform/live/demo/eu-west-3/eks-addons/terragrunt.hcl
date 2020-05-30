@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.7.0"
+  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.8.0"
 
   before_hook "init" {
     commands = ["init"]
@@ -48,7 +48,15 @@ inputs = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
   }
 
+  calico = {
+    enabled = true
+  }
+
   alb_ingress = {
+    enabled = true
+  }
+
+  aws_node_termination_handler = {
     enabled = true
   }
 
@@ -141,6 +149,10 @@ inputs = {
 
   fluentd_cloudwatch = {
     enabled = false
+  }
+
+  aws_fluent_bit = {
+    enabled = true
   }
 
   npd = {
