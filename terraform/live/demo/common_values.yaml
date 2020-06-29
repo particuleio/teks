@@ -2,3 +2,4 @@
 aws_account_id: 161285725140
 aws_region: eu-west-3
 prefix: cfd-particule
+default_domain_name: clusterfrak-dynamics.io

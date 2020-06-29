@@ -12,8 +12,9 @@ terraform {
 }
 
 locals {
-  env        = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  aws_region = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  env                 = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+  aws_region          = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  default_domain_name = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["default_domain_name"]
 }
 
 dependency "eks" {
@@ -119,11 +120,11 @@ inputs = {
             kubernetes.io/ingress.class: nginx
             cert-manager.io/cluster-issuer: "letsencrypt"
           hosts:
-            - grafana.clusterfrak-dynamics.io
+            - grafana.${local.default_domain_name}
           tls:
-            - secretName: grafana-clusterfrak-dynamics-io
+            - secretName: grafana.${local.default_domain_name}
               hosts:
-                - grafana.clusterfrak-dynamics.io
+                - grafana.${local.default_domain_name}
         persistence:
           enabled: true
           storageClassName: gp2
@@ -185,11 +186,11 @@ inputs = {
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: "letsencrypt"
         hosts:
-          - karma.clusterfrak-dynamics.io
+          - karma.local.${local.default_domain_name}
         tls:
-          - secretName: karma-clusterfrak-dynamics-io
+          - secretName: karma.${local.default_domain_name}
             hosts:
-              - karma.clusterfrak-dynamics.io
+              - karma.${local.default_domain_name}
       env:
         - name: ALERTMANAGER_URI
           value: "http://prometheus-operator-alertmanager.monitoring.svc.cluster.local:9093"
