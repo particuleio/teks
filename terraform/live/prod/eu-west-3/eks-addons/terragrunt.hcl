@@ -186,7 +186,7 @@ inputs = {
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: "letsencrypt"
         hosts:
-          - karma.local.${local.default_domain_name}
+          - karma.${local.default_domain_name}
         tls:
           - secretName: karma.${local.default_domain_name}
             hosts:
