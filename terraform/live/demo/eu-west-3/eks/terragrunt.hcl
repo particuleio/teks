@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.0.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.1.0"
 
   before_hook "init" {
     commands = ["init"]
