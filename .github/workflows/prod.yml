@@ -80,8 +80,7 @@ jobs:
       uses: actions/upload-artifact@v1
       with:
         name: kubeconfig
-        path: kubeconfig
-      working-directory: terraform/live/prod/eu-west-3/eks
+        path: terraform/live/prod/eu-west-3/eks/kubeconfig
 
     - name: 'terragrunt:init:eks-addons'
       run: terragrunt init --terragrunt-non-interactive
