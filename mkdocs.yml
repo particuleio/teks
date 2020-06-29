@@ -10,13 +10,13 @@ copyright: <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/
 
 theme:
   name: 'material'
+  logo: "images/logo-white.svg"
   palette:
     primary: 'indigo'
     accent: 'indigo'
-  logo:
-    icon: dashboard
-  feature:
-    tabs: true
+  features:
+    - tabs
+    - instant
 
 markdown_extensions:
   - toc:

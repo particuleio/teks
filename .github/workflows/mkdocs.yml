@@ -1,0 +1,23 @@
+name: 'teks:mkdocs'
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - 'docs/**'
+    - 'mkdocs.yml'
+
+jobs:
+  terraform:
+    name: 'teks:mkdocs'
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v2
+    
+    - name: deploy
+      uses: mhausenblas/mkdocs-deploy-gh-pages@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REQUIREMENTS: docs/requirements.txt
