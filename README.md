@@ -1,7 +1,7 @@
 # tEKS
 
 <p align="center">
-  <img src="/images/logo.png">
+  <img src="images/logo.png">
 </p>
 
 ![terragrunt:env:demo](https://github.com/clusterfrak-dynamics/teks/workflows/terragrunt:env:demo/badge.svg)
