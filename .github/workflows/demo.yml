@@ -30,7 +30,6 @@ jobs:
       with:
         terraform_wrapper: false
 
-
     - name: 'aws:credentials'
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -39,7 +38,7 @@ jobs:
         aws-region: eu-west-1
 
     - name: 'terragrunt:init:vpc'
-      run: terragrunt init
+      run: terragrunt init --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:fmt:vpc'
@@ -51,7 +50,7 @@ jobs:
       working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:plan:vpc'
-      run: terragrunt plan
+      run: terragrunt plan --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:apply:vpc'
@@ -59,7 +58,7 @@ jobs:
       working-directory: terraform/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:init:eks'
-      run: terragrunt init
+      run: terragrunt init --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:fmt:eks'
@@ -71,15 +70,22 @@ jobs:
       working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:plan:eks'
-      run: terragrunt plan
+      run: terragrunt plan --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:apply:eks'
       run: terragrunt apply -auto-approve
       working-directory: terraform/live/demo/eu-west-3/eks
 
+    - name: 'terragrunt:apply:eks:upload-kubeconfig'
+      uses: actions/upload-artifact@v1
+      with:
+        name: kubeconfig
+        path: kubeconfig
+      working-directory: terraform/live/demo/eu-west-3/eks
+
     - name: 'terragrunt:init:eks-addons'
-      run: terragrunt init
+      run: terragrunt init --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:fmt:eks-addons'
@@ -91,7 +97,7 @@ jobs:
       working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:plan:eks-addons'
-      run: terragrunt plan
+      run: terragrunt plan --terragrunt-non-interactive
       working-directory: terraform/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:apply:eks-addons'

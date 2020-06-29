@@ -76,6 +76,13 @@ jobs:
       run: terragrunt apply -auto-approve
       working-directory: terraform/live/prod/eu-west-3/eks
 
+    - name: 'terragrunt:apply:eks:upload-kubeconfig'
+      uses: actions/upload-artifact@v1
+      with:
+        name: kubeconfig
+        path: kubeconfig
+      working-directory: terraform/live/prod/eu-west-3/eks
+
     - name: 'terragrunt:init:eks-addons'
       run: terragrunt init --terragrunt-non-interactive
       working-directory: terraform/live/prod/eu-west-3/eks-addons
