@@ -106,19 +106,23 @@ jobs:
       run: terragrunt destroy -auto-approve
       working-directory: terraform/live/demo/eu-west-3/eks-addons
       continue-on-error: true
+      if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:eks-addons:cleanup-stale-state'
       run: terragrunt state list 2>/dev/null | xargs terragrunt state rm
       working-directory: terraform/live/demo/eu-west-3/eks-addons
       continue-on-error: true
+      if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:eks'
       run: terragrunt destroy -auto-approve
       working-directory: terraform/live/demo/eu-west-3/eks
       continue-on-error: true
+      if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:vpc'
       run: terragrunt destroy -auto-approve
       working-directory: terraform/live/demo/eu-west-3/vpc
       continue-on-error: true
+      if: "!contains(github.event.head_commit.message, 'ci keep')"
 
