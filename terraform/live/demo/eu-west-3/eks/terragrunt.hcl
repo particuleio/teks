@@ -46,6 +46,7 @@ locals {
   custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
   prefix         = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
   cluster_name   = "eks-${local.prefix}-${local.env}"
+  trigger_ci     = "0"
 }
 
 dependency "vpc" {
