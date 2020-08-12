@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.1.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.2.0"
 
   before_hook "init" {
     commands = ["init"]
@@ -93,7 +93,7 @@ inputs = {
   ]
   kubeconfig_aws_authenticator_additional_args = []
 
-  cluster_version           = "1.16"
+  cluster_version           = "1.17"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   worker_groups_launch_template = [
