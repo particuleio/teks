@@ -45,7 +45,7 @@ locals {
   aws_account_id = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_account_id"]
   custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
   prefix         = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
-  cluster_name   = "eks-${local.prefix}-${local.env}"
+  cluster_name   = "${local.prefix}-${local.env}"
   trigger_ci     = "0"
 }
 
