@@ -19,17 +19,11 @@ jobs:
     - name: 'asdf:install'
       uses: asdf-vm/actions/install@v1.0.0
 
-    - name: 'terraform:provider:kubectl'
-      run: |
-        mkdir -p ~/.terraform.d/plugins
-        curl -Ls https://api.github.com/repos/gavinbunney/terraform-provider-kubectl/releases/latest | jq -r ".assets[] | select(.browser_download_url | contains(\"$(uname -s | tr A-Z a-z)\")) | select(.browser_download_url | contains(\"amd64\")) | .browser_download_url" | xargs -n 1 curl -Lo ~/.terraform.d/plugins/terraform-provider-kubectl
-        chmod +x ~/.terraform.d/plugins/terraform-provider-kubectl
-
     - name: 'terraform:setup'
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_wrapper: false
-        terraform_version: 0.12.29
+        terraform_version: 0.13.0
 
     - name: 'aws:credentials'
       uses: aws-actions/configure-aws-credentials@v1
