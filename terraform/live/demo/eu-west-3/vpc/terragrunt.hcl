@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.38.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.48.0"
 }
 
 locals {

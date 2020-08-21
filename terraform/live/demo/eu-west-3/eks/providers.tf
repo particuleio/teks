@@ -1,11 +1,16 @@
 terraform {
   backend "s3" {
   }
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.6.2"
+    }
+  }
 }
 
 provider "aws" {
-  region  = var.aws["region"]
-  version = "~> 2.41"
+  region = var.aws["region"]
 }
 
 provider "kubectl" {

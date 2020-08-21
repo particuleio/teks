@@ -1,11 +1,16 @@
 terraform {
   backend "s3" {
   }
+  required_providers {
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = "1.6.2"
+    }
+  }
 }
 
 provider "aws" {
-  region  = var.aws["region"]
-  version = "~> 2.41"
+  region = var.aws["region"]
 }
 
 provider "kubectl" {
@@ -20,7 +25,6 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
   load_config_file       = false
-  version                = "1.10"
 }
 
 provider "helm" {
