@@ -41,7 +41,6 @@ locals {
   custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
   prefix         = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
   cluster_name   = "${local.prefix}-${local.env}"
-  trigger_ci     = "0"
 }
 
 dependency "vpc" {
@@ -55,6 +54,44 @@ dependency "vpc" {
       "subnet-00000002",
     ]
   }
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    provider "aws" {
+      region = "${local.aws_region}"
+    }
+    provider "kubectl" {
+      host                   = data.aws_eks_cluster.cluster.endpoint
+      cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+      token                  = data.aws_eks_cluster_auth.cluster.token
+      load_config_file       = false
+    }
+    provider "kubernetes" {
+      host                   = data.aws_eks_cluster.cluster.endpoint
+      cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+      token                  = data.aws_eks_cluster_auth.cluster.token
+      load_config_file       = false
+    }
+    data "aws_eks_cluster" "cluster" {
+      name = aws_eks_cluster.this[0].id
+    }
+    data "aws_eks_cluster_auth" "cluster" {
+      name = aws_eks_cluster.this[0].id
+    }
+  EOF
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "s3" {}
+    }
+  EOF
 }
 
 inputs = {
@@ -92,87 +129,113 @@ inputs = {
   cluster_version           = "1.17"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  worker_groups_launch_template = [
-    {
-      name                 = "default-${local.aws_region}a"
-      instance_type        = "t3.medium"
-      asg_min_size         = 1
-      asg_max_size         = 3
-      asg_desired_capacity = 1
-      subnets              = [dependency.vpc.outputs.private_subnets[0]]
-      autoscaling_enabled  = true
-      root_volume_size     = 50
-      tags = [
-        {
-          key                 = "CLUSTER_ID"
-          value               = local.cluster_name
-          propagate_at_launch = true
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/enabled"
-          propagate_at_launch = "false"
-          value               = "true"
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
-          propagate_at_launch = "false"
-          value               = "true"
-        }
-      ]
-    },
-    {
-      name                 = "default-${local.aws_region}b"
-      instance_type        = "t3.medium"
-      asg_min_size         = 1
-      asg_max_size         = 3
-      asg_desired_capacity = 1
-      subnets              = [dependency.vpc.outputs.private_subnets[1]]
-      autoscaling_enabled  = true
-      root_volume_size     = 50
-      tags = [
-        {
-          key                 = "CLUSTER_ID"
-          value               = local.cluster_name
-          propagate_at_launch = true
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/enabled"
-          propagate_at_launch = "false"
-          value               = "true"
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
-          propagate_at_launch = "false"
-          value               = "true"
-        }
-      ]
-    },
-    {
-      name                 = "default-${local.aws_region}c"
-      instance_type        = "t3.medium"
-      asg_min_size         = 1
-      asg_max_size         = 3
-      asg_desired_capacity = 1
-      subnets              = [dependency.vpc.outputs.private_subnets[2]]
-      autoscaling_enabled  = true
-      root_volume_size     = 50
-      tags = [
-        {
-          key                 = "CLUSTER_ID"
-          value               = local.cluster_name
-          propagate_at_launch = true
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/enabled"
-          propagate_at_launch = "false"
-          value               = "true"
-        },
-        {
-          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
-          propagate_at_launch = "false"
-          value               = "true"
-        }
-      ]
-    },
-  ]
+  node_groups = {
+    "default-${local.aws_region}a" = {
+      desired_capacity = 1
+      max_capacity     = 3
+      min_capacity     = 1
+      instance_type    = "t3.medium"
+      subnets          = [dependency.vpc.outputs.private_subnets[0]]
+      disk_size        = 50
+    }
+
+    "default-${local.aws_region}b" = {
+      desired_capacity = 1
+      max_capacity     = 3
+      min_capacity     = 1
+      instance_type    = "t3.medium"
+      subnets          = [dependency.vpc.outputs.private_subnets[1]]
+      disk_size        = 50
+    }
+
+    "default-${local.aws_region}c" = {
+      desired_capacity = 1
+      max_capacity     = 3
+      min_capacity     = 1
+      instance_type    = "t3.medium"
+      subnets          = [dependency.vpc.outputs.private_subnets[2]]
+      disk_size        = 50
+    }
+  }
+
+#  worker_groups_launch_template = [
+#    {
+#      name                 = "default-${local.aws_region}a"
+#      instance_type        = "t3.medium"
+#      asg_min_size         = 1
+#      asg_max_size         = 3
+#      asg_desired_capacity = 1
+#      subnets              = [dependency.vpc.outputs.private_subnets[0]]
+#      root_volume_size     = 50
+#      tags = [
+#        {
+#          key                 = "CLUSTER_ID"
+#          value               = local.cluster_name
+#          propagate_at_launch = true
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/enabled"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        }
+#      ]
+#    },
+#    {
+#      name                 = "default-${local.aws_region}b"
+#      instance_type        = "t3.medium"
+#      asg_min_size         = 1
+#      asg_max_size         = 3
+#      asg_desired_capacity = 1
+#      subnets              = [dependency.vpc.outputs.private_subnets[1]]
+#      root_volume_size     = 50
+#      tags = [
+#        {
+#          key                 = "CLUSTER_ID"
+#          value               = local.cluster_name
+#          propagate_at_launch = true
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/enabled"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        }
+#      ]
+#    },
+#    {
+#      name                 = "default-${local.aws_region}c"
+#      instance_type        = "t3.medium"
+#      asg_min_size         = 1
+#      asg_max_size         = 3
+#      asg_desired_capacity = 1
+#      subnets              = [dependency.vpc.outputs.private_subnets[2]]
+#      root_volume_size     = 50
+#      tags = [
+#        {
+#          key                 = "CLUSTER_ID"
+#          value               = local.cluster_name
+#          propagate_at_launch = true
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/enabled"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        },
+#        {
+#          key                 = "k8s.io/cluster-autoscaler/${local.cluster_name}"
+#          propagate_at_launch = "false"
+#          value               = "true"
+#        }
+#      ]
+#    },
+#  ]
 }

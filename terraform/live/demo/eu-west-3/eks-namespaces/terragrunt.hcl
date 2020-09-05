@@ -29,18 +29,9 @@ inputs = {
     "region" = local.aws_region
   }
 
-  eks = {
-    "cluster_name" = dependency.eks.outputs.cluster_id
-  }
 
-  //
-  // [env]
-  //
   env = local.env
 
-  //
-  // [namespaces]
-  //
   namespaces = [
     {
       "name"                       = "myapp-${local.env}"

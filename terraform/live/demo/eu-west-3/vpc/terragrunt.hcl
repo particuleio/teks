@@ -9,19 +9,35 @@ terraform {
 locals {
   aws_region  = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
   env         = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  custom_tags = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
   prefix      = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
+  custom_tags = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite"
+  contents = <<-EOF
+    provider "aws" {
+      region = "${local.aws_region}"
+    }
+  EOF
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents = <<-EOF
+    terraform {
+      backend "s3" {}
+    }
+  EOF
 }
 
 inputs = {
 
-  aws = {
-    "region" = local.aws_region
-  }
-
   tags = merge(
     {
-      "kubernetes.io/cluster/eks-${local.prefix}-${local.env}" = "shared"
+      "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
     },
     local.custom_tags
   )
@@ -41,6 +57,7 @@ inputs = {
 
   enable_dns_hostnames = true
   enable_dns_support   = true
+  enable_s3_endpoint = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"

@@ -3,7 +3,8 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.9.0"
+  #source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.9.0"
+  source = "/home/klefevre/git/clusterfrak-dynamics/terraform-kubernetes-addons"
 }
 
 locals {
@@ -32,13 +33,47 @@ dependency "vpc" {
   }
 }
 
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    provider "aws" {
+      region = "${local.aws_region}"
+    }
+    provider "kubectl" {
+      host                   = data.aws_eks_cluster.cluster.endpoint
+      cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+      token                  = data.aws_eks_cluster_auth.cluster.token
+      load_config_file       = false
+    }
+    provider "kubernetes" {
+      host                   = data.aws_eks_cluster.cluster.endpoint
+      cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+      token                  = data.aws_eks_cluster_auth.cluster.token
+      load_config_file       = false
+    }
+    data "aws_eks_cluster" "cluster" {
+      name = var.cluster-name
+    }
+    data "aws_eks_cluster_auth" "cluster" {
+      name = var.cluster-name
+    }
+  EOF
+}
+
+generate "backend" {
+  path      = "backend.tf"
+  if_exists = "overwrite"
+  contents  = <<-EOF
+    terraform {
+      backend "s3" {}
+    }
+  EOF
+}
+
 inputs = {
 
   cluster-name = dependency.eks.outputs.cluster_id
-
-  aws = {
-    "region" = local.aws_region
-  }
 
   eks = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
@@ -98,7 +133,7 @@ inputs = {
       rbac:
         create: false
       registry:
-        automationInterval: "2m"
+        automationInterval: "5m"
       EXTRA_VALUES
   }
 
@@ -164,7 +199,7 @@ inputs = {
   }
 
   kong = {
-    enabled = true
+    enabled = false
   }
 
   keycloak = {

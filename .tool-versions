@@ -1,3 +1,3 @@
-terragrunt 0.23.33
+terragrunt 0.23.40
 kubectl 1.17.11
-helm 3.3.0
+helm 3.3.1
