@@ -3,8 +3,7 @@ include {
 }
 
 terraform {
-  #source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.9.0"
-  source = "/home/klefevre/git/clusterfrak-dynamics/terraform-kubernetes-addons"
+  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.10.0"
 }
 
 locals {
