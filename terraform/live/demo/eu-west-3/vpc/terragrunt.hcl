@@ -16,7 +16,7 @@ locals {
 generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite"
-  contents = <<-EOF
+  contents  = <<-EOF
     provider "aws" {
       region = "${local.aws_region}"
     }
@@ -26,7 +26,7 @@ generate "provider" {
 generate "backend" {
   path      = "backend.tf"
   if_exists = "overwrite"
-  contents = <<-EOF
+  contents  = <<-EOF
     terraform {
       backend "s3" {}
     }
@@ -57,7 +57,7 @@ inputs = {
 
   enable_dns_hostnames = true
   enable_dns_support   = true
-  enable_s3_endpoint = true
+  enable_s3_endpoint   = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
