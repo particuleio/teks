@@ -1,5 +1,0 @@
----
-Owner: clusterfrak-dynamics
-Env: prod
-Terraform: "0.12"
-Trigger: 2
