@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v12.2.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v13.2.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
@@ -18,19 +18,6 @@ terraform {
   after_hook "kube-system-label" {
     commands = ["apply"]
     execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig label ns kube-system name=kube-system --overwrite"]
-  }
-
-  after_hook "remove-default-psp" {
-    commands = ["apply"]
-    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete psp eks.privileged || true"]
-  }
-  after_hook "remove-default-psp-clusterrolebindind" {
-    commands = ["apply"]
-    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete clusterrolebinding eks:podsecuritypolicy:authenticated || true"]
-  }
-  after_hook "remove-default-psp-clusterrole" {
-    commands = ["apply"]
-    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig delete clusterrole eks:podsecuritypolicy:privileged || true"]
   }
 }
 
@@ -63,12 +50,6 @@ generate "provider" {
     provider "aws" {
       region = "${local.aws_region}"
     }
-    provider "kubectl" {
-      host                   = data.aws_eks_cluster.cluster.endpoint
-      cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
-      token                  = data.aws_eks_cluster_auth.cluster.token
-      load_config_file       = false
-    }
     provider "kubernetes" {
       host                   = data.aws_eks_cluster.cluster.endpoint
       cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
@@ -100,14 +81,6 @@ inputs = {
     "region" = local.aws_region
   }
 
-  psp_privileged_ns = [
-    "istio-system",
-    "istio-operator",
-    "monitoring",
-    "aws-alb-ingress-controller",
-    "aws-for-fluent-bit"
-  ]
-
   tags = merge(
     local.custom_tags
   )
@@ -126,7 +99,7 @@ inputs = {
   ]
   kubeconfig_aws_authenticator_additional_args = []
 
-  cluster_version           = "1.17"
+  cluster_version           = "1.18"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   node_groups = {
