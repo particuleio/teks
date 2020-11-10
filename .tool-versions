@@ -1,3 +1,2 @@
-terragrunt 0.23.40
-kubectl 1.17.11
-helm 3.3.1
+terraform 0.13.5
+terragrunt 0.26.0
