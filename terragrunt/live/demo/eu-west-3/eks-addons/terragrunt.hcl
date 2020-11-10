@@ -75,7 +75,7 @@ generate "backend" {
 
 locals {
   aws_region          = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+  custom_tags         = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
   default_domain_name = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["default_domain_name"]
   env                 = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
 }
@@ -116,7 +116,7 @@ inputs = {
   }
 
   cluster-autoscaler = {
-    enabled      = true
+    enabled = true
   }
 
   cni-metrics-helper = {
