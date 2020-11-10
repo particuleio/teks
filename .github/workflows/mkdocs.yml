@@ -3,7 +3,7 @@ name: 'teks:mkdocs'
 on:
   push:
     branches:
-    - master
+    - main
     paths:
     - 'docs/**'
     - 'mkdocs.yml'
@@ -16,7 +16,7 @@ jobs:
     steps:
     - name: checkout
       uses: actions/checkout@v2
-    
+
     - name: deploy
       uses: mhausenblas/mkdocs-deploy-gh-pages@master
       env:

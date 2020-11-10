@@ -3,13 +3,13 @@ name: 'terragrunt:env:demo'
 on:
   push:
     branches:
-    - master
+    - main
     paths:
-    - 'terraform/live/demo/**'
+    - 'terragrunt/live/demo/**'
   pull_request:
 
 jobs:
-  terraform:
+  terragrunt:
     name: 'terragrunt:env:demo'
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +23,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_wrapper: false
-        terraform_version: 0.13.2
+        terraform_version: 0.13.5
 
     - name: 'aws:credentials'
       uses: aws-actions/configure-aws-credentials@v1
@@ -34,95 +34,100 @@ jobs:
 
     - name: 'terragrunt:init:vpc'
       run: terragrunt init --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:fmt:vpc'
       run: terragrunt fmt -check
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:validate:vpc'
       run: terragrunt validate
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:plan:vpc'
       run: terragrunt plan --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:apply:vpc'
       run: terragrunt apply -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
 
     - name: 'terragrunt:init:eks'
       run: terragrunt init --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:fmt:eks'
       run: terragrunt fmt -check
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:validate:eks'
       run: terragrunt validate
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:plan:eks'
       run: terragrunt plan --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:apply:eks'
       run: terragrunt apply -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:apply:eks:upload-kubeconfig'
       uses: actions/upload-artifact@v1
       with:
         name: kubeconfig
-        path: terraform/live/demo/eu-west-3/eks/kubeconfig
+        path: terragrunt/live/demo/eu-west-3/eks/kubeconfig
 
     - name: 'terragrunt:init:eks-addons'
       run: terragrunt init --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:fmt:eks-addons'
       run: terragrunt fmt -check
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:validate:eks-addons'
       run: terragrunt validate
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:plan:eks-addons'
       run: terragrunt plan --terragrunt-non-interactive
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
 
     - name: 'terragrunt:apply:eks-addons'
       run: terragrunt apply -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
 
     - name: 'kubectl:wait-for-pods'
-      run: kubectl --kubeconfig=kubeconfig wait --for=condition=Ready pods --all --all-namespaces --timeout 300s
-      working-directory: terraform/live/demo/eu-west-3/eks
+      run: kubectl --kubeconfig=kubeconfig wait --for=condition=Ready pods --all --all-namespaces --timeout 600s
+      working-directory: terragrunt/live/demo/eu-west-3/eks
 
     - name: 'terragrunt:destroy:eks-addons'
       run: terragrunt destroy -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
       continue-on-error: true
+      if: "!contains(github.event.head_commit.message, 'ci keep')"
+
+    - name: 'terragrunt:destroy:eks-addons:failsafe'
+      run: terragrunt destroy -auto-approve
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
       if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:eks-addons:cleanup-stale-state'
       run: terragrunt state list 2>/dev/null | xargs terragrunt state rm
-      working-directory: terraform/live/demo/eu-west-3/eks-addons
+      working-directory: terragrunt/live/demo/eu-west-3/eks-addons
       continue-on-error: true
       if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:eks'
       run: terragrunt destroy -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/eks
+      working-directory: terragrunt/live/demo/eu-west-3/eks
       continue-on-error: true
       if: "!contains(github.event.head_commit.message, 'ci keep')"
 
     - name: 'terragrunt:destroy:vpc'
       run: terragrunt destroy -auto-approve
-      working-directory: terraform/live/demo/eu-west-3/vpc
+      working-directory: terragrunt/live/demo/eu-west-3/vpc
       continue-on-error: true
       if: "!contains(github.event.head_commit.message, 'ci keep')"
 
