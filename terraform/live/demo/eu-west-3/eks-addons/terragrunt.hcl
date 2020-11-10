@@ -3,13 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/clusterfrak-dynamics/terraform-kubernetes-addons.git?ref=v5.10.0"
-}
-
-locals {
-  env                 = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  aws_region          = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  default_domain_name = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["default_domain_name"]
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.0.4"
 }
 
 dependency "eks" {
@@ -79,73 +73,104 @@ generate "backend" {
   EOF
 }
 
+locals {
+  aws_region          = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
+  custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+  default_domain_name = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["default_domain_name"]
+  env                 = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+}
+
 inputs = {
 
   cluster-name = dependency.eks.outputs.cluster_id
 
+  tags = merge(
+    local.custom_tags
+  )
+
   eks = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
+  }
+
+  aws-for-fluent-bit = {
+    enabled = true
+  }
+
+  aws-load-balancer-controller = {
+    enabled = true
+  }
+
+  aws-node-termination-handler = {
+    enabled = true
   }
 
   calico = {
     enabled = true
   }
 
-  alb_ingress = {
-    enabled = true
-  }
-
-  aws_node_termination_handler = {
-    enabled = true
-  }
-
-  nginx_ingress = {
-    enabled = true
-  }
-
-  istio_operator = {
-    enabled = true
-  }
-
-  cluster_autoscaler = {
-    enabled      = true
-    cluster_name = dependency.eks.outputs.cluster_id
-    extra_values = <<-EXTRA_VALUES
-      image:
-        repository: eu.gcr.io/k8s-artifacts-prod/autoscaling/cluster-autoscaler
-      EXTRA_VALUES
-  }
-
-  external_dns = {
-    enabled = true
-  }
-
-  cert_manager = {
+  cert-manager = {
     enabled                        = true
     acme_email                     = "kevin@particule.io"
     enable_default_cluster_issuers = true
     allowed_cidrs                  = dependency.vpc.outputs.private_subnets_cidr_blocks
   }
 
-  metrics_server = {
-    enabled       = true
-    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
+  cluster-autoscaler = {
+    enabled      = true
   }
 
-  flux = {
+  cni-metrics-helper = {
+    enabled = true
+  }
+
+  external-dns = {
+    external-dns = {
+      enabled = true
+    },
+  }
+
+  ingress-nginx = {
+    enabled = true
+  }
+
+  istio-operator = {
+    enabled = true
+  }
+
+  karma = {
     enabled      = true
     extra_values = <<-EXTRA_VALUES
-      git:
-        url: "ssh://git@gitlab.com/myrepo/gitops-${local.env}.git"
-        pollInterval: "2m"
-      rbac:
-        create: false
-      registry:
-        automationInterval: "5m"
+      ingress:
+        enabled: true
+        path: /
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          cert-manager.io/cluster-issuer: "letsencrypt"
+        hosts:
+          - karma.${local.default_domain_name}
+        tls:
+          - secretName: karma.${local.default_domain_name}
+            hosts:
+              - karma.${local.default_domain_name}
+      env:
+        - name: ALERTMANAGER_URI
+          value: "http://prometheus-operator-alertmanager.monitoring.svc.cluster.local:9093"
+        - name: ALERTMANAGER_PROXY
+          value: "true"
+        - name: FILTERS_DEFAULT
+          value: "@state=active severity!=info severity!=none"
       EXTRA_VALUES
   }
 
-  prometheus_operator = {
+  keycloak = {
+    enabled = true
+  }
+
+  kong = {
+    enabled = true
+  }
+
+  kube-prometheus-stack = {
     enabled       = true
     allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
     extra_values  = <<-EXTRA_VALUES
@@ -186,56 +211,17 @@ inputs = {
       EXTRA_VALUES
   }
 
-  fluentd_cloudwatch = {
-    enabled = false
-  }
-
-  aws_fluent_bit = {
-    enabled = true
+  metrics-server = {
+    enabled       = true
+    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
   }
 
   npd = {
     enabled = true
   }
 
-  sealed_secrets = {
+  sealed-secrets = {
     enabled = true
   }
 
-  cni_metrics_helper = {
-    enabled = true
-  }
-
-  kong = {
-    enabled = false
-  }
-
-  keycloak = {
-    enabled = false
-  }
-
-  karma = {
-    enabled      = true
-    extra_values = <<-EXTRA_VALUES
-      ingress:
-        enabled: true
-        path: /
-        annotations:
-          kubernetes.io/ingress.class: nginx
-          cert-manager.io/cluster-issuer: "letsencrypt"
-        hosts:
-          - karma.${local.default_domain_name}
-        tls:
-          - secretName: karma.${local.default_domain_name}
-            hosts:
-              - karma.${local.default_domain_name}
-      env:
-        - name: ALERTMANAGER_URI
-          value: "http://prometheus-operator-alertmanager.monitoring.svc.cluster.local:9093"
-        - name: ALERTMANAGER_PROXY
-          value: "true"
-        - name: FILTERS_DEFAULT
-          value: "@state=active severity!=info severity!=none"
-      EXTRA_VALUES
-  }
 }
