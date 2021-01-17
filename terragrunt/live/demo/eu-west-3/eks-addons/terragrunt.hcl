@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.0.4"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.7.8"
 }
 
 dependency "eks" {
@@ -46,12 +46,10 @@ generate "provider" {
       load_config_file       = false
     }
     provider "helm" {
-      version = "~> 1.0"
       kubernetes {
         host                   = data.aws_eks_cluster.cluster.endpoint
         cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
         token                  = data.aws_eks_cluster_auth.cluster.token
-        load_config_file       = false
       }
     }
     data "aws_eks_cluster" "cluster" {
@@ -92,6 +90,11 @@ inputs = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
   }
 
+  aws-ebs-csi-driver = {
+    enabled          = true
+    is_default_class = true
+  }
+
   aws-for-fluent-bit = {
     enabled = true
   }
@@ -109,10 +112,13 @@ inputs = {
   }
 
   cert-manager = {
-    enabled                        = true
-    acme_email                     = "kevin@particule.io"
-    enable_default_cluster_issuers = true
-    allowed_cidrs                  = dependency.vpc.outputs.private_subnets_cidr_blocks
+    enabled                   = true
+    acme_email                = "kevin@particule.io"
+    acme_http01_enabled       = true
+    acme_http01_ingress_class = "nginx"
+    acme_dns01_enabled        = true
+    allowed_cidrs             = dependency.vpc.outputs.private_subnets_cidr_blocks
+    experimental_csi_driver   = true
   }
 
   cluster-autoscaler = {
@@ -130,7 +136,8 @@ inputs = {
   }
 
   ingress-nginx = {
-    enabled = true
+    enabled    = true
+    use_nlb_ip = true
   }
 
   istio-operator = {
@@ -167,13 +174,17 @@ inputs = {
   }
 
   kong = {
-    enabled = true
+    enabled       = true
+    version       = "2.2"
+    chart_version = "1.13.0"
   }
 
   kube-prometheus-stack = {
-    enabled       = true
-    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
-    extra_values  = <<-EXTRA_VALUES
+    enabled                     = true
+    allowed_cidrs               = dependency.vpc.outputs.private_subnets_cidr_blocks
+    thanos_sidecar_enabled      = true
+    thanos_bucket_force_destroy = true
+    extra_values                = <<-EXTRA_VALUES
       grafana:
         deploymentStrategy:
           type: Recreate
@@ -190,24 +201,26 @@ inputs = {
                 - grafana.${local.default_domain_name}
         persistence:
           enabled: true
-          storageClassName: gp2
+          storageClassName: ebs-sc
           accessModes:
             - ReadWriteOnce
-          size: 10Gi
+          size: 1Gi
       prometheus:
         prometheusSpec:
           replicas: 1
-          retention: 180d
+          retention: 7d
+          retentionSize: "9GB"
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
+          podMonitorSelectorNilUsesHelmValues: false
           storageSpec:
             volumeClaimTemplate:
               spec:
-                storageClassName: gp2
+                storageClassName: ebs-sc
                 accessModes: ["ReadWriteOnce"]
                 resources:
                   requests:
-                    storage: 50Gi
+                    storage: 10Gi
       EXTRA_VALUES
   }
 
@@ -222,6 +235,13 @@ inputs = {
 
   sealed-secrets = {
     enabled = true
+  }
+
+  thanos = {
+    enabled                 = true
+    generate_ca             = true
+    default_global_requests = true
+    default_global_limits   = true
   }
 
 }
