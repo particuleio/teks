@@ -1,2 +1,3 @@
 .terragrunt-cache
 kubeconfig
+.terraform
