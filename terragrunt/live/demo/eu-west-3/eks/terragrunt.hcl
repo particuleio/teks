@@ -3,21 +3,26 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v13.2.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v13.2.1"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
-    execute  = ["bash", "-c", "terraform output kubeconfig 2>/dev/null > ${get_terragrunt_dir()}/kubeconfig"]
+    execute  = ["bash", "-c", "terraform output --raw kubeconfig 2>/dev/null > ${get_terragrunt_dir()}/kubeconfig"]
   }
 
   after_hook "kubeconfig-tg" {
     commands = ["apply"]
-    execute  = ["bash", "-c", "terraform output kubeconfig 2>/dev/null > kubeconfig"]
+    execute  = ["bash", "-c", "terraform output --raw kubeconfig 2>/dev/null > kubeconfig"]
   }
 
   after_hook "kube-system-label" {
     commands = ["apply"]
     execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig label ns kube-system name=kube-system --overwrite"]
+  }
+
+  after_hook "undefault-gp2" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig kubeconfig patch storageclass gp2 -p '{\"metadata\": {\"annotations\":{\"storageclass.kubernetes.io/is-default-class\":\"false\"}}}'"]
   }
 }
 
