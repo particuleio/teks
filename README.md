@@ -25,7 +25,6 @@ A production cluster all defined in IaaC with Terraform/Terragrunt:
 * EKS cluster base on [`terraform-aws-eks`](https://github.com/terraform-aws-modules/terraform-aws-eks)
 * Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/particuleio/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
 * Kubernetes namespaces quota management based on [`terraform-kubernetes-namespaces`](https://github.com/particuleio/terraform-kubernetes-addons): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
-* AWS ECR registries management based on [`terraform-aws-ecr`](https://github.com/particuleio/terraform-aws-ecr)
 
 Everything is tied together with Terragrunt and allows you to deploy a multi cluster architecture in a matter of minutes (ok maybe an hour) and different AWS accounts for different environments.
 
