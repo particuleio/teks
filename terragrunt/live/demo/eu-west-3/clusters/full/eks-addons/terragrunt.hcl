@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.7.8"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.8.2"
 }
 
 dependency "eks" {
@@ -61,21 +61,15 @@ generate "provider" {
   EOF
 }
 
-generate "backend" {
-  path      = "backend.tf"
-  if_exists = "overwrite"
-  contents  = <<-EOF
-    terraform {
-      backend "s3" {}
-    }
-  EOF
-}
 
 locals {
-  aws_region          = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  custom_tags         = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
-  default_domain_name = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["default_domain_name"]
-  env                 = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
+  aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
+  custom_tags = merge(
+    yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
+    yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
+  )
+  default_domain_name   = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["default_domain_name"]
+  default_domain_suffix = "${local.custom_tags["Env"]}.${local.custom_tags["Project"]}.${local.default_domain_name}"
 }
 
 inputs = {
@@ -136,8 +130,9 @@ inputs = {
   }
 
   ingress-nginx = {
-    enabled    = true
-    use_nlb_ip = true
+    enabled       = true
+    use_nlb_ip    = true
+    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
   }
 
   istio-operator = {
@@ -154,14 +149,14 @@ inputs = {
           kubernetes.io/ingress.class: nginx
           cert-manager.io/cluster-issuer: "letsencrypt"
         hosts:
-          - karma.${local.default_domain_name}
+          - karma.${local.default_domain_suffix}
         tls:
-          - secretName: karma.${local.default_domain_name}
+          - secretName: karma.${local.default_domain_suffix}
             hosts:
-              - karma.${local.default_domain_name}
+              - karma.${local.default_domain_suffix}
       env:
         - name: ALERTMANAGER_URI
-          value: "http://prometheus-operator-alertmanager.monitoring.svc.cluster.local:9093"
+          value: "http://kube-prometheus-stack-alertmanager.monitoring.svc.cluster.local:9093"
         - name: ALERTMANAGER_PROXY
           value: "true"
         - name: FILTERS_DEFAULT
@@ -174,9 +169,7 @@ inputs = {
   }
 
   kong = {
-    enabled       = true
-    version       = "2.2"
-    chart_version = "1.13.0"
+    enabled = true
   }
 
   kube-prometheus-stack = {
@@ -194,11 +187,11 @@ inputs = {
             kubernetes.io/ingress.class: nginx
             cert-manager.io/cluster-issuer: "letsencrypt"
           hosts:
-            - grafana.${local.default_domain_name}
+            - grafana.${local.default_domain_suffix}
           tls:
-            - secretName: grafana.${local.default_domain_name}
+            - secretName: grafana.${local.default_domain_suffix}
               hosts:
-                - grafana.${local.default_domain_name}
+                - grafana.${local.default_domain_suffix}
         persistence:
           enabled: true
           storageClassName: ebs-sc
@@ -208,8 +201,8 @@ inputs = {
       prometheus:
         prometheusSpec:
           replicas: 1
-          retention: 7d
-          retentionSize: "9GB"
+          retention: 2d
+          retentionSize: "6GB"
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
           podMonitorSelectorNilUsesHelmValues: false
@@ -222,6 +215,11 @@ inputs = {
                   requests:
                     storage: 10Gi
       EXTRA_VALUES
+  }
+
+  loki-stack = {
+    enabled = true
+    bucket_force_destroy = true
   }
 
   metrics-server = {
@@ -238,10 +236,8 @@ inputs = {
   }
 
   thanos = {
-    enabled                 = true
-    generate_ca             = true
-    default_global_requests = true
-    default_global_limits   = true
+    enabled = true
+    bucket_force_destroy = true
   }
 
 }

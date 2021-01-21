@@ -3,14 +3,17 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.64.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.66.0"
 }
 
 locals {
-  aws_region  = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  env         = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  prefix      = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
-  custom_tags = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
+  aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
+  env        = yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))["Env"]
+  prefix     = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["prefix"]
+  custom_tags = merge(
+    yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
+    yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
+  )
 }
 
 generate "provider" {
@@ -19,16 +22,6 @@ generate "provider" {
   contents  = <<-EOF
     provider "aws" {
       region = "${local.aws_region}"
-    }
-  EOF
-}
-
-generate "backend" {
-  path      = "backend.tf"
-  if_exists = "overwrite"
-  contents  = <<-EOF
-    terraform {
-      backend "s3" {}
     }
   EOF
 }

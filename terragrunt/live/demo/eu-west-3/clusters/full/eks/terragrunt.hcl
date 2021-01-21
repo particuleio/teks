@@ -27,11 +27,13 @@ terraform {
 }
 
 locals {
-  aws_region     = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_region"]
-  env            = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))["Env"]
-  aws_account_id = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["aws_account_id"]
-  custom_tags    = yamldecode(file("${find_in_parent_folders("common_tags.yaml")}"))
-  prefix         = yamldecode(file("${find_in_parent_folders("common_values.yaml")}"))["prefix"]
+  aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
+  env        = yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))["Env"]
+  prefix     = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["prefix"]
+  custom_tags = merge(
+    yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
+    yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
+  )
   cluster_name   = "${local.prefix}-${local.env}"
 }
 
@@ -70,16 +72,6 @@ generate "provider" {
   EOF
 }
 
-generate "backend" {
-  path      = "backend.tf"
-  if_exists = "overwrite"
-  contents  = <<-EOF
-    terraform {
-      backend "s3" {}
-    }
-  EOF
-}
-
 inputs = {
 
   aws = {
@@ -112,7 +104,7 @@ inputs = {
       desired_capacity = 1
       max_capacity     = 3
       min_capacity     = 1
-      instance_type    = "t3.medium"
+      instance_type    = "t3a.medium"
       subnets          = [dependency.vpc.outputs.private_subnets[0]]
       disk_size        = 50
     }
@@ -121,7 +113,7 @@ inputs = {
       desired_capacity = 1
       max_capacity     = 3
       min_capacity     = 1
-      instance_type    = "t3.medium"
+      instance_type    = "t3a.medium"
       subnets          = [dependency.vpc.outputs.private_subnets[1]]
       disk_size        = 50
     }
@@ -130,7 +122,7 @@ inputs = {
       desired_capacity = 1
       max_capacity     = 3
       min_capacity     = 1
-      instance_type    = "t3.medium"
+      instance_type    = "t3a.medium"
       subnets          = [dependency.vpc.outputs.private_subnets[2]]
       disk_size        = 50
     }
