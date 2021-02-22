@@ -16,7 +16,7 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 ## Terraform/Terragrunt
 
 * Terraform implementation is available in the [`terraform`](./terraform) folder.
-* Terragrunt implementation is available in the [`terraform`](./terragrunt) folder.
+* Terragrunt implementation is available in the [`terragrunt`](./terragrunt) folder.
 
 ## Requirements
 
