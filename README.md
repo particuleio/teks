@@ -13,6 +13,24 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything y
 
 :warning: the v5 and further version of this project have been completely revamp and now offer a skeleton to use as a base for your infrastructure projects around EKS. All the modules have been moved outside this repository and get their own versioning. The [old README is accessible here](https://github.com/particuleio/teks/tree/release-4.X)
 
+## Terraform/Terragrunt
+
+* Terraform implementation is available in the [`terraform`](./terraform) folder.
+* Terragrunt implementation is available in the [`terraform`](./terragrunt) folder.
+
+## Requirements
+
+### Terraform
+
+* [Terraform](https://www.terraform.io/downloads.html)
+* [direnv](https://direnv.net/): available in every Linux distribution
+* [tfenv](https://github.com/cloudposse/tfenv)
+
+### Terragrunt
+
+* [Terraform](https://www.terraform.io/downloads.html)
+* [Terragrunt](https://github.com/gruntwork-io/terragrunt/releases)
+
 ## Main purposes
 
 The main goal of this project is to glue together commonly used tooling with Kubernetes/EKS and to get from an AWS Account to a production cluster with everything you need without any manual configuration.

@@ -1,0 +1,6 @@
+---
+aws_account_id: 161285725140
+default_domain_name: clusterfrak-dynamics.io
+prefix: pio
+project: teks
+tf_state_bucket_region: eu-west-1
