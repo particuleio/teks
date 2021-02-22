@@ -2,11 +2,11 @@ remote_state {
   backend = "s3"
 
   config = {
-    bucket         = "${yamldecode(file("global_values.yaml"))["prefix"]}-${yamldecode(file("global_values.yaml"))["project"]}-tf-state-store"
+    bucket         = "${yamldecode(file("global_values.yaml"))["prefix"]}-${yamldecode(file("global_values.yaml"))["project"]}-tg-state-store"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "${yamldecode(file("global_values.yaml"))["tf_state_bucket_region"]}"
     encrypt        = true
-    dynamodb_table = "${yamldecode(file("global_values.yaml"))["prefix"]}-${yamldecode(file("global_values.yaml"))["project"]}-tf-state-lock"
+    dynamodb_table = "${yamldecode(file("global_values.yaml"))["prefix"]}-${yamldecode(file("global_values.yaml"))["project"]}-tg-state-lock"
   }
 
   generate = {
