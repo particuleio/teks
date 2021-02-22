@@ -1,4 +1,4 @@
 .terragrunt-cache
-kubeconfig
+kubeconfig*
 .terraform
 .terraform.lock.hcl
