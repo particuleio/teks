@@ -34,7 +34,7 @@ locals {
     yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
     yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
   )
-  cluster_name   = "${local.prefix}-${local.env}"
+  cluster_name = "${local.prefix}-${local.env}"
 }
 
 dependency "vpc" {

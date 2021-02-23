@@ -3,17 +3,19 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.71.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.77.0"
 }
 
 locals {
   aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
   env        = yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))["Env"]
   prefix     = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["prefix"]
+  name       = yamldecode(file("${find_in_parent_folders("cluster_values.yaml")}"))["name"]
   custom_tags = merge(
     yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
     yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
   )
+  cluster-name = "${local.prefix}-${local.env}-${local.name}"
 }
 
 generate "provider" {
@@ -30,7 +32,7 @@ inputs = {
 
   tags = merge(
     {
-      "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
+      "kubernetes.io/cluster/${local.cluster-name}" = "shared"
     },
     local.custom_tags
   )
@@ -56,12 +58,12 @@ inputs = {
   enable_s3_endpoint   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
-    "kubernetes.io/role/elb"                             = "1"
+    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
-    "kubernetes.io/role/internal-elb"                    = "1"
+    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
   }
 }

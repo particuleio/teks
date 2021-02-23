@@ -218,7 +218,7 @@ inputs = {
   }
 
   loki-stack = {
-    enabled = true
+    enabled              = true
     bucket_force_destroy = true
   }
 
@@ -236,7 +236,7 @@ inputs = {
   }
 
   thanos = {
-    enabled = true
+    enabled              = true
     bucket_force_destroy = true
   }
 
