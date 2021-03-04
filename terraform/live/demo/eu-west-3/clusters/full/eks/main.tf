@@ -17,7 +17,8 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 module "eks" {
-  source = "terraform-aws-modules/eks/aws"
+  source  = "terraform-aws-modules/eks/aws"
+  version = "< 14"
 
   tags = merge(
     local.custom_tags
