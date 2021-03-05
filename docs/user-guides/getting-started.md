@@ -23,7 +23,7 @@ The following dependencies are required on the deployer host:
 You can either clone the repo locally or generate/fork a template from github.
 
 ```bash
-git clone https://github.com/clusterfrak-dynamics/teks.git --branch v6.0.0
+git clone https://github.com/particuleio/teks.git
 ```
 
 The terraform directory structure is the following:
@@ -81,16 +81,16 @@ cp -ar demo mycluster
 
 `live/demo/terragrunt.hcl` is the parent terragrunt file use to configure remote state.
 
-The configuration is done automatically from the `common_values.yaml` file.
+The configuration is done automatically from the `global_values.yaml` file.
 
 ```yaml
-{!terraform/live/demo/common_values.yaml!}
+{!terragrunt/live/global_values.yaml!}
 ```
 
 The values here will generate automatically the parent terragrunt file.
 
 ```json
-{!terraform/live/demo/terragrunt.hcl!}
+{!terragrunt/live/terragrunt.hcl!}
 ```
 
 You can either customize the values or edit directly the `terragrunt.hcl` file.
