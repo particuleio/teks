@@ -2,10 +2,10 @@
 site_name: tEKS
 site_description: Website and documentation for tEKS project
 site_author: ArchiFleKs
-site_url: https://clusterfrak-dynamics.github.io/teks/
+site_url: https://particuleio.github.io/teks/
 
-repo_name: clusterfrak-dynamics/teks
-repo_url: https://github.com/clusterfrak-dynamics/teks
+repo_name: particuleio/teks
+repo_url: https://github.com/particuleio/teks
 
 copyright: <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
 
@@ -47,10 +47,7 @@ markdown_extensions:
 nav:
   - Overview: index.md
   - Documentation:
-    - Getting started: user-guides/getting-started.md
-    - VPC: user-guides/vpc.md
-    - EKS: user-guides/eks.md
-    - EKS Addons: user-guides/eks-addons.md
-    - EKS Namespaces: user-guides/eks-namespaces.md
-    - ECR: user-guides/ecr.md
-
+      - Getting started: user-guides/getting-started.md
+      - VPC: user-guides/vpc.md
+      - EKS: user-guides/eks.md
+      - EKS Addons: user-guides/eks-addons.md

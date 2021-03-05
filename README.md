@@ -7,7 +7,7 @@
 ![terragrunt:env:demo](https://github.com/particuleio/teks/workflows/terragrunt:env:demo/badge.svg)
 ![teks:mkdocs](https://github.com/particuleio/teks/workflows/teks:mkdocs/badge.svg)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield)
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
@@ -90,14 +90,15 @@ Terragrunt is not a hard requirement but all the modules are tested with Terragr
 
 ## Additional infrastructure blocks
 
-If you wish to extend your infrastructure you can pick up additional modules on the [clusterfrak-dynamics github page](https://github.com/clusterfrak-dynamics) and more recently [particuleio github page](https://github.com/particuleio).
+If you wish to extend your infrastructure you can pick up additional modules on the [particuleio github page](https://github.com/particuleio).
+Some modules can also be found on the [clusterfrak-dynamics github page](https://github.com/clusterfrak-dynamics).
 
 ## Branches
 
-* [`master`](https://github.com/particuleio/teks/tree/master): Backward incompatible with v1.X but compatible with v2.X, releases bumped to v3.X because a lot has changed.
+* [`main`](https://github.com/particuleio/teks/tree/main): Backward incompatible with v1.X but compatible with v2.X, releases bumped to v3.X because a lot has changed.
 * [`release-1.X`](https://github.com/particuleio/teks/tree/release-1.X): Compatible with Terraform < 0.12 and Terragrunt < 0.19. Be sure to target the same modules version.
 * [`release-2.X`](https://github.com/particuleio/teks/tree/release-2.X): Compatible with Terraform >= 0.12 and Terragrunt >= 0.19. Be sure to target the same modules version.
 
 ## License
 
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fclusterfrak-dynamics%2Fteks?ref=badge_large)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_large)

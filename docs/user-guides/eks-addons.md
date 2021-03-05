@@ -1,12 +1,16 @@
 # EKS addons module
 
-`eks-addons` is a custom module maintained [here](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons) and provides either:
+`terraform-kubernetes-addons:aws` is a custom module maintained
+[here][terraform-kubernetes-addons:aws] and provides:
+
+[terraform-kubernetes-addons:aws]: https://github.com/particuleio/terraform-kubernetes-addons/tree/main/modules/aws
 
 * helm v3 charts
 * manifests
 * operators
 
-For commonly used addons one Kubernetes and most specifically with EKS. The deployments are curated to be tightly integrated with AWS and EKS.
+For commonly used addons one Kubernetes and most specifically with EKS.
+The deployments are curated to be tightly integrated with AWS and EKS.
 
 The following addons are available and work out of the box.
 
@@ -17,7 +21,6 @@ All charts have been tested with Helm v3 and the `terraform-provider-helm` v1.0 
 * [cluster-autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler): scale worker nodes based on workload.
 * [external-dns](https://github.com/kubernetes-incubator/external-dns): sync ingress and service records in route53.
 * [cert-manager](https://github.com/jetstack/cert-manager): automatically generate TLS certificates, supports ACME v2.
-* [kiam](https://github.com/uswitch/kiam): prevents pods to access EC2 metadata and enables pods to assume specific AWS IAM roles.
 * [nginx-ingress](https://github.com/kubernetes/ingress-nginx): processes *Ingress* object and acts as a HTTP/HTTPS proxy (compatible with cert-manager).
 * [metrics-server](https://github.com/kubernetes-incubator/metrics-server): enable metrics API and horizontal pod scaling (HPA).
 * [prometheus-operator](https://github.com/coreos/prometheus-operator): Monitoring / Alerting / Dashboards.
@@ -45,12 +48,10 @@ Some project are transitioning to [Operators](https://kubernetes.io/docs/concept
 Some addons require specific IAM permission. This can be done by either:
 
 * IRSA: [IAM role for service account](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) which is the default and recommended way
-* [Kiam](https://github.com/uswitch/kiam)
 
 Addons that need IAM access have two variables:
 
 * `create_resources_irsa`: default to true and uses IAM role for service account
-* `create_resources_kiam`: default to false and uses KIAM to manage IAM permissions
 
 There is no specific config, everything is taken care of by the module.
 
@@ -59,16 +60,19 @@ There is no specific config, everything is taken care of by the module.
 All the configuration is done in `eks-addons/terragrunt.hcl`.
 
 ```json
-{!terraform/live/demo/eu-west-3/eks-addons/terragrunt.hcl!}
+{!terragrunt/live/demo/eu-west-3/clusters/full/eks-addons/terragrunt.hcl!}
 ```
 
 ### Default charts values
 
-Some values are defined by default directly into the module. These can off course be overridden and or merged/replaced. You can find the defaults values in the [upstream module](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons). Eg. default values for `cluster-autoscaler` are in [`cluster-autoscaler.tf`](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons/blob/master/cluster-autoscaler.tf)
+Some values are defined by default directly into the module. These can off
+course be overridden and or merged/replaced. You can find the defaults values
+in the [upstream module][terraform-kubernetes-addons:aws]. Eg. default values
+for `cluster-autoscaler` are in [`cluster-autoscaler.tf`](https://github.com/particuleio/terraform-kubernetes-addons/blob/main/modules/aws/cluster-autoscaler.tf).
 
 ### Overriding Helm provider values
 
-Helm provider have defaults values defined [here](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons/blob/master/locals.tf):
+Helm provider have defaults values defined [here](https://github.com/particuleio/terraform-kubernetes-addons/blob/main/locals.tf):
 
 ```json
   helm_defaults_defaults = {
@@ -91,7 +95,8 @@ Helm provider have defaults values defined [here](https://github.com/clusterfrak
   }
 ```
 
-These can be overridden globally with the `helm_defaults` input variable or can be overridden per chart in `terragrunt.hcl`:
+These can be overridden globally with the `helm_defaults` input variable or
+can be overridden per chart in `terragrunt.hcl`:
 
 ```json
   helm_defaults = {
@@ -102,7 +107,6 @@ These can be overridden globally with the `helm_defaults` input variable or can 
 
 
   cluster_autoscaler = {
-    create_iam_resources_kiam = false
     create_iam_resources_irsa = true
     iam_policy_override       = ""
     version                   = "v1.14.7"
@@ -116,13 +120,14 @@ These can be overridden globally with the `helm_defaults` input variable or can 
 
 ### Overriding charts values.yaml
 
-It is possible to add or override values per charts. Helm provider use the same merge logic as Helm so you can basically rewrite the whole `values.yaml` if needed.
+It is possible to add or override values per charts. Helm provider use the
+same merge logic as Helm so you can basically rewrite the whole
+`values.yaml` if needed.
 
 Each chart has a `extra_values` variable where you can specify custom values.
 
 ```json
-  flux = {
-    create_iam_resources_kiam = false
+flux = {
     create_iam_resources_irsa = true
     version                   = "1.18.0"
     chart_version             = "1.2.0"
@@ -138,6 +143,10 @@ rbac:
 registry:
   automationInterval: "2m"
 EXTRA_VALUES
+}
 ```
 
-There are some examples in the `terragrunt.hcl` file. Not all the variables available are present. If you want a full list of variable, you can find them in the [upstream module](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons). For example for `cluster-autoscaler` you can see the default [here](https://github.com/clusterfrak-dynamics/terraform-kubernetes-addons/blob/master/cluster-autoscaler.tf#L2).
+There are some examples in the `terragrunt.hcl` file. Not all the variables
+available are present. If you want a full list of variable, you can find them
+in the [upstream module][terraform-kubernetes-addons:aws]. For example
+for `cluster-autoscaler` you can see the default [here](https://github.com/particuleio/terraform-kubernetes-addons/blob/main/modules/aws/cluster-autoscaler.tf#L2).
