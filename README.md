@@ -7,7 +7,7 @@
 ![terragrunt:env:demo](https://github.com/particuleio/teks/workflows/terragrunt:env:demo/badge.svg)
 ![teks:mkdocs](https://github.com/particuleio/teks/workflows/teks:mkdocs/badge.svg)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield)
 
 tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
 
