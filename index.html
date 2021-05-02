@@ -1,0 +1,766 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Website and documentation for tEKS project">
+      
+      
+      
+        <meta name="author" content="ArchiFleKs">
+      
+      
+        <link rel="canonical" href="https://particuleio.github.io/teks/">
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1.2, mkdocs-material-7.1.3">
+    
+    
+      
+        <title>tEKS</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.e35208c4.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.ef6f36e2.min.css">
+        
+          
+          
+          <meta name="theme-color" content="#4051b5">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <script>function __prefix(e){return new URL(".",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#teks" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="tEKS" class="md-header__button md-logo" aria-label="tEKS" data-md-component="logo">
+      
+  <img src="images/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tEKS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Overview
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/particuleio/teks/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    particuleio/teks
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="tEKS" class="md-nav__button md-logo" aria-label="tEKS" data-md-component="logo">
+      
+  <img src="images/logo-white.svg" alt="logo">
+
+    </a>
+    tEKS
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/particuleio/teks/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    particuleio/teks
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Overview
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        Overview
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terraformterragrunt" class="md-nav__link">
+    Terraform/Terragrunt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+    <nav class="md-nav" aria-label="Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform" class="md-nav__link">
+    Terraform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terragrunt" class="md-nav__link">
+    Terragrunt
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-purposes" class="md-nav__link">
+    Main purposes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-get" class="md-nav__link">
+    What you get
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#curated-features" class="md-nav__link">
+    Curated Features
+  </a>
+  
+    <nav class="md-nav" aria-label="Curated Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enforced-security" class="md-nav__link">
+    Enforced security
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-the-box-monitoring" class="md-nav__link">
+    Out of the box monitoring
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helm-v3-provider" class="md-nav__link">
+    Helm v3 provider
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-and-not-limited-to" class="md-nav__link">
+    Other and not limited to
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements_1" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-infrastructure-blocks" class="md-nav__link">
+    Additional infrastructure blocks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#branches" class="md-nav__link">
+    Branches
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+      
+      <label class="md-nav__link" for="__nav_2">
+        Documentation
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Documentation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_2">
+          <span class="md-nav__icon md-icon"></span>
+          Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="user-guides/getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="user-guides/vpc/" class="md-nav__link">
+        VPC
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="user-guides/eks/" class="md-nav__link">
+        EKS
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="user-guides/eks-addons/" class="md-nav__link">
+        EKS Addons
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#terraformterragrunt" class="md-nav__link">
+    Terraform/Terragrunt
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements" class="md-nav__link">
+    Requirements
+  </a>
+  
+    <nav class="md-nav" aria-label="Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#terraform" class="md-nav__link">
+    Terraform
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#terragrunt" class="md-nav__link">
+    Terragrunt
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#main-purposes" class="md-nav__link">
+    Main purposes
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-get" class="md-nav__link">
+    What you get
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#curated-features" class="md-nav__link">
+    Curated Features
+  </a>
+  
+    <nav class="md-nav" aria-label="Curated Features">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#enforced-security" class="md-nav__link">
+    Enforced security
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#out-of-the-box-monitoring" class="md-nav__link">
+    Out of the box monitoring
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#helm-v3-provider" class="md-nav__link">
+    Helm v3 provider
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-and-not-limited-to" class="md-nav__link">
+    Other and not limited to
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#requirements_1" class="md-nav__link">
+    Requirements
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#examples" class="md-nav__link">
+    Examples
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-infrastructure-blocks" class="md-nav__link">
+    Additional infrastructure blocks
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#branches" class="md-nav__link">
+    Branches
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#license" class="md-nav__link">
+    License
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/particuleio/teks/edit/master/docs/index.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="teks">tEKS<a class="headerlink" href="#teks" title="Permanent link">&para;</a></h1>
+<p align="center">
+  <img src="images/logo.png">
+</p>
+
+<p><img alt="terragrunt:env:demo" src="https://github.com/particuleio/teks/workflows/terragrunt:env:demo/badge.svg" />
+<img alt="teks:mkdocs" src="https://github.com/particuleio/teks/workflows/teks:mkdocs/badge.svg" />
+<a href="https://github.com/semantic-release/semantic-release"><img alt="semantic-release" src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" /></a>
+<a href="https://app.fossa.com/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield"><img alt="FOSSA Status" src="https://app.fossa.com/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield" /></a></p>
+<p>tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.</p>
+<p><img alt="⚠️" class="emojione" src="https://cdnjs.cloudflare.com/ajax/libs/emojione/2.2.7/assets/svg/26a0.svg" title=":warning:" /> the v5 and further version of this project have been completely revamp and now offer a skeleton to use as a base for your infrastructure projects around EKS. All the modules have been moved outside this repository and get their own versioning. The <a href="https://github.com/particuleio/teks/tree/release-4.X">old README is accessible here</a></p>
+<h2 id="terraformterragrunt">Terraform/Terragrunt<a class="headerlink" href="#terraformterragrunt" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Terraform implementation is available in the <a href="./terraform"><code>terraform</code></a> folder.</li>
+<li>Terragrunt implementation is available in the <a href="./terragrunt"><code>terragrunt</code></a> folder.</li>
+</ul>
+<h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permanent link">&para;</a></h2>
+<h3 id="terraform">Terraform<a class="headerlink" href="#terraform" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://www.terraform.io/downloads.html">Terraform</a></li>
+<li><a href="https://direnv.net/">direnv</a>: available in every Linux distribution</li>
+<li><a href="https://github.com/cloudposse/tfenv">tfenv</a></li>
+</ul>
+<h3 id="terragrunt">Terragrunt<a class="headerlink" href="#terragrunt" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://www.terraform.io/downloads.html">Terraform</a></li>
+<li><a href="https://github.com/gruntwork-io/terragrunt/releases">Terragrunt</a></li>
+</ul>
+<h2 id="main-purposes">Main purposes<a class="headerlink" href="#main-purposes" title="Permanent link">&para;</a></h2>
+<p>The main goal of this project is to glue together commonly used tooling with Kubernetes/EKS and to get from an AWS Account to a production cluster with everything you need without any manual configuration.</p>
+<h2 id="what-you-get">What you get<a class="headerlink" href="#what-you-get" title="Permanent link">&para;</a></h2>
+<p>A production cluster all defined in IaaC with Terraform/Terragrunt:</p>
+<ul>
+<li>AWS VPC if needed based on <a href="https://github.com/terraform-aws-modules/terraform-aws-vpc"><code>terraform-aws-vpc</code></a></li>
+<li>EKS cluster base on <a href="https://github.com/terraform-aws-modules/terraform-aws-eks"><code>terraform-aws-eks</code></a></li>
+<li>Kubernetes addons based on <a href="https://github.com/particuleio/terraform-kubernetes-addons"><code>terraform-kubernetes-addons</code></a>: provides various addons that are often used on Kubernetes and specifically on EKS.</li>
+<li>Kubernetes namespaces quota management based on <a href="https://github.com/particuleio/terraform-kubernetes-addons"><code>terraform-kubernetes-namespaces</code></a>: allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.</li>
+</ul>
+<p>Everything is tied together with Terragrunt and allows you to deploy a multi cluster architecture in a matter of minutes (ok maybe an hour) and different AWS accounts for different environments.</p>
+<h2 id="curated-features">Curated Features<a class="headerlink" href="#curated-features" title="Permanent link">&para;</a></h2>
+<p>The main additionals features are the curated addons list, see <a href="https://github.com/particuleio/terraform-kubernetes-addons">here</a> and in the customization of the cluster policy</p>
+<h3 id="enforced-security">Enforced security<a class="headerlink" href="#enforced-security" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Default PSP is removed and sensible defaults are enforced</li>
+<li>All addons have specific PSP enabled</li>
+<li>No IAM credentials on instances, everything is enforced with <a href="https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/">IRSA</a> or <a href="https://github.com/uswitch/kiam">KIAM</a></li>
+<li>Each addons is deployed in it's own namespace with sensible default network policies</li>
+</ul>
+<h3 id="out-of-the-box-monitoring">Out of the box monitoring<a class="headerlink" href="#out-of-the-box-monitoring" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Prometheus Operator with defaults dashboards</li>
+<li>Addons that support metrics are enable along with their <code>serviceMonitor</code></li>
+<li>Custom grafana dashboard are available by default.</li>
+</ul>
+<h3 id="helm-v3-provider">Helm v3 provider<a class="headerlink" href="#helm-v3-provider" title="Permanent link">&para;</a></h3>
+<ul>
+<li>All addons support Helm v3 configuration</li>
+<li>All charts are easily customizable</li>
+</ul>
+<h3 id="other-and-not-limited-to">Other and not limited to<a class="headerlink" href="#other-and-not-limited-to" title="Permanent link">&para;</a></h3>
+<ul>
+<li>priorityClasses for addons</li>
+<li>use of [<code>kubectl-provider</code>], no more local exec and custom manifest are properly handled</li>
+<li>lot of manual stuff have been automated under the hood</li>
+</ul>
+<h2 id="requirements_1">Requirements<a class="headerlink" href="#requirements_1" title="Permanent link">&para;</a></h2>
+<p>Terragrunt is not a hard requirement but all the modules are tested with Terragrunt.</p>
+<ul>
+<li><a href="https://www.terraform.io/intro/getting-started/install.html">Terraform</a></li>
+<li><a href="https://github.com/gruntwork-io/terragrunt#install-terragrunt">Terragrunt</a></li>
+<li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/">kubectl</a></li>
+<li><a href="https://helm.sh/">helm</a></li>
+<li><a href="https://github.com/kubernetes-sigs/aws-iam-authenticator">aws-iam-authenticator</a></li>
+</ul>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p><a href="terraform/live"><code>terraform/live</code></a> folder provides an opinionated directory structure for a production environment with an example using</p>
+<h2 id="additional-infrastructure-blocks">Additional infrastructure blocks<a class="headerlink" href="#additional-infrastructure-blocks" title="Permanent link">&para;</a></h2>
+<p>If you wish to extend your infrastructure you can pick up additional modules on the <a href="https://github.com/particuleio">particuleio github page</a>.
+Some modules can also be found on the <a href="https://github.com/clusterfrak-dynamics">clusterfrak-dynamics github page</a>.</p>
+<h2 id="branches">Branches<a class="headerlink" href="#branches" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/particuleio/teks/tree/main"><code>main</code></a>: Backward incompatible with v1.X but compatible with v2.X, releases bumped to v3.X because a lot has changed.</li>
+<li><a href="https://github.com/particuleio/teks/tree/release-1.X"><code>release-1.X</code></a>: Compatible with Terraform &lt; 0.12 and Terragrunt &lt; 0.19. Be sure to target the same modules version.</li>
+<li><a href="https://github.com/particuleio/teks/tree/release-2.X"><code>release-2.X</code></a>: Compatible with Terraform &gt;= 0.12 and Terragrunt &gt;= 0.19. Be sure to target the same modules version.</li>
+</ul>
+<h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
+<p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_large"><img alt="FOSSA Status" src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=large" /></a></p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+      
+        <a href="user-guides/getting-started/" class="md-footer__link md-footer__link--next" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Getting started
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": ".", "features": ["tabs", "instant"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing"}, "search": "assets/javascripts/workers/search.fe42c31b.min.js", "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.4ea5477f.min.js"></script>
+      
+    
+  </body>
+</html>
