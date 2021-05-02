@@ -17,8 +17,7 @@ data "aws_eks_cluster_auth" "cluster" {
 }
 
 module "eks" {
-  source  = "terraform-aws-modules/eks/aws"
-  version = "< 14"
+  source = "terraform-aws-modules/eks/aws"
 
   tags = merge(
     local.custom_tags
@@ -42,31 +41,30 @@ module "eks" {
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   node_groups = {
-    "default-${local.aws_region}a" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [data.terraform_remote_state.vpc.outputs.vpc.private_subnets[0]]
-      disk_size        = 50
+    "default-${local.aws_region}" = {
+      create_launch_template = true
+      desired_capacity       = 1
+      max_capacity           = 5
+      min_capacity           = 1
+      instance_types         = ["t3a.medium", "t3.medium"]
+      disk_size              = 50
+      k8s_labels = {
+        pool = "default"
+      }
+      capacity_type = "ON_DEMAND"
     }
-
-    "default-${local.aws_region}b" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [data.terraform_remote_state.vpc.outputs.vpc.private_subnets[1]]
-      disk_size        = 50
-    }
-
-    "default-${local.aws_region}c" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [data.terraform_remote_state.vpc.outputs.vpc.private_subnets[2]]
-      disk_size        = 50
+    "dedicated-${local.aws_region}" = {
+      create_launch_template = true
+      desired_capacity       = 1
+      max_capacity           = 5
+      min_capacity           = 1
+      instance_types         = ["t3a.medium", "t3.medium"]
+      disk_size              = 50
+      kubelet_extra_args     = "--register-with-taints=dedicated=spot:NoSchedule"
+      k8s_labels = {
+        pool = "dedicated"
+      }
+      capacity_type = "SPOT"
     }
   }
 }

@@ -27,7 +27,6 @@ module "vpc" {
 
   enable_dns_hostnames = true
   enable_dns_support   = true
-  enable_s3_endpoint   = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
@@ -38,6 +37,27 @@ module "vpc" {
     "kubernetes.io/cluster/${local.prefix}-${local.env}" = "shared"
     "kubernetes.io/role/internal-elb"                    = "1"
   }
+}
+
+module "vpc-endpoints" {
+  source = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
+
+  vpc_id = module.vpc.vpc_id
+
+  endpoints = {
+    s3 = {
+      service             = "s3"
+      tags                = { Name = "s3-vpc-endpoint" }
+      service_type        = "Gateway"
+      route_table_ids     = flatten([module.vpc.intra_route_table_ids, module.vpc.private_route_table_ids, module.vpc.public_route_table_ids])
+      private_dns_enabled = true
+
+    },
+  }
+
+  tags = merge(
+    local.custom_tags
+  )
 }
 
 output "vpc" {

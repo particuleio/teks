@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.8.2"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=main"
 }
 
 dependency "eks" {
@@ -43,7 +43,6 @@ generate "provider" {
       host                   = data.aws_eks_cluster.cluster.endpoint
       cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
       token                  = data.aws_eks_cluster_auth.cluster.token
-      load_config_file       = false
     }
     provider "helm" {
       kubernetes {
@@ -107,7 +106,7 @@ inputs = {
 
   cert-manager = {
     enabled                   = true
-    acme_email                = "kevin@particule.io"
+    acme_email                = "cert@particule.io"
     acme_http01_enabled       = true
     acme_http01_ingress_class = "nginx"
     acme_dns01_enabled        = true

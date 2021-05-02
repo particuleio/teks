@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v1.13.2"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=main"
 }
 
 dependency "eks" {
@@ -105,7 +105,7 @@ inputs = {
   }
 
   aws-node-termination-handler = {
-    enabled = true
+    enabled = false
   }
 
   calico = {
@@ -114,11 +114,12 @@ inputs = {
 
   cert-manager = {
     enabled                   = true
-    acme_email                = "kevin@particule.io"
+    acme_email                = "cert@particule.io"
     acme_http01_enabled       = true
     acme_http01_ingress_class = "nginx"
     acme_dns01_enabled        = true
     allowed_cidrs             = dependency.vpc.outputs.private_subnets_cidr_blocks
+    experimental_csi_driver   = true
   }
 
   cluster-autoscaler = {
@@ -126,7 +127,7 @@ inputs = {
   }
 
   cni-metrics-helper = {
-    enabled = true
+    enabled = false
   }
 
   external-dns = {
@@ -139,6 +140,22 @@ inputs = {
     enabled       = true
     use_nlb_ip    = true
     allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
+  }
+
+  istio-operator = {
+    enabled = false
+  }
+
+  karma = {
+    enabled = false
+  }
+
+  keycloak = {
+    enabled = false
+  }
+
+  kong = {
+    enabled = false
   }
 
   kube-prometheus-stack = {
@@ -196,11 +213,11 @@ inputs = {
   }
 
   npd = {
-    enabled = true
+    enabled = false
   }
 
   sealed-secrets = {
-    enabled = true
+    enabled = false
   }
 
   thanos = {

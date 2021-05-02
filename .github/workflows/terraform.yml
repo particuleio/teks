@@ -1,0 +1,114 @@
+name: 'teks'
+
+on:
+  push:
+    branches:
+    - main
+    - release
+  pull_request:
+    branches:
+      - main
+      - release
+  workflow_dispatch:
+
+jobs:
+  renovate-config-check:
+    name: 'renovate:config'
+    runs-on: ubuntu-20.04
+    if: github.ref != 'refs/heads/release'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '15'
+        check-latest: true
+
+    - name: Install Renovate
+      run: npm install -g renovate
+
+    - name: Check Renovate configuraton
+      run: renovate-config-validator
+
+  terraform-pre-commit:
+    name: 'terraform:pre-commit'
+    runs-on: ubuntu-20.04
+    if: github.ref != 'refs/heads/release'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ secrets.TERRAFORM_VERSION }}
+
+    - name: 'asdf:install'
+      uses: asdf-vm/actions/install@v1.1.0
+
+    - uses: actions/setup-python@v2
+
+    - name: Install terraform tooling
+      run: |
+        curl -L "$(curl -s https://api.github.com/repos/terraform-docs/terraform-docs/releases/latest | grep -o -E "https://.+?-linux-amd64.tar.gz")" > terraform-docs.tgz && tar xzf terraform-docs.tgz && chmod +x terraform-docs && sudo mv terraform-docs /usr/bin/
+        curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && rm tflint.zip && sudo mv tflint /usr/bin/
+
+    - name: Log tooling version
+      run: |
+        tflint --version
+        terraform-docs --version
+        terraform -version
+        terragrunt -version
+
+    - name: Check modules
+      uses: pre-commit/action@v2.0.3
+      with:
+        extra_args: --show-diff-on-failure --all-files
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v2
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger
+
+  terraform-release:
+    if: github.ref == 'refs/heads/release'
+    name: 'terraform:release'
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v2
+      with:
+        branches: |
+          [
+            'release'
+          ]
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: 'slack:success'
+      if: success()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v2
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: SUCCESS
+        color: good
+
+    - name: 'slack:failure'
+      if: failure()
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      uses: voxmedia/github-action-slack-notify-build@v2
+      with:
+        channel: ${{ secrets.SLACK_CHANNEL }}
+        status: failure
+        color: danger

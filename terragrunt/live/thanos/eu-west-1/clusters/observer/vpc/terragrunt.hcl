@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v2.77.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.0.0"
 }
 
 locals {
@@ -15,7 +15,7 @@ locals {
     yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
     yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
   )
-  cluster-name = "${local.prefix}-${local.env}-${local.name}"
+  cluster_name = "${local.prefix}-${local.env}-${local.name}"
 }
 
 generate "provider" {
@@ -32,7 +32,7 @@ inputs = {
 
   tags = merge(
     {
-      "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+      "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     },
     local.custom_tags
   )
@@ -55,15 +55,14 @@ inputs = {
 
   enable_dns_hostnames = true
   enable_dns_support   = true
-  enable_s3_endpoint   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                      = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster-name}" = "shared"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
   }
 }

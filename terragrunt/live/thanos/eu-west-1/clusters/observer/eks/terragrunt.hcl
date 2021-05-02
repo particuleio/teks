@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v13.2.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=master"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
@@ -30,11 +30,12 @@ locals {
   aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
   env        = yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))["Env"]
   prefix     = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["prefix"]
+  name       = yamldecode(file("${find_in_parent_folders("cluster_values.yaml")}"))["name"]
   custom_tags = merge(
     yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
     yamldecode(file("${find_in_parent_folders("env_tags.yaml")}"))
   )
-  cluster_name = "${local.prefix}-${local.env}"
+  cluster_name = "${local.prefix}-${local.env}-${local.name}"
 }
 
 dependency "vpc" {
@@ -61,7 +62,6 @@ generate "provider" {
       host                   = data.aws_eks_cluster.cluster.endpoint
       cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
       token                  = data.aws_eks_cluster_auth.cluster.token
-      load_config_file       = false
     }
     data "aws_eks_cluster" "cluster" {
       name = aws_eks_cluster.this[0].id
@@ -100,34 +100,17 @@ inputs = {
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   node_groups = {
-    "default-${local.aws_region}a" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [dependency.vpc.outputs.private_subnets[0]]
-      disk_size        = 20
-      key_pair         = "klefevre-sorrow"
-    }
-
-    "default-${local.aws_region}b" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [dependency.vpc.outputs.private_subnets[1]]
-      disk_size        = 20
-      key_pair         = "klefevre-sorrow"
-    }
-
-    "default-${local.aws_region}c" = {
-      desired_capacity = 1
-      max_capacity     = 3
-      min_capacity     = 1
-      instance_type    = "t3a.medium"
-      subnets          = [dependency.vpc.outputs.private_subnets[2]]
-      disk_size        = 20
-      key_pair         = "klefevre-sorrow"
+    "default-${local.aws_region}" = {
+      create_launch_template = true
+      desired_capacity       = 3
+      max_capacity           = 5
+      min_capacity           = 1
+      instance_types         = ["m5a.large"]
+      disk_size              = 50
+      k8s_labels = {
+        pool = "default"
+      }
+      capacity_type = "ON_DEMAND"
     }
   }
 }

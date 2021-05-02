@@ -46,8 +46,7 @@ module "eks-addons" {
   }
 
   aws-ebs-csi-driver = {
-    enabled          = true
-    is_default_class = true
+    enabled = true
   }
 
   aws-for-fluent-bit = {
