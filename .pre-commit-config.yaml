@@ -8,5 +8,5 @@ repos:
     - id: terraform_validate
       files: ^terraform/live/demo
     - id: terragrunt_fmt
-    - id: terragrunt_validate
-      files: ^terragrunt/live/demo/eu-west-3/clusters/full/
+    # - id: terragrunt_validate
+    #   files: ^terragrunt/live/demo/eu-west-3/clusters/full
