@@ -105,7 +105,7 @@ inputs = {
       desired_capacity       = 3
       max_capacity           = 5
       min_capacity           = 1
-      instance_types         = ["m5a.large"]
+      instance_types         = ["m5.large"]
       disk_size              = 50
       k8s_labels = {
         pool = "default"
@@ -117,7 +117,7 @@ inputs = {
       desired_capacity       = 3
       max_capacity           = 5
       min_capacity           = 3
-      instance_types         = ["m5a.large"]
+      instance_types         = ["m5.large"]
       disk_size              = 50
       kubelet_extra_args     = "--register-with-taints=dedicated=spot:NoSchedule"
       k8s_labels = {

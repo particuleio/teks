@@ -37,7 +37,7 @@ module "eks" {
   ]
   kubeconfig_aws_authenticator_additional_args = []
 
-  cluster_version           = "1.19"
+  cluster_version           = "1.21"
   cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   node_groups = {
