@@ -3,6 +3,10 @@ include {
   expose = true
 }
 
+dependencies {
+  paths = ["../eks-addons-tier-1"]
+}
+
 terraform {
   source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=main"
 }

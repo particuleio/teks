@@ -3,6 +3,10 @@ include {
   expose = true
 }
 
+dependencies {
+  paths = ["../vpc"]
+}
+
 terraform {
   source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v17.1.0"
 
