@@ -101,4 +101,8 @@ inputs = {
     enabled = false
   }
 
+  tigera-operator = {
+    # Waiting for https://github.com/tigera/operator/issues/1246
+    enabled = false
+  }
 }

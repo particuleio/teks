@@ -112,6 +112,7 @@ inputs = {
 
     "large-a" = {
       desired_capacity = 0
+      launch_template_version = 2
       instance_types   = ["t4g.large"]
       subnets          = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
       public_ip        = true
@@ -130,6 +131,7 @@ inputs = {
 
     "large-b" = {
       desired_capacity = 0
+      launch_template_version = 2
       instance_types   = ["t4g.large"]
       subnets          = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
       public_ip        = true
