@@ -1,5 +1,5 @@
 include {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
   expose = true
 }
 
@@ -8,15 +8,15 @@ terraform {
 }
 
 locals {
-  azs  = [
+  azs = [
     "${include.locals.aws_region}a",
     "${include.locals.aws_region}b",
     "${include.locals.aws_region}c"
   ]
-  cidr = "10.0.0.0/16"
-  subnets = cidrsubnets(local.cidr, 3, 3, 3, 3, 3, 3)
+  cidr            = "10.0.0.0/16"
+  subnets         = cidrsubnets(local.cidr, 3, 3, 3, 3, 3, 3)
   private_subnets = chunklist(local.subnets, 3)[0]
-  public_subnets = chunklist(local.subnets, 3)[1]
+  public_subnets  = chunklist(local.subnets, 3)[1]
 }
 
 inputs = {
@@ -46,11 +46,11 @@ inputs = {
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${include.locals.full_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
+    "kubernetes.io/role/elb"                            = "1"
   }
 
   private_subnet_tags = {
     "kubernetes.io/cluster/${include.locals.full_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
+    "kubernetes.io/role/internal-elb"                   = "1"
   }
 }

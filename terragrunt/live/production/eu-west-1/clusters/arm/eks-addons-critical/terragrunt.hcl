@@ -3,6 +3,10 @@ include {
   expose = true
 }
 
+dependencies {
+  paths = ["../eks"]
+}
+
 terraform {
   source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.14.0"
 }
@@ -19,6 +23,14 @@ locals {
 }
 
 inputs = {
+
+  priority-class = {
+    name = basename(get_terragrunt_dir())
+  }
+
+  priority-class-ds = {
+    name = "${basename(get_terragrunt_dir())}-ds"
+  }
 
   cluster-name = local.eks.dependency.eks.outputs.cluster_id
 
@@ -40,35 +52,6 @@ inputs = {
 
   aws-load-balancer-controller = {
     enabled = true
-  }
-
-  cert-manager = {
-    enabled             = true
-    acme_http01_enabled = true
-    acme_dns01_enabled  = true
-    extra_values        = <<-EXTRA_VALUES
-      ingressShim:
-        defaultIssuerName: letsencrypt
-        defaultIssuerKind: ClusterIssuer
-        defaultIssuerGroup: cert-manager.io
-      EXTRA_VALUES
-  }
-
-  cluster-autoscaler = {
-    enabled = true
-    version = "v1.21.0"
-  }
-
-  external-dns = {
-    external-dns = {
-      enabled = true
-      # Waiting for https://github.com/kubernetes-sigs/external-dns/pull/2208
-      extra_values = <<-EXTRA_VALUES
-        image:
-          repository: k8s.gcr.io/external-dns/external-dns
-          tag: v0.9.0
-        EXTRA_VALUES
-    },
   }
 
   metrics-server = {
@@ -105,4 +88,5 @@ inputs = {
     # Waiting for https://github.com/tigera/operator/issues/1246
     enabled = false
   }
+
 }

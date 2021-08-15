@@ -4,7 +4,7 @@ include {
 }
 
 dependencies {
-  paths = ["../eks-addons-tier-1"]
+  paths = ["../eks-addons-critical"]
 }
 
 terraform {
@@ -25,11 +25,11 @@ locals {
 inputs = {
 
   priority-class = {
-    create = false
+    name = basename(get_terragrunt_dir())
   }
 
   priority-class-ds = {
-    create = false
+    name = "${basename(get_terragrunt_dir())}-ds"
   }
 
   cluster-name = local.eks.dependency.eks.outputs.cluster_id
@@ -40,6 +40,35 @@ inputs = {
 
   eks = {
     "cluster_oidc_issuer_url" = local.eks.dependency.eks.outputs.cluster_oidc_issuer_url
+  }
+
+  cert-manager = {
+    enabled             = true
+    acme_http01_enabled = true
+    acme_dns01_enabled  = true
+    extra_values        = <<-EXTRA_VALUES
+      ingressShim:
+        defaultIssuerName: letsencrypt
+        defaultIssuerKind: ClusterIssuer
+        defaultIssuerGroup: cert-manager.io
+      EXTRA_VALUES
+  }
+
+  cluster-autoscaler = {
+    enabled = true
+    version = "v1.21.0"
+  }
+
+  external-dns = {
+    external-dns = {
+      enabled = true
+      # Waiting for https://github.com/kubernetes-sigs/external-dns/pull/2208
+      extra_values = <<-EXTRA_VALUES
+        image:
+          repository: k8s.gcr.io/external-dns/external-dns
+          tag: v0.9.0
+        EXTRA_VALUES
+    },
   }
 
   # For this to work:
@@ -84,7 +113,7 @@ inputs = {
     default_global_requests     = true
     # Using https://github.com/raspbernetes/multi-arch-images
     # Wainting for ARM support in https://github.com/thanos-io/thanos/issues/1851
-    extra_values                = <<-EXTRA_VALUES
+    extra_values = <<-EXTRA_VALUES
       grafana:
         image:
           tag: 8.1.1
@@ -151,7 +180,7 @@ inputs = {
     default_global_limits   = false
     # Using https://github.com/raspbernetes/multi-arch-images
     # Wainting for ARM support in https://github.com/thanos-io/thanos/issues/1851
-    extra_values            = <<-EXTRA_VALUES
+    extra_values = <<-EXTRA_VALUES
       image:
         repository: raspbernetes/thanos
         tag: v0.22.0

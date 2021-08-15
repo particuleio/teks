@@ -3,6 +3,10 @@ include {
   expose = true
 }
 
+dependencies {
+  paths = ["../eks"]
+}
+
 terraform {
   source = "../../../../../../modules/eks-asg-tags"
 }
