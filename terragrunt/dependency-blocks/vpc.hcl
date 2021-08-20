@@ -1,3 +1,5 @@
+skip = true
+
 dependency "vpc" {
   config_path = "${get_original_terragrunt_dir()}/../vpc"
 
@@ -18,5 +20,8 @@ dependency "vpc" {
       "10.0.0.0/8",
       "172.16.0.0/12"
     ]
+    intra_route_table_ids = []
+    private_route_table_ids = []
+    public_route_table_ids = []
   }
 }
