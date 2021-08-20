@@ -1,5 +1,5 @@
 locals {
-  addons_cluster_name = element(concat(aws_eks_cluster.this.*.id, [""]), 0)
+  addons_cluster_name = var.cluster-name
 }
 
 resource "aws_eks_addon" "vpc_cni" {
