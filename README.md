@@ -22,7 +22,7 @@ here](https://github.com/particuleio/teks/tree/release-4.X)
 
 :warning: Terraform implementation will not be maintained anymore because of
 time, and mostly because it has become quite difficult to get feature parity
-with Terragrunt.
+with Terragrunt. [Archive branch is available here](https://github.com/particuleio/teks/tree/archive/terraform)
 
 ## Terraform/Terragrunt
 
@@ -31,11 +31,6 @@ with Terragrunt.
 
 ## Requirements
 
-### Terraform
-
-* [Terraform](https://www.terraform.io/downloads.html)
-* [direnv](https://direnv.net/): available in every Linux distribution
-* [tfenv](https://github.com/cloudposse/tfenv)
 
 ### Terragrunt
 
@@ -53,7 +48,6 @@ A production cluster all defined in IaaC with Terraform/Terragrunt:
 * AWS VPC if needed based on [`terraform-aws-vpc`](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 * EKS cluster base on [`terraform-aws-eks`](https://github.com/terraform-aws-modules/terraform-aws-eks)
 * Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/particuleio/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
-* Kubernetes namespaces quota management based on [`terraform-kubernetes-namespaces`](https://github.com/particuleio/terraform-kubernetes-addons): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
 
 Everything is tied together with Terragrunt and allows you to deploy a multi
 cluster architecture in a matter of minutes (ok maybe an hour) and different AWS
@@ -67,10 +61,9 @@ customization of the cluster policy
 
 ### Enforced security
 
-* Default PSP is removed and sensible defaults are enforced
-* All addons have specific PSP enabled
-* No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/) or [KIAM](https://github.com/uswitch/kiam)
-* Each addons is deployed in it's own namespace with sensible default network policies
+* No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/)
+* Each addons is deployed in it's own namespace with sensible default network policies.
+* Calico Tigera Operator for network policy
 
 ### Out of the box monitoring
 
@@ -97,11 +90,10 @@ Terragrunt is not a hard requirement but all the modules are tested with Terragr
 * [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
-* [aws-iam-authenticator](https://github.com/kubernetes-sigs/aws-iam-authenticator)
 
 ## Examples
 
-[`terraform/live`](terraform/live) folder provides an opinionated directory structure for a production environment with an example using
+[`terragrunt/live`](terragrunt/live) folder provides an opinionated directory structure for a production environment with an example using
 
 ## Additional infrastructure blocks
 
