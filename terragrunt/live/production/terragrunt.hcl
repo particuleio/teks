@@ -5,11 +5,11 @@ remote_state {
   backend = "s3"
 
   config = {
-    bucket         = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-state-store"
+    bucket         = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-tg-state-store"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["tf_state_bucket_region"]}"
     encrypt        = true
-    dynamodb_table = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-state-lock"
+    dynamodb_table = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-tg-state-lock"
   }
 
   generate = {
@@ -19,17 +19,19 @@ remote_state {
 }
 
 locals {
-  aws_region = yamldecode(file("${find_in_parent_folders("region_values.yaml")}"))["aws_region"]
-  env        = yamldecode(file("${find_in_parent_folders("env_values.yaml")}"))["env"]
-  prefix     = yamldecode(file("${find_in_parent_folders("global_values.yaml")}"))["prefix"]
-  name       = yamldecode(file("${find_in_parent_folders("component_values.yaml")}"))["name"]
-  custom_tags = merge(
-    yamldecode(file("${find_in_parent_folders("global_tags.yaml")}")),
-    yamldecode(file("${find_in_parent_folders("env_tags.yaml")}")),
-    yamldecode(file("${find_in_parent_folders("component_tags.yaml")}"))
+  merged = merge(
+    yamldecode(file(find_in_parent_folders("global_values.yaml"))),
+    yamldecode(file(find_in_parent_folders("env_values.yaml"))),
+    yamldecode(file(find_in_parent_folders("region_values.yaml"))),
+    yamldecode(file(find_in_parent_folders("component_values.yaml")))
   )
-  full_name           = "${local.prefix}-${local.env}-${local.name}"
-  default_domain_name = yamldecode(file("${find_in_parent_folders("env_values.yaml")}"))["default_domain_name"]
+  custom_tags = merge(
+    yamldecode(file(find_in_parent_folders("global_tags.yaml"))),
+    yamldecode(file(find_in_parent_folders("env_tags.yaml"))),
+    yamldecode(file(find_in_parent_folders("region_tags.yaml"))),
+    yamldecode(file(find_in_parent_folders("component_tags.yaml")))
+  )
+  full_name = "${local.merged.prefix}-${local.merged.env}-${local.merged.name}"
 }
 
 generate "provider-aws" {
@@ -41,7 +43,7 @@ generate "provider-aws" {
       default = {}
     }
     provider "aws" {
-      region = "${local.aws_region}"
+      region = "${local.merged.aws_region}"
       default_tags {
         tags = var.provider_default_tags
       }
