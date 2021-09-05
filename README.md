@@ -9,9 +9,20 @@
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield)
 
-tEKS is a set of Terraform / Terragrunt modules designed to get you everything you need to run a production EKS cluster on AWS. It ships with sensible defaults, and add a lot of common addons with their configurations that work out of the box.
+tEKS is a set of Terraform / Terragrunt modules designed to get you everything
+you need to run a production EKS cluster on AWS. It ships with sensible
+defaults, and add a lot of common addons with their configurations that work out
+of the box.
 
-:warning: the v5 and further version of this project have been completely revamp and now offer a skeleton to use as a base for your infrastructure projects around EKS. All the modules have been moved outside this repository and get their own versioning. The [old README is accessible here](https://github.com/particuleio/teks/tree/release-4.X)
+:warning: the v5 and further version of this project have been completely revamp
+and now offer a skeleton to use as a base for your infrastructure projects
+around EKS. All the modules have been moved outside this repository and get
+their own versioning. The [old README is accessible
+here](https://github.com/particuleio/teks/tree/release-4.X)
+
+:warning: Terraform implementation will not be maintained anymore because of
+time, and mostly because it has become quite difficult to get feature parity
+with Terragrunt.
 
 ## Terraform/Terragrunt
 
@@ -44,11 +55,15 @@ A production cluster all defined in IaaC with Terraform/Terragrunt:
 * Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/particuleio/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
 * Kubernetes namespaces quota management based on [`terraform-kubernetes-namespaces`](https://github.com/particuleio/terraform-kubernetes-addons): allows administrator to manage namespaces and quotas from a centralized configuration with Terraform.
 
-Everything is tied together with Terragrunt and allows you to deploy a multi cluster architecture in a matter of minutes (ok maybe an hour) and different AWS accounts for different environments.
+Everything is tied together with Terragrunt and allows you to deploy a multi
+cluster architecture in a matter of minutes (ok maybe an hour) and different AWS
+accounts for different environments.
 
 ## Curated Features
 
-The main additionals features are the curated addons list, see [here](https://github.com/particuleio/terraform-kubernetes-addons) and in the customization of the cluster policy
+The main additionals features are the curated addons list, see
+[here](https://github.com/particuleio/terraform-kubernetes-addons) and in the
+customization of the cluster policy
 
 ### Enforced security
 
