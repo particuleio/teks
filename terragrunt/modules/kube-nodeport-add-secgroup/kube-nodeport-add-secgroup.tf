@@ -4,7 +4,7 @@ resource "aws_security_group_rule" "workers_ingress_cluster_node_port_tcp" {
   protocol          = "tcp"
   security_group_id = local.worker_security_group_id
   cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 30000
+  from_port         = 1025
   to_port           = 32767
   type              = "ingress"
 }
@@ -15,7 +15,7 @@ resource "aws_security_group_rule" "workers_ingress_cluster_node_port_udp" {
   protocol          = "udp"
   security_group_id = local.worker_security_group_id
   cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 30000
+  from_port         = 1025
   to_port           = 32767
   type              = "ingress"
 }
