@@ -57,7 +57,7 @@ inputs = {
   }
 
   metrics-server = {
-    enabled       = true
+    enabled = true
   }
 
   npd = {

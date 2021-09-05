@@ -16,18 +16,17 @@ locals {
 }
 
 inputs = {
-    vpc_id = local.vpc.dependency.vpc.outputs.vpc_id
-    endpoints = {
-      s3 = {
-        service             = "s3"
-        service_type        = "Gateway"
-        private_dns_enabled = true
-        route_table_ids     = flatten([local.vpc.dependency.vpc.outputs.intra_route_table_ids, local.vpc.dependency.vpc.outputs.private_route_table_ids, local.vpc.dependency.vpc.outputs.public_route_table_ids])
-        tags                = { Name = "s3-vpc-endpoint" }
-      },
-    }
-    tags = merge(
-      include.locals.custom_tags
-    )
+  vpc_id = local.vpc.dependency.vpc.outputs.vpc_id
+  endpoints = {
+    s3 = {
+      service             = "s3"
+      service_type        = "Gateway"
+      private_dns_enabled = true
+      route_table_ids     = flatten([local.vpc.dependency.vpc.outputs.intra_route_table_ids, local.vpc.dependency.vpc.outputs.private_route_table_ids, local.vpc.dependency.vpc.outputs.public_route_table_ids])
+      tags                = { Name = "s3-vpc-endpoint" }
+    },
   }
-)
+  tags = merge(
+    include.locals.custom_tags
+  )
+}

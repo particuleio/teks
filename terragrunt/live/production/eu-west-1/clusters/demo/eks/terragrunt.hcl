@@ -109,7 +109,7 @@ inputs = {
 
     "default-a-" = {
       desired_capacity   = 1
-      name_prefix = "default-a-"
+      name_prefix        = "default-a-"
       instance_types     = ["t3a.large"]
       subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[0]]
       kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
@@ -124,7 +124,7 @@ inputs = {
 
     "default-b-" = {
       desired_capacity   = 1
-      name_prefix = "default-b-"
+      name_prefix        = "default-b-"
       instance_types     = ["t3a.large"]
       subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[1]]
       kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
@@ -139,7 +139,7 @@ inputs = {
 
     "default-c-" = {
       desired_capacity   = 1
-      name_prefix = "default-c-"
+      name_prefix        = "default-c-"
       instance_types     = ["t3a.medium"]
       subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[2]]
       kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
