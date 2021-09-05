@@ -1,5 +1,5 @@
 locals {
-  addons_cluster_name = var.cluster_name
+  addons_cluster_name = aws_eks_cluster.this.0.name
 }
 
 resource "aws_eks_addon" "vpc_cni" {
