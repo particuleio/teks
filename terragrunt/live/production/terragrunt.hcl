@@ -1,4 +1,4 @@
-skip = true
+skip                          = true
 terragrunt_version_constraint = ">= 0.31"
 
 remote_state {
