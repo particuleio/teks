@@ -8,7 +8,22 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.15.1"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.17.0"
+
+  after_hook "kubeconfig" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "cd ${get_terragrunt_dir()}/../eks && terragrunt output --raw kubeconfig 2>/dev/null > ${get_terragrunt_dir()}/kubeconfig"]
+  }
+
+  after_hook "vpc-cni-prefix-delegation" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig ${get_terragrunt_dir()}/kubeconfig set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true"]
+  }
+
+  after_hook "vpc-cni-prefix-warm-prefix" {
+    commands = ["apply"]
+    execute  = ["bash", "-c", "kubectl --kubeconfig ${get_terragrunt_dir()}/kubeconfig set env daemonset aws-node -n kube-system WARM_PREFIX_TARGET=1"]
+  }
 }
 
 generate "provider-local" {
@@ -25,11 +40,13 @@ locals {
 inputs = {
 
   priority-class = {
-    name = basename(get_terragrunt_dir())
+    name  = basename(get_terragrunt_dir())
+    value = "90000"
   }
 
   priority-class-ds = {
-    name = "${basename(get_terragrunt_dir())}-ds"
+    name   = "${basename(get_terragrunt_dir())}-ds"
+    values = "100000"
   }
 
   cluster-name = local.eks.dependency.eks.outputs.cluster_id
@@ -57,12 +74,12 @@ inputs = {
   metrics-server = {
     enabled       = true
     allowed_cidrs = local.vpc.dependency.vpc.outputs.private_subnets_cidr_blocks
-
     # Waiting for https://github.com/kubernetes-sigs/metrics-server/issues/572
     extra_values = <<-EXTRA_VALUES
       securePort: 443
       image:
-        repository: k8s.gcr.io/metrics-server/metrics-server
+        registry: k8s.gcr.io
+        repository: metrics-server/metrics-server
         tag: v0.5.0
       command: ["/metrics-server"]
       extraVolumes:

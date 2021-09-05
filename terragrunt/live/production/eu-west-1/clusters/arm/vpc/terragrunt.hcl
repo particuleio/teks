@@ -4,14 +4,14 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.6.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.7.0"
 }
 
 locals {
   azs = [
-    "${include.locals.aws_region}a",
-    "${include.locals.aws_region}b",
-    "${include.locals.aws_region}c"
+    "${include.locals.merged.aws_region}a",
+    "${include.locals.merged.aws_region}b",
+    "${include.locals.merged.aws_region}c"
   ]
   cidr            = "10.0.0.0/16"
   subnets         = cidrsubnets(local.cidr, 3, 3, 3, 3, 3, 3)

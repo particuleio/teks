@@ -8,7 +8,7 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v17.1.0"
+  source = "github.com/particuleio/terraform-aws-eks?ref=v17.12.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
@@ -40,7 +40,7 @@ generate "provider-local" {
 inputs = {
 
   aws = {
-    "region" = include.locals.aws_region
+    "region" = include.locals.merged.aws_region
   }
 
   tags = merge(
@@ -72,100 +72,363 @@ inputs = {
       resources        = ["secrets"]
     }
   ]
+  cluster_log_retention_in_days = 7
+
+  map_users = [
+    {
+      userarn  = "arn:aws:iam::128478261352:user/github-actions"
+      username = "github-action-iac"
+      groups   = ["system:masters"]
+    }
+  ]
 
   node_groups_defaults = {
-    disk_size               = 10
-    create_launch_template  = true
-    launch_template_version = 1
-    ami_type                = "AL2_ARM_64"
-    min_capacity            = 0
-    max_capacity            = 5
+    disk_size              = 10
+    create_launch_template = true
+    ami_type               = "AL2_x86_64"
+    min_capacity           = 0
+    max_capacity           = 10
+    desired_capacity       = 0
+    container_runtime      = "containerd"
+    capacity_type          = "ON_DEMAND"
+    use_max_pods           = false
+    taints = [
+      {
+        key    = "dedicated"
+        value  = "true"
+        effect = "NO_SCHEDULE"
+      }
+    ]
   }
 
   node_groups = {
 
-    "default-a" = {
-      desired_capacity = 1
-      instance_types   = ["t4g.medium"]
-      subnets          = [local.vpc.dependency.vpc.outputs.private_subnets[0]]
+    "default-a-" = {
+      desired_capacity   = 1
+      ami_type           = "AL2_ARM_64"
+      instance_types     = ["t4g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[0]]
+      kubelet_extra_args = "--max-pods=110"
+      taints             = []
       k8s_labels = {
-        pool = "default"
+        size                            = "medium"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
       }
-      capacity_type = "ON_DEMAND"
     }
 
-    "default-b" = {
-      desired_capacity = 1
-      instance_types   = ["t4g.medium"]
-      subnets          = [local.vpc.dependency.vpc.outputs.private_subnets[1]]
+    "default-b-" = {
+      desired_capacity   = 1
+      ami_type           = "AL2_ARM_64"
+      instance_types     = ["t4g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[1]]
+      kubelet_extra_args = "--max-pods=110"
+      taints             = []
       k8s_labels = {
-        pool = "default"
+        size                            = "medium"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
       }
-      capacity_type = "ON_DEMAND"
     }
 
-    "default-c" = {
-      desired_capacity = 1
-      instance_types   = ["t4g.medium"]
-      subnets          = [local.vpc.dependency.vpc.outputs.private_subnets[2]]
+    "default-c-" = {
+      desired_capacity   = 1
+      ami_type           = "AL2_ARM_64"
+      instance_types     = ["t4g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[2]]
+      kubelet_extra_args = "--max-pods=110"
+      taints             = []
       k8s_labels = {
-        pool = "default"
+        size                            = "medium"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
       }
-      capacity_type = "ON_DEMAND"
     }
 
-    "large-a" = {
-      desired_capacity        = 0
-      instance_types          = ["t4g.large"]
-      subnets                 = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
-      public_ip               = true
+    "c6g-xlarge-pub-a-" = {
+      name_prefix        = "c6g-xlarge-pub-a-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
       k8s_labels = {
-        pool = "large"
+        size                            = "c6g.xlarge"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
       }
-      capacity_type = "SPOT"
-      taints = [
-        {
-          key    = "dedicated"
-          value  = "large"
-          effect = "NO_SCHEDULE"
-        }
-      ]
     }
 
-    "large-b" = {
-      desired_capacity        = 0
-      instance_types          = ["t4g.large"]
-      subnets                 = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
-      public_ip               = true
+    "c6g-xlarge-pub-b-" = {
+      name_prefix        = "c6g-xlarge-pub-b-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
       k8s_labels = {
-        pool = "large"
+        size                            = "c6g.xlarge"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
       }
-      capacity_type = "SPOT"
-      taints = [
-        {
-          key    = "dedicated"
-          value  = "large"
-          effect = "NO_SCHEDULE"
-        }
-      ]
     }
 
-    "large-c" = {
-      desired_capacity = 0
-      instance_types   = ["t4g.large"]
-      subnets          = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
-      public_ip        = true
+    "c6g-xlarge-pub-c-" = {
+      name_prefix        = "c6g-xlarge-pub-c-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
       k8s_labels = {
-        pool = "large"
+        size                            = "c6g.xlarge"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
       }
-      capacity_type = "SPOT"
-      taints = [
-        {
-          key    = "dedicated"
-          value  = "large"
-          effect = "NO_SCHEDULE"
-        }
-      ]
     }
+
+    "c6g-large-pub-a-" = {
+      name_prefix        = "c6g-large-pub-a-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.large"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.large"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+      }
+    }
+
+    "c6g-large-pub-b-" = {
+      name_prefix        = "c6g-large-pub-b-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.large"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.large"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+      }
+    }
+
+    "c6g-large-pub-c-" = {
+      name_prefix        = "c6g-large-pub-c-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.large"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.large"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+      }
+    }
+
+    "c6g-medium-pub-a-" = {
+      name_prefix        = "c6g-medium-pub-a-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
+      kubelet_extra_args = "--max-pods=98"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.medium"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+      }
+    }
+
+    "c6g-medium-pub-b-" = {
+      name_prefix        = "c6g-medium-pub-b-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
+      kubelet_extra_args = "--max-pods=98"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.medium"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+      }
+    }
+
+    "c6g-medium-pub-c-" = {
+      name_prefix        = "c6g-medium-pub-c-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["c6g.medium"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
+      kubelet_extra_args = "--max-pods=98"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c6g.medium"
+        network                         = "public"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+      }
+    }
+
+    "c5-2xlarge-a-" = {
+      name_prefix        = "c5-2xlarge-a-"
+      desired_capacity   = 0
+      instance_types     = ["c5.2xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c5.xlarge"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+      }
+    }
+
+    "c5-2xlarge-b-" = {
+      name_prefix        = "c5-2xlarge-b-"
+      desired_capacity   = 0
+      instance_types     = ["c5.2xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c5.2xlarge"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+      }
+    }
+
+    "c5-2xlarge-c-" = {
+      name_prefix        = "c5-2xlarge-b-"
+      desired_capacity   = 0
+      instance_types     = ["c5.2xlarge"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
+      kubelet_extra_args = "--max-pods=110"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "c5.2xlarge"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+      }
+    }
+
+    "t3a-micro-a-" = {
+      name_prefix        = "t3a-micro-a-"
+      desired_capacity   = 0
+      instance_types     = ["t3a.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[0]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t3a.micro"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+      }
+    }
+
+    "t3a-micro-b-" = {
+      name_prefix        = "t3a-micro-b-"
+      desired_capacity   = 0
+      instance_types     = ["t3a.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[1]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t3a.micro"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+      }
+    }
+
+    "t3a-micro-c-" = {
+      name_prefix        = "t3a-micro-c-"
+      desired_capacity   = 0
+      instance_types     = ["t3a.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.public_subnets[2]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t3a.micro"
+        network                         = "public"
+        arch                            = "amd64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+      }
+    }
+
+    "t4g-micro-a-" = {
+      name_prefix        = "t4g-micro-a-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["t4g.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[0]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t4g.micro"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+      }
+    }
+
+    "t4g-micro-b-" = {
+      name_prefix        = "t4g-micro-b-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["t4g.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[1]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t4g.micro"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+      }
+    }
+
+    "t4g-micro-c-" = {
+      name_prefix        = "t4g-micro-c-"
+      ami_type           = "AL2_ARM_64"
+      desired_capacity   = 0
+      instance_types     = ["t4g.micro"]
+      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[2]]
+      kubelet_extra_args = "--max-pods=34"
+      public_ip          = true
+      k8s_labels = {
+        size                            = "t4g.micro"
+        network                         = "private"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+      }
+    }
+
   }
 }

@@ -8,7 +8,7 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v3.6.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v3.7.0"
 }
 
 locals {

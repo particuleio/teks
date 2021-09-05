@@ -8,7 +8,7 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.15.1"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.17.0"
 }
 
 generate "provider-local" {
@@ -43,7 +43,7 @@ inputs = {
   }
 
   cert-manager = {
-    enabled             = true
+    enabled             = false
     acme_http01_enabled = true
     acme_dns01_enabled  = true
     extra_values        = <<-EXTRA_VALUES
@@ -55,8 +55,17 @@ inputs = {
   }
 
   cluster-autoscaler = {
-    enabled = true
-    version = "v1.21.0"
+    enabled      = true
+    version      = "v1.21.0"
+    extra_values = <<-EXTRA_VALUES
+      extraArgs:
+        scale-down-utilization-threshold: 0.7
+        balancing-ignore-label_1: topology.ebs.csi.aws.com/zone
+        balancing-ignore-label_2: eks.amazonaws.com/nodegroup
+        balancing-ignore-label_3: eks.amazonaws.com/nodegroup-image
+        balancing-ignore-label_4: eks.amazonaws.com/sourceLaunchTemplateId
+        balancing-ignore-label_5: eks.amazonaws.com/sourceLaunchTemplateVersion
+      EXTRA_VALUES
   }
 
   external-dns = {
@@ -64,8 +73,10 @@ inputs = {
       enabled = true
       # Waiting for https://github.com/kubernetes-sigs/external-dns/pull/2208
       extra_values = <<-EXTRA_VALUES
+        policy: sync
         image:
-          repository: k8s.gcr.io/external-dns/external-dns
+          registry: k8s.gcr.io
+          repository: external-dns/external-dns
           tag: v0.9.0
         EXTRA_VALUES
     },
@@ -76,17 +87,17 @@ inputs = {
   # * GITHUB_OWNER should be set to your org or username
   flux2 = {
     enabled               = false
-    target_path           = "gitops/clusters/${include.locals.env}/${include.locals.name}"
-    github_url            = "ssh://git@github.com/particuleio/gitops"
-    repository            = "repo"
+    target_path           = "gitops/clusters/${include.locals.merged.env}/${include.locals.merged.name}"
+    github_url            = "ssh://git@github.com/repo/repo"
+    repository            = "solid"
     branch                = "main"
-    repository_visibility = "public"
+    repository_visibility = "private"
     version               = "v0.16.2"
-    auto_image_update     = true
+    auto_image_update     = false
   }
 
   ingress-nginx = {
-    enabled       = true
+    enabled       = false
     use_nlb_ip    = true
     allowed_cidrs = local.vpc.dependency.vpc.outputs.private_subnets_cidr_blocks
     extra_values  = <<-EXTRA_VALUES
@@ -105,7 +116,7 @@ inputs = {
   }
 
   kube-prometheus-stack = {
-    enabled                     = true
+    enabled                     = false
     allowed_cidrs               = local.vpc.dependency.vpc.outputs.private_subnets_cidr_blocks
     namespace                   = "telemetry"
     thanos_sidecar_enabled      = true
@@ -125,11 +136,11 @@ inputs = {
           ingressClassName: nginx
           enabled: true
           hosts:
-            - telemetry.${include.locals.default_domain_name}
+            - telemetry.${include.locals.merged.default_domain_name}
           tls:
-            - secretName: ${include.locals.default_domain_name}
+            - secretName: ${include.locals.merged.default_domain_name}
               hosts:
-                - telemetry.${include.locals.default_domain_name}
+                - telemetry.${include.locals.merged.default_domain_name}
         persistence:
           enabled: true
           accessModes:
@@ -174,7 +185,7 @@ inputs = {
   }
 
   thanos = {
-    enabled                 = true
+    enabled                 = false
     namespace               = "telemetry"
     default_global_requests = true
     default_global_limits   = false
