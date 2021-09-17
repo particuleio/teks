@@ -8,7 +8,7 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-aws-eks?ref=v17.12.0"
+  source = "github.com/particuleio/terraform-aws-eks?ref=v17.21.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
