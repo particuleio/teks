@@ -1,14 +1,23 @@
-include {
-  path   = find_in_parent_folders()
-  expose = true
+include "root" {
+  path           = find_in_parent_folders()
+  expose         = true
+  merge_strategy = "deep"
 }
 
-dependencies {
-  paths = ["../vpc", "../encryption-config"]
+include "vpc" {
+  path           = "../../../../../../dependency-blocks/vpc.hcl"
+  expose         = true
+  merge_strategy = "deep"
+}
+
+include "encryption_config" {
+  path           = "../../../../../../dependency-blocks/encryption-config.hcl"
+  expose         = true
+  merge_strategy = "deep"
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-aws-eks?ref=v17.21.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v17.24.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
@@ -36,11 +45,6 @@ terraform {
   }
 }
 
-locals {
-  vpc               = read_terragrunt_config("../../../../../../dependency-blocks/vpc.hcl")
-  encryption_config = read_terragrunt_config("../../../../../../dependency-blocks/encryption-config.hcl")
-}
-
 generate "provider-local" {
   path      = "provider-local.tf"
   if_exists = "overwrite"
@@ -50,16 +54,16 @@ generate "provider-local" {
 inputs = {
 
   aws = {
-    "region" = include.locals.merged.aws_region
+    "region" = include.root.locals.merged.aws_region
   }
 
   tags = merge(
-    include.locals.custom_tags
+    include.root.locals.custom_tags
   )
 
-  cluster_name = include.locals.full_name
-  subnets      = local.vpc.dependency.vpc.outputs.private_subnets
-  vpc_id       = local.vpc.dependency.vpc.outputs.vpc_id
+  cluster_name = include.root.locals.full_name
+  subnets      = dependency.vpc.outputs.private_subnets
+  vpc_id       = dependency.vpc.outputs.vpc_id
 
   write_kubeconfig = false
   enable_irsa      = true
@@ -69,7 +73,7 @@ inputs = {
     "eks",
     "get-token",
     "--cluster-name",
-    include.locals.full_name
+    include.root.locals.full_name
   ]
   kubeconfig_aws_authenticator_additional_args = []
 
@@ -78,24 +82,23 @@ inputs = {
   cluster_endpoint_private_access = true
   cluster_encryption_config = [
     {
-      provider_key_arn = local.encryption_config.dependency.encryption_config.outputs.arn
+      provider_key_arn = dependency.encryption_config.outputs.arn
       resources        = ["secrets"]
     }
   ]
   cluster_log_retention_in_days = 7
 
   node_groups_defaults = {
-    disk_size              = 8
+    disk_size              = 10
     create_launch_template = true
-    disk_encrypted         = true
-    disk_kms_key_id        = local.encryption_config.dependency.encryption_config.outputs.arn
     ami_type               = "AL2_x86_64"
     min_capacity           = 0
     max_capacity           = 10
     desired_capacity       = 0
-    container_runtime      = "containerd"
     capacity_type          = "ON_DEMAND"
-    use_max_pods           = false
+    bootstrap_env = {
+      USE_MAX_PODS = false
+    }
     taints = [
       {
         key    = "dedicated"
@@ -109,48 +112,44 @@ inputs = {
 
     "default-a-" = {
       desired_capacity   = 1
-      name_prefix        = "default-a-"
       instance_types     = ["t3a.large"]
-      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[0]]
-      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
+      subnets            = [dependency.vpc.outputs.private_subnets[0]]
+      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.9.1 --cni-prefix-delegation-enabled")}"
       taints             = []
       k8s_labels = {
-        size                            = "t3a.medium"
+        size                            = "medium"
         network                         = "private"
-        arch                            = "amd64"
-        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}a"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}a"
       }
     }
 
     "default-b-" = {
       desired_capacity   = 1
-      name_prefix        = "default-b-"
       instance_types     = ["t3a.large"]
-      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[1]]
-      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
+      subnets            = [dependency.vpc.outputs.private_subnets[1]]
+      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.9.1 --cni-prefix-delegation-enabled")}"
       taints             = []
       k8s_labels = {
-        size                            = "t3a.medium"
+        size                            = "medium"
         network                         = "private"
-        arch                            = "amd64"
-        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}b"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}b"
       }
     }
 
     "default-c-" = {
       desired_capacity   = 1
-      name_prefix        = "default-c-"
-      instance_types     = ["t3a.medium"]
-      subnets            = [local.vpc.dependency.vpc.outputs.private_subnets[2]]
-      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.9.0 --cni-prefix-delegation-enabled")}"
+      instance_types     = ["t3a.large"]
+      subnets            = [dependency.vpc.outputs.private_subnets[2]]
+      kubelet_extra_args = "--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.9.1 --cni-prefix-delegation-enabled")}"
       taints             = []
       k8s_labels = {
-        size                            = "t3a.medium"
+        size                            = "medium"
         network                         = "private"
-        arch                            = "amd64"
-        "topology.ebs.csi.aws.com/zone" = "${include.locals.merged.aws_region}c"
+        arch                            = "arm64"
+        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}c"
       }
     }
   }
-
 }

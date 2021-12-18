@@ -1,6 +1,7 @@
-include {
-  path   = find_in_parent_folders()
-  expose = true
+include "root" {
+  path           = "${find_in_parent_folders()}"
+  expose         = true
+  merge_strategy = "deep"
 }
 
 terraform {
@@ -8,11 +9,9 @@ terraform {
 }
 
 inputs = {
-
-  description = "EKS Secret Encryption Key for ${include.locals.full_name}"
-  alias       = "${include.locals.full_name}_encryption"
+  description = "EKS Secret Encryption Key for ${include.root.locals.full_name}"
+  alias       = "${include.root.locals.full_name}_secret_encryption"
   tags = merge(
-    include.locals.custom_tags
+    include.root.locals.custom_tags
   )
-
 }

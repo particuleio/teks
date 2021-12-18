@@ -1,25 +1,29 @@
-include {
-  path   = find_in_parent_folders()
-  expose = true
+include "root" {
+  path           = find_in_parent_folders()
+  expose         = true
+  merge_strategy = "deep"
 }
 
-dependencies {
-  paths = ["../eks"]
+include "vpc" {
+  path           = "../../../../../../dependency-blocks/vpc.hcl"
+  expose         = true
+  merge_strategy = "deep"
+}
+
+include "eks" {
+  path           = "../../../../../../dependency-blocks/eks.hcl"
+  expose         = true
+  merge_strategy = "deep"
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.32.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.40.1"
 }
 
 generate "provider-local" {
   path      = "provider-local.tf"
   if_exists = "overwrite"
   contents  = file("../../../../../../provider-config/eks-addons/eks-addons.tf")
-}
-
-locals {
-  vpc = read_terragrunt_config("../../../../../../dependency-blocks/vpc.hcl")
-  eks = read_terragrunt_config("../../../../../../dependency-blocks/eks.hcl")
 }
 
 inputs = {
@@ -34,14 +38,19 @@ inputs = {
     values = "100000"
   }
 
-  cluster-name = local.eks.dependency.eks.outputs.cluster_id
+  cluster-name = dependency.eks.outputs.cluster_id
 
   tags = merge(
-    include.locals.custom_tags
+    include.root.locals.custom_tags
   )
 
   eks = {
-    "cluster_oidc_issuer_url" = local.eks.dependency.eks.outputs.cluster_oidc_issuer_url
+    "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
+  }
+
+  aws-for-fluent-bit = {
+    enabled                          = true
+    containers_log_retention_in_days = 14
   }
 
   aws-ebs-csi-driver = {
@@ -57,7 +66,8 @@ inputs = {
   }
 
   metrics-server = {
-    enabled = true
+    enabled       = true
+    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
   }
 
   npd = {

@@ -1,5 +1,5 @@
 skip                          = true
-terragrunt_version_constraint = ">= 0.31"
+terragrunt_version_constraint = ">= 0.32"
 
 remote_state {
   backend = "s3"
@@ -38,6 +38,9 @@ generate "provider-aws" {
   path      = "provider-aws.tf"
   if_exists = "overwrite"
   contents  = <<-EOF
+    provider "github" {
+      owner = "${local.merged.github_owner}"
+    }
     variable "provider_default_tags" {
       type = map
       default = {}

@@ -1,4 +1,5 @@
 ---
 aws_account_id: 161285725140
-prefix: pio-teks-tg
+prefix: pio-teks
 tf_state_bucket_region: eu-west-1
+github_owner: particuleio

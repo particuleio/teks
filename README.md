@@ -26,11 +26,9 @@ with Terragrunt. [Archive branch is available here](https://github.com/particule
 
 ## Terraform/Terragrunt
 
-* Terraform implementation is available in the [`terraform`](./terraform) folder.
 * Terragrunt implementation is available in the [`terragrunt`](./terragrunt) folder.
 
 ## Requirements
-
 
 ### Terragrunt
 

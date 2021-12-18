@@ -1,12 +1,12 @@
 locals {
-  addons_cluster_name = aws_eks_cluster.this.0.name
+  addons_cluster_name = element(concat(aws_eks_cluster.this.*.id, [""]), 0)
 }
 
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name      = local.addons_cluster_name
   resolve_conflicts = "OVERWRITE"
   addon_name        = "vpc-cni"
-  addon_version     = "v1.9.0-eksbuild.1"
+  addon_version     = "v1.10.1-eksbuild.1"
 }
 
 resource "aws_eks_addon" "coredns" {
