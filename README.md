@@ -4,6 +4,27 @@
   <img src="images/logo.png">
 </p>
 
+
+<!-- vim-markdown-toc GFM -->
+
+* [Terraform/Terragrunt](#terraformterragrunt)
+* [Requirements](#requirements)
+  * [Terragrunt](#terragrunt)
+* [Main purposes](#main-purposes)
+* [What you get](#what-you-get)
+* [Curated Features](#curated-features)
+  * [Enforced security](#enforced-security)
+  * [Out of the box monitoring](#out-of-the-box-monitoring)
+  * [Helm v3 provider](#helm-v3-provider)
+  * [Other and not limited to](#other-and-not-limited-to)
+* [Requirements](#requirements-1)
+* [Examples](#examples)
+* [Additional infrastructure blocks](#additional-infrastructure-blocks)
+* [Branches](#branches)
+* [License](#license)
+
+<!-- vim-markdown-toc -->
+
 [![teks](https://github.com/particuleio/teks/actions/workflows/terraform.yml/badge.svg)](https://github.com/particuleio/teks/actions/workflows/terraform.yml)
 [![teks:mkdocs](https://github.com/particuleio/teks/actions/workflows/mkdocs.yml/badge.svg)](https://github.com/particuleio/teks/actions/workflows/mkdocs.yml)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
