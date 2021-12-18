@@ -1,13 +1,13 @@
 # tEKS
 
+<p align="center">
+  <img src="images/logo.png">
+</p>
+
 [![teks](https://github.com/particuleio/teks/actions/workflows/terraform.yml/badge.svg)](https://github.com/particuleio/teks/actions/workflows/terraform.yml)
 [![teks:mkdocs](https://github.com/particuleio/teks/actions/workflows/mkdocs.yml/badge.svg)](https://github.com/particuleio/teks/actions/workflows/mkdocs.yml)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fparticuleio%2Fteks.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fparticuleio%2Fteks?ref=badge_shield)
-
-<p align="center">
-  <img src="images/logo.png">
-</p>
 
 <!-- vim-markdown-toc GFM -->
 
