@@ -11,6 +11,9 @@ on:
       - release
   workflow_dispatch:
 
+env:
+  GITGUARDIAN_API_KEY: ${{ secrets.TERRAFORM_VERSION }}
+
 jobs:
   renovate-config-check:
     name: 'renovate:config'
