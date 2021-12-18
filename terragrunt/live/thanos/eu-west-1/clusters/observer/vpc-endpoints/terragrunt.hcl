@@ -3,7 +3,7 @@ include {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v3.10.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v3.11.0"
 }
 
 dependency "vpc" {
