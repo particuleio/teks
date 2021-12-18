@@ -1,17 +1,18 @@
-include {
-  path   = find_in_parent_folders()
-  expose = true
+include "root" {
+  path           = find_in_parent_folders()
+  expose         = true
+  merge_strategy = "deep"
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.10.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.11.0"
 }
 
 locals {
   azs = [
-    "${include.locals.merged.aws_region}a",
-    "${include.locals.merged.aws_region}b",
-    "${include.locals.merged.aws_region}c"
+    "${include.root.locals.merged.aws_region}a",
+    "${include.root.locals.merged.aws_region}b",
+    "${include.root.locals.merged.aws_region}c"
   ]
   cidr            = "10.0.0.0/16"
   subnets         = cidrsubnets(local.cidr, 3, 3, 3, 3, 3, 3)
@@ -22,10 +23,10 @@ locals {
 inputs = {
 
   tags = merge(
-    include.locals.custom_tags
+    include.root.locals.custom_tags
   )
 
-  name = include.locals.full_name
+  name = include.root.locals.full_name
 
   cidr = local.cidr
 
@@ -45,12 +46,12 @@ inputs = {
   enable_dns_support   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${include.locals.full_name}" = "shared"
-    "kubernetes.io/role/elb"                            = "1"
+    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
+    "kubernetes.io/role/elb"                                 = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${include.locals.full_name}" = "shared"
-    "kubernetes.io/role/internal-elb"                   = "1"
+    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
+    "kubernetes.io/role/internal-elb"                        = "1"
   }
 }

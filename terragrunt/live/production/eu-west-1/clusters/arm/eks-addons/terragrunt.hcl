@@ -1,6 +1,19 @@
-include {
-  path   = find_in_parent_folders()
-  expose = true
+include "root" {
+  path           = find_in_parent_folders()
+  expose         = true
+  merge_strategy = "deep"
+}
+
+include "vpc" {
+  path           = "../../../../../../dependency-blocks/vpc.hcl"
+  expose         = true
+  merge_strategy = "deep"
+}
+
+include "eks" {
+  path           = "../../../../../../dependency-blocks/eks.hcl"
+  expose         = true
+  merge_strategy = "deep"
 }
 
 dependencies {
@@ -8,18 +21,13 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.32.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.40.1"
 }
 
 generate "provider-local" {
   path      = "provider-local.tf"
   if_exists = "overwrite"
   contents  = file("../../../../../../provider-config/eks-addons/eks-addons.tf")
-}
-
-locals {
-  vpc = read_terragrunt_config("../../../../../../dependency-blocks/vpc.hcl")
-  eks = read_terragrunt_config("../../../../../../dependency-blocks/eks.hcl")
 }
 
 inputs = {
@@ -32,18 +40,18 @@ inputs = {
     name = "${basename(get_terragrunt_dir())}-ds"
   }
 
-  cluster-name = local.eks.dependency.eks.outputs.cluster_id
+  cluster-name = dependency.eks.outputs.cluster_id
 
   tags = merge(
-    include.locals.custom_tags
+    include.root.locals.custom_tags
   )
 
   eks = {
-    "cluster_oidc_issuer_url" = local.eks.dependency.eks.outputs.cluster_oidc_issuer_url
+    "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
   }
 
   cert-manager = {
-    enabled             = false
+    enabled             = true
     acme_http01_enabled = true
     acme_dns01_enabled  = true
     extra_values        = <<-EXTRA_VALUES
@@ -60,11 +68,6 @@ inputs = {
     extra_values = <<-EXTRA_VALUES
       extraArgs:
         scale-down-utilization-threshold: 0.7
-        balancing-ignore-label_1: topology.ebs.csi.aws.com/zone
-        balancing-ignore-label_2: eks.amazonaws.com/nodegroup
-        balancing-ignore-label_3: eks.amazonaws.com/nodegroup-image
-        balancing-ignore-label_4: eks.amazonaws.com/sourceLaunchTemplateId
-        balancing-ignore-label_5: eks.amazonaws.com/sourceLaunchTemplateVersion
       EXTRA_VALUES
   }
 
@@ -84,22 +87,21 @@ inputs = {
 
   # For this to work:
   # * GITHUB_TOKEN should be set
-  # * GITHUB_OWNER should be set to your org or username
   flux2 = {
     enabled               = false
     target_path           = "gitops/clusters/${include.locals.merged.env}/${include.locals.merged.name}"
     github_url            = "ssh://git@github.com/repo/repo"
-    repository            = "solid"
+    repository            = "repo"
     branch                = "main"
     repository_visibility = "private"
-    version               = "v0.16.2"
-    auto_image_update     = false
+    version               = "v0.24.1"
+    auto_image_update     = true
   }
 
   ingress-nginx = {
-    enabled       = false
+    enabled       = true
     use_nlb_ip    = true
-    allowed_cidrs = local.vpc.dependency.vpc.outputs.private_subnets_cidr_blocks
+    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
     extra_values  = <<-EXTRA_VALUES
       controller:
         ingressClassResource:
@@ -116,9 +118,8 @@ inputs = {
   }
 
   kube-prometheus-stack = {
-    enabled                     = false
-    allowed_cidrs               = local.vpc.dependency.vpc.outputs.private_subnets_cidr_blocks
-    namespace                   = "telemetry"
+    enabled                     = true
+    allowed_cidrs               = dependency.vpc.outputs.private_subnets_cidr_blocks
     thanos_sidecar_enabled      = true
     thanos_bucket_force_destroy = true
     default_global_requests     = true
@@ -127,7 +128,7 @@ inputs = {
     extra_values = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 8.1.1
+          tag: 8.3.3
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -136,11 +137,11 @@ inputs = {
           ingressClassName: nginx
           enabled: true
           hosts:
-            - telemetry.${include.locals.merged.default_domain_name}
+            - telemetry.${include.root.locals.merged.default_domain_name}
           tls:
-            - secretName: ${include.locals.merged.default_domain_name}
+            - secretName: ${include.root.locals.merged.default_domain_name}
               hosts:
-                - telemetry.${include.locals.merged.default_domain_name}
+                - telemetry.${include.root.locals.merged.default_domain_name}
         persistence:
           enabled: true
           accessModes:
@@ -153,7 +154,7 @@ inputs = {
           scrapeInterval: 60s
           replicas: 1
           retention: 2d
-          retentionSize: "40GB"
+          retentionSize: "10GB"
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
           podMonitorSelectorNilUsesHelmValues: false
@@ -163,30 +164,15 @@ inputs = {
                 accessModes: ["ReadWriteOnce"]
                 resources:
                   requests:
-                    storage: 50Gi
-          nodeSelector:
-            pool: large
-          tolerations:
-          - key: "dedicated"
-            operator: "Equal"
-            value: "large"
-            effect: "NoSchedule"
+                    storage: 10Gi
       alertmanager:
         alertmanagerSpec:
           replicas: 1
-          nodeSelector:
-            pool: large
-          tolerations:
-          - key: "dedicated"
-            operator: "Equal"
-            value: "large"
-            effect: "NoSchedule"
       EXTRA_VALUES
   }
 
   thanos = {
-    enabled                 = false
-    namespace               = "telemetry"
+    enabled                 = true
     default_global_requests = true
     default_global_limits   = false
     # Using https://github.com/raspbernetes/multi-arch-images
@@ -194,7 +180,7 @@ inputs = {
     extra_values = <<-EXTRA_VALUES
       image:
         repository: raspbernetes/thanos
-        tag: v0.22.0
+        tag: v0.23.1
       compactor:
         retentionResolution5m: 90d
       EXTRA_VALUES

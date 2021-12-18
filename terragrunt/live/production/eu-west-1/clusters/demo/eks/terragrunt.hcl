@@ -97,7 +97,8 @@ inputs = {
     desired_capacity       = 0
     capacity_type          = "ON_DEMAND"
     bootstrap_env = {
-      USE_MAX_PODS = false
+      USE_MAX_PODS      = false
+      CONTAINER_RUNTIME = "containerd"
     }
     taints = [
       {
