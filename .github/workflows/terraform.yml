@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 env:
-  GITGUARDIAN_API_KEY: ${{ secrets.TERRAFORM_VERSION }}
+  GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
 jobs:
   renovate-config-check:
