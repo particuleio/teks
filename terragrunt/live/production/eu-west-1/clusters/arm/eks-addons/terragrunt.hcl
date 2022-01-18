@@ -21,7 +21,7 @@ dependencies {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.41.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.41.1"
 }
 
 generate "provider-local" {
