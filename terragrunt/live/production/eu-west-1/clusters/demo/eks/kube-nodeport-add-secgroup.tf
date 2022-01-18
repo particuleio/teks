@@ -1,1 +1,0 @@
-../../../../../../modules/kube-nodeport-add-secgroup/kube-nodeport-add-secgroup.tf

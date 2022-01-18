@@ -17,7 +17,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.41.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.0"
 }
 
 generate "provider-local" {
@@ -82,7 +82,7 @@ inputs = {
     repository            = "repo"
     branch                = "main"
     repository_visibility = "private"
-    version               = "v0.24.1"
+    version               = "v0.25.1"
     auto_image_update     = true
   }
 
@@ -178,5 +178,7 @@ inputs = {
   thanos = {
     enabled              = true
     bucket_force_destroy = true
+    extra_values         = <<-EXTRA_VALUES
+      EXTRA_VALUES
   }
 }

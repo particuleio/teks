@@ -17,7 +17,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v2.41.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.0"
 }
 
 generate "provider-local" {
@@ -62,6 +62,10 @@ inputs = {
   }
 
   aws-load-balancer-controller = {
+    enabled = true
+  }
+
+  csi-external-snapshotter = {
     enabled = true
   }
 

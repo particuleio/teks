@@ -1,0 +1,27 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM1ekNDQWMrZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRJeU1ERXdPVEV4TWprek1Gb1hEVE15TURFd056RXhNamt6TUZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTHJwClM2UW9hL2oxcjdmejl6Q3YzMFR3Y1ZtNDd2ZHpJUFRMVkhWZEM0cFJ3NjgxSyticXRBWWtuUnBzdUI5RXk3MHAKTmlrb1ZJWnk4UEY3YnJ3QkJjUVVnT2V6V2RyNVh2Y2c0Q3VsZk1kNW80M0xkbklkeWszT21YcENCdHBsYStXcApYZ1R4UXdWTkd1YVhJK2Z6TGhZV0RpaTF4WUtPVlVsQ0JnYkdMcnhxOC95RHNPYXR3Q2MwWjk0Y0ErVHRBNnJGCjNBdGY4SjBDcDd3eGhlT1F2Qk5SODhLeXloOVJ1ZFlZa1NnQUNtQ2NiOGh3cjYrWkJhbjh2aHorUU50emxWb3kKa3dYMXZCYXQ3SXBNZnZadlFtRm90QWV2bVJ4Wjh3Mk9DanFMK3AzOW1wKy9rRE1WcWd0RGdIbGJsWXJkRXhVTApWQzBDa1BZeHZrVm9MdFJWVWlrQ0F3RUFBYU5DTUVBd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0hRWURWUjBPQkJZRUZHb25iTnZQRllFQXFlZ2lYb24vL1o5Q0pmYUdNQTBHQ1NxR1NJYjMKRFFFQkN3VUFBNElCQVFCNjNrVDE1ZmIyR2Y5UHd0V2RqMTVEMnR6d01MMG01Y1hFVFRxdXF6WHcvenpqWFd5cApaS3RqK1diTDZYN1RETi8wMm56UkN0RUsxUW1ZaW4xNVI1ZWtQZHlrQmt4MW9XNXlLNEpPaFlJK21IVnpmdlErCjdyODlSRDB6dWdIZTZmbXY2MEwwVFdpbVVBMlRPbko1bGZxUklwanB1c091UmZEalBkcWc1N1VRTDUxRFVqWmQKb3U5c1RaWUZRbkhSdkFuWCt2dWFCcjBybGR0Znk5WVFubGsvSUVrSWVkV3VyMEJrYVREQWhuSDdvVVNzNFE1awpTazZyc1RDWGNMME5vQksxN1hJbEpMcHNWaWpJQ0ZlYTQ5enFCbk1aVS9rYVR6TzV6aW9HeWY3dG13RHNlN2lHCmRHZ3VhZ2JVdEhrZUlhTlFsNTc2RzFMRDlwTEhIK1B0cU1QUwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    server: https://732CC77068B4A2F46DC40497FD380C96.sk1.eu-west-1.eks.amazonaws.com
+  name: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+contexts:
+- context:
+    cluster: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+    user: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+  name: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+current-context: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+kind: Config
+preferences: {}
+users:
+- name: arn:aws:eks:eu-west-1:161285725140:cluster/pio-teks-demo-demo
+  user:
+    exec:
+      apiVersion: client.authentication.k8s.io/v1alpha1
+      args:
+      - --region
+      - eu-west-1
+      - eks
+      - get-token
+      - --cluster-name
+      - pio-teks-demo-demo
+      command: aws
