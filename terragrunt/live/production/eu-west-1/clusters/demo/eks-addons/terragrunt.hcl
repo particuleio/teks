@@ -17,7 +17,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.1"
 }
 
 generate "provider-local" {
@@ -178,7 +178,32 @@ inputs = {
   thanos = {
     enabled              = true
     bucket_force_destroy = true
-    extra_values         = <<-EXTRA_VALUES
+    # Waiting for ARM support https://github.com/bitnami/charts/issues/7305
+    extra_values = <<-EXTRA_VALUES
+      query:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      queryFrontend:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      bucketweb:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      compactor:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      storegateway:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      ruler:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      receive:
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      receiveDistributor:
+        nodeSelector:
+          kubernetes.io/arch: amd64
       EXTRA_VALUES
   }
 }

@@ -17,7 +17,7 @@ include "encryption_config" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.2.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.2.1"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
@@ -137,9 +137,9 @@ inputs = {
 
   eks_managed_node_group_defaults = {
     force_update_version         = true
+    desired_size                 = 1
     min_size                     = 1
     max_size                     = 10
-    desired_capacity             = 0
     capacity_type                = "ON_DEMAND"
     iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
     block_device_mappings = {
@@ -159,14 +159,14 @@ inputs = {
       desired_size            = 1
       ami_type                = "AL2_x86_64"
       instance_types          = ["t3a.medium"]
-      subnets                 = [dependency.vpc.outputs.private_subnets[0]]
+      subnet_ids              = [dependency.vpc.outputs.private_subnets[0]]
       pre_bootstrap_user_data = <<-EOT
         #!/bin/bash
         set -ex
         cat <<-EOF > /etc/profile.d/bootstrap.sh
         export CONTAINER_RUNTIME="containerd"
         export USE_MAX_PODS=false
-        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
+        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
         EOF
         # Source extra environment variables in bootstrap script
         sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
@@ -176,23 +176,43 @@ inputs = {
         sudo systemctl start amazon-ssm-agent
         EOT
       labels = {
-        network                         = "private"
-        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}a"
+        network = "private"
       }
     }
 
     "default-b" = {
-      desired_size         = 1
-      ami_type             = "BOTTLEROCKET_x86_64"
-      platform             = "bottlerocket"
-      instance_types       = ["t3a.medium"]
-      subnet_ids           = [dependency.vpc.outputs.private_subnets[1]]
+      desired_size   = 1
+      ami_type       = "BOTTLEROCKET_x86_64"
+      platform       = "bottlerocket"
+      instance_types = ["t3a.medium"]
+      subnet_ids     = [dependency.vpc.outputs.private_subnets[1]]
+      block_device_mappings = {
+        root = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 10
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+            kms_key_id            = dependency.encryption_config.outputs.arn
+          }
+        }
+        containers = {
+          device_name = "/dev/xvdb"
+          ebs = {
+            volume_size           = 20
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+            kms_key_id            = dependency.encryption_config.outputs.arn
+          }
+        }
+      }
       bootstrap_extra_args = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network                         = "private"
-        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}b"
+        network = "private"
       }
     }
 
@@ -207,7 +227,7 @@ inputs = {
         cat <<-EOF > /etc/profile.d/bootstrap.sh
         export CONTAINER_RUNTIME="containerd"
         export USE_MAX_PODS=false
-        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
+        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
         EOF
         # Source extra environment variables in bootstrap script
         sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
@@ -217,8 +237,93 @@ inputs = {
         sudo systemctl start amazon-ssm-agent
         EOT
       labels = {
-        network                         = "private"
-        "topology.ebs.csi.aws.com/zone" = "${include.root.locals.merged.aws_region}c"
+        network = "private"
+      }
+    }
+
+    "arm-a" = {
+      desired_size            = 1
+      ami_type                = "AL2_ARM_64"
+      instance_types          = ["t4g.medium"]
+      subnet_ids              = [dependency.vpc.outputs.private_subnets[0]]
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        set -ex
+        cat <<-EOF > /etc/profile.d/bootstrap.sh
+        export CONTAINER_RUNTIME="containerd"
+        export USE_MAX_PODS=false
+        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
+        EOF
+        # Source extra environment variables in bootstrap script
+        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+        cd /tmp
+        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+        sudo systemctl enable amazon-ssm-agent
+        sudo systemctl start amazon-ssm-agent
+        EOT
+      labels = {
+        network = "private"
+      }
+    }
+
+    "arm-b" = {
+      desired_size   = 1
+      ami_type       = "BOTTLEROCKET_ARM_64"
+      platform       = "bottlerocket"
+      instance_types = ["t4g.medium"]
+      subnet_ids     = [dependency.vpc.outputs.private_subnets[1]]
+      block_device_mappings = {
+        root = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 10
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+            kms_key_id            = dependency.encryption_config.outputs.arn
+          }
+        }
+        containers = {
+          device_name = "/dev/xvdb"
+          ebs = {
+            volume_size           = 20
+            volume_type           = "gp3"
+            delete_on_termination = true
+            encrypted             = true
+            kms_key_id            = dependency.encryption_config.outputs.arn
+          }
+        }
+      }
+      bootstrap_extra_args = <<-EOT
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        EOT
+      labels = {
+        network = "private"
+      }
+    }
+
+    "arm-c" = {
+      desired_size            = 1
+      ami_type                = "AL2_ARM_64"
+      instance_types          = ["t4g.medium"]
+      subnet_ids              = [dependency.vpc.outputs.private_subnets[2]]
+      pre_bootstrap_user_data = <<-EOT
+        #!/bin/bash
+        set -ex
+        cat <<-EOF > /etc/profile.d/bootstrap.sh
+        export CONTAINER_RUNTIME="containerd"
+        export USE_MAX_PODS=false
+        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
+        EOF
+        # Source extra environment variables in bootstrap script
+        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+        cd /tmp
+        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
+        sudo systemctl enable amazon-ssm-agent
+        sudo systemctl start amazon-ssm-agent
+        EOT
+      labels = {
+        network = "private"
       }
     }
   }

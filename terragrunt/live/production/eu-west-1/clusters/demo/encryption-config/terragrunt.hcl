@@ -1,11 +1,11 @@
 include "root" {
-  path           = "${find_in_parent_folders()}"
+  path           = find_in_parent_folders()
   expose         = true
   merge_strategy = "deep"
 }
 
 terraform {
-  source = "../../../../../../modules/kms-key"
+  source = "github.com/particuleio/terraform-aws-kms.git?ref=v1.0.2"
 }
 
 inputs = {
@@ -14,4 +14,5 @@ inputs = {
   tags = merge(
     include.root.locals.custom_tags
   )
+  policy_flavor = "eks_root_volume_encryption"
 }

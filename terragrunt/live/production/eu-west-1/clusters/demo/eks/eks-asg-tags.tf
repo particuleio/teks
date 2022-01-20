@@ -1,1 +1,1 @@
-../../../../../../modules/eks-asg-tags/eks-asg-tags.tf
+../../../../../../snippets/eks-asg-tags/eks-asg-tags.tf

@@ -1,6 +1,8 @@
 resource "aws_kms_key" "this" {
-  description = var.description
-  tags        = var.tags
+  description         = var.description
+  enable_key_rotation = var.enable_key_rotation
+  policy              = data.aws_iam_policy_document.this.json
+  tags                = var.tags
 }
 
 resource "aws_kms_alias" "this" {

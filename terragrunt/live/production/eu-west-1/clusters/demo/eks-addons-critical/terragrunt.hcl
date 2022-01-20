@@ -17,7 +17,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.0.1"
 }
 
 generate "provider-local" {
@@ -75,7 +75,12 @@ inputs = {
   }
 
   npd = {
-    enabled = true
+    # Waiing for ARM image https://github.com/kubernetes/node-problem-detector/issues/586
+    enabled      = true
+    extra_values = <<-EXTRA_VALUES
+      nodeSelector:
+        kubernetes.io/arch: arm64
+      EXTRA_VALUES
   }
 
   tigera-operator = {

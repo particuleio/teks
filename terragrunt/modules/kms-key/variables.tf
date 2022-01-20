@@ -3,6 +3,11 @@ variable "description" {
   default = ""
 }
 
+variable "enable_key_rotation" {
+  type    = bool
+  default = true
+}
+
 variable "alias" {
   type = string
 }

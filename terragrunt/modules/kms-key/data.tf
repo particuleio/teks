@@ -1,8 +1,6 @@
 data "aws_caller_identity" "current" {}
 
-# This policy is required for the KMS key used for EKS root volumes, so the cluster is allowed to enc/dec/attach encrypted EBS volumes
-data "aws_iam_policy_document" "ebs_decryption" {
-  # Copy of default KMS policy that lets you manage it
+data "aws_iam_policy_document" "this" {
   statement {
     sid    = "Enable IAM User Permissions"
     effect = "Allow"
@@ -19,7 +17,6 @@ data "aws_iam_policy_document" "ebs_decryption" {
     resources = ["*"]
   }
 
-  # Required for EKS
   statement {
     sid    = "Allow service-linked role use of the CMK"
     effect = "Allow"
@@ -27,7 +24,7 @@ data "aws_iam_policy_document" "ebs_decryption" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", # required for the ASG to manage encrypted volumes for nodes
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
       ]
     }
 
@@ -49,7 +46,7 @@ data "aws_iam_policy_document" "ebs_decryption" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling", # required for the ASG to manage encrypted volumes for nodes
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
       ]
     }
 

@@ -17,7 +17,7 @@ resource "null_resource" "node_groups_asg_tags" {
     taints            = jsonencode(lookup(var.eks_managed_node_groups[each.key], "taint", null))
     restricted_labels = jsonencode(lookup(var.eks_managed_node_groups[each.key], "restricted_labels", null))
     instance_types    = jsonencode(lookup(var.eks_managed_node_groups[each.key], "instance_types", null))
-    md5file           = md5(file("eks-asg-tags.tf"))
+    filemd5           = filemd5("eks-asg-tags")
   }
 
   provisioner "local-exec" {
@@ -41,21 +41,21 @@ resource "null_resource" "node_groups_asg_tags" {
   "ResourceId" : each.value.name
   "ResourceType" : "auto-scaling-group",
   "Key" : "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/zone",
-  "Value" : element(sort(data.aws_autoscaling_group.node_groups[each.key].availability_zones), 0),
+  "Value" : one(data.aws_autoscaling_group.node_groups[each.key].availability_zones),
   "PropagateAtLaunch" : true
   })}'
     aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${jsonencode({
   "ResourceId" : each.value.name
   "ResourceType" : "auto-scaling-group",
   "Key" : "k8s.io/cluster-autoscaler/node-template/label/topology.ebs.csi.aws.com/zone",
-  "Value" : element(sort(data.aws_autoscaling_group.node_groups[each.key].availability_zones), 0),
+  "Value" : one(data.aws_autoscaling_group.node_groups[each.key].availability_zones),
   "PropagateAtLaunch" : true
   })}'
     aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${jsonencode({
   "ResourceId" : each.value.name
   "ResourceType" : "auto-scaling-group",
   "Key" : "k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/instance-type",
-  "Value" : element(var.eks_managed_node_groups[each.key].instance_types, 0),
+  "Value" : one(var.eks_managed_node_groups[each.key].instance_types),
   "PropagateAtLaunch" : true
   })}'
     aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${lookup(var.eks_managed_node_groups[each.key], "taint", null) == null ? "[]" : jsonencode([for i in var.eks_managed_node_groups[each.key].taint : {
