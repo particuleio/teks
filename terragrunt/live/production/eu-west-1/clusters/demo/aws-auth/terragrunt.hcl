@@ -17,7 +17,7 @@ generate "provider-local" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-eks-aws-auth.git?ref=v1.0.0"
+  source = "github.com/particuleio/terraform-eks-aws-auth.git?ref=v1.1.0"
 }
 
 inputs = {
