@@ -25,8 +25,11 @@
   * [Enforced security](#enforced-security)
   * [Out of the box logging](#out-of-the-box-logging)
   * [Out of the box monitoring](#out-of-the-box-monitoring)
+  * [Long term storage with Thanos](#long-term-storage-with-thanos)
+  * [Support for ARM instances](#support-for-arm-instances)
   * [Helm v3 provider](#helm-v3-provider)
   * [Other and not limited to](#other-and-not-limited-to)
+  * [Always up to date](#always-up-to-date)
 * [Requirements](#requirements-1)
 * [Examples](#examples)
 * [Additional infrastructure blocks](#additional-infrastructure-blocks)
@@ -120,6 +123,8 @@ up to date with the latest features.
 
 ### Enforced security
 
+* Encryption by default for root volume on instances with Custom KMS Key
+* AWS EBS CSI volumes encrypted by default with Custom KMS Key
 * No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/).
 * Each addons is deployed in it's own namespace with sensible default network policies.
 * Calico Tigera Operator for network policy.
@@ -143,6 +148,19 @@ Two stacks are supported:
 * [Victoria Metrics](https://victoriametrics.com/) [Stack](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack): [Victoria Metrics](https://victoriametrics.com/) is a Prometheus alertnative, [compatible with prometheus CRDs](https://github.com/VictoriaMetrics/operator#overview)
 * [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack): Classic [Prometheus](https://prometheus.io/) Monitoring
 
+### Long term storage with Thanos
+
+With Prometheus, tEKS includes [Thanos](https://thanos.io/) by default. Thanos
+uses S3 to store and query metrics, offering long term storage without the
+costs. For more information check out our article on the [CNCF
+Blog](https://www.cncf.io/blog/2021/03/15/multi-cluster-monitoring-with-thanos/)
+
+### Support for ARM instances
+
+With either Amazon Linux or BottleRocket, you can use a mix of ARM and AMD64
+instances. [Check out our
+example](https://github.com/particuleio/teks/blob/main/terragrunt/live/production/eu-west-1/clusters/demo/eks/terragrunt.hcl#L157)
+
 ### Helm v3 provider
 
 * All addons support Helm v3 configuration
@@ -152,6 +170,19 @@ Two stacks are supported:
 
 * priorityClasses for addons and critical addons
 * lot of manual stuff have been automated under the hood
+
+### Always up to date
+
+We always support the latest modules and features [for our addons module](https://github.com/particuleio/terraform-kubernetes-addons).
+
+Our cutting edges addons include (not limited to):
+  * [AWS EBS CSI Drivers](https://github.com/kubernetes-sigs/aws-ebs-csi-driver): Support for Volume encryption by default, snapshot, etc
+  * [AWS EFS CSI Drivers](https://secrets-store-csi-driver.sigs.k8s.io/): Use AWS NFS shares.
+  * [Secret Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/): load
+      secret from Secret Managers with
+      [`aws-secret-store-csi-driver`(https://github.com/aws/secrets-store-csi-driver-provider-aws)]
+  * [Linkerd2](https://linkerd.io/) or [Certificate Manager CSI](https://cert-manager.io/docs/usage/csi/) for mTLS
+
 
 ## Requirements
 
