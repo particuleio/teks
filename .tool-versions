@@ -1,5 +1,5 @@
-terragrunt 0.35.16
-terraform 1.1.3
+terragrunt 0.36.0
+terraform 1.1.4
 terraform-docs 0.16.0
-tflint 0.33.1
-tfsec 0.61.3
+tflint 0.34.1
+tfsec 0.63.1

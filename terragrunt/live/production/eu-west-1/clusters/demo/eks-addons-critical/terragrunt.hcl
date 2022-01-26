@@ -17,13 +17,23 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.1.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.2.0"
 }
 
 generate "provider-local" {
   path      = "provider-local.tf"
   if_exists = "overwrite"
   contents  = file("../../../../../../provider-config/eks-addons/eks-addons.tf")
+}
+
+generate "provider-github" {
+  path      = "provider-github.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<-EOF
+    provider "github" {
+      owner = "${include.root.locals.merged.github_owner}"
+    }
+  EOF
 }
 
 inputs = {
@@ -56,7 +66,7 @@ inputs = {
   aws-ebs-csi-driver = {
     enabled          = true
     is_default_class = true
-    wait             = true
+    wait             = false
     use_encryption   = true
     use_kms          = true
   }
@@ -77,9 +87,10 @@ inputs = {
   npd = {
     # Waiing for ARM image https://github.com/kubernetes/node-problem-detector/issues/586
     enabled      = true
+    wait         = false
     extra_values = <<-EXTRA_VALUES
       nodeSelector:
-        kubernetes.io/arch: arm64
+        kubernetes.io/arch: amd64
       EXTRA_VALUES
   }
 

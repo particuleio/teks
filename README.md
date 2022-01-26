@@ -12,12 +12,17 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Terraform/Terragrunt](#terraformterragrunt)
+* [Contributing](#contributing)
 * [Requirements](#requirements)
   * [Terragrunt](#terragrunt)
 * [Main purposes](#main-purposes)
 * [What you get](#what-you-get)
 * [Curated Features](#curated-features)
+  * [Bottlerocket support](#bottlerocket-support)
+  * [AWS Session Manager by default](#aws-session-manager-by-default)
+  * [From and to Zero scaling with EKS Managed Node Groups](#from-and-to-zero-scaling-with-eks-managed-node-groups)
   * [Enforced security](#enforced-security)
+  * [Out of the box logging](#out-of-the-box-logging)
   * [Out of the box monitoring](#out-of-the-box-monitoring)
   * [Helm v3 provider](#helm-v3-provider)
   * [Other and not limited to](#other-and-not-limited-to)
@@ -48,6 +53,12 @@ with Terragrunt. [Archive branch is available here](https://github.com/particule
 
 * Terragrunt implementation is available in the [`terragrunt`](./terragrunt) folder.
 
+## Contributing
+
+Contribution are welcome, as well as issues, we are usually quite reactive. If
+you need more support for your project, do not hesitate to [reach us
+directly](mailto:contact@particule.io).
+
 ## Requirements
 
 ### Terragrunt
@@ -65,29 +76,62 @@ A production cluster all defined in IaaC with Terraform/Terragrunt:
 
 * AWS VPC if needed based on [`terraform-aws-vpc`](https://github.com/terraform-aws-modules/terraform-aws-vpc)
 * EKS cluster base on [`terraform-aws-eks`](https://github.com/terraform-aws-modules/terraform-aws-eks)
-* Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/particuleio/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS.
+* Kubernetes addons based on [`terraform-kubernetes-addons`](https://github.com/particuleio/terraform-kubernetes-addons): provides various addons that are often used on Kubernetes and specifically on EKS. This module is currated by [Particule](https://particule.io/en/) and well maintained.
 
 Everything is tied together with Terragrunt and allows you to deploy a multi
-cluster architecture in a matter of minutes (ok maybe an hour) and different AWS
-accounts for different environments.
+cluster architecture in a matter of minutes.
 
 ## Curated Features
 
-The main additionals features are the curated addons list, see
-[here](https://github.com/particuleio/terraform-kubernetes-addons) and in the
-customization of the cluster policy
+The additional features are provided by tEKS here as well as our [curated addons
+module](https://github.com/particuleio/terraform-kubernetes-addons) which
+support a bunch of various configuration.
+
+### Bottlerocket support
+
+[Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) is available
+for node groups (see example
+(here)[https://github.com/particuleio/teks/tree/main/terragrunt/live/production/eu-west-1/clusters/demo/eks]).
+Bottle rocket is a container centric OS with less attack surface and no default
+shell.
+
+### AWS Session Manager by default
+
+All the instances (Bottlerocket or Amazon Linux) are registered with [AWS Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html). No SSH keys or SSH access is open on instances. Shell access on every instance can be given with SSM for added security.
+
+```
+aws ssm start-session --target INSTANCE_ID
+```
+
+### From and to Zero scaling with EKS Managed Node Groups
+
+tEKS support scaling to and from 0, even with using [well know Kubernetes labels](https://kubernetes.io/docs/reference/labels-annotations-taints/), there are a number of [ongoing issues](https://github.com/aws/containers-roadmap/issues/724) for support of [EKS Managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) with [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler). Thanks to [automatic ASG tagging](https://github.com/particuleio/teks/blob/main/terragrunt/snippets/eks-asg-tags/eks-asg-tags.tf), tEKS adds the necessary tags on autoscaling group to balance similar node groups and allow you to scale to and from 0 and even to use well know labels such as `node.kubernetes.io/instance-type` or `topology.kubernetes.io/zone
+`. The logic can be extended to support other well known labels.
 
 ### Enforced security
 
-* No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/)
+* No IAM credentials on instances, everything is enforced with [IRSA](https://aws.amazon.com/blogs/opensource/introducing-fine-grained-iam-roles-service-accounts/).
 * Each addons is deployed in it's own namespace with sensible default network policies.
-* Calico Tigera Operator for network policy
+* Calico Tigera Operator for network policy.
+* PSP are enabled but not enforced because of depreciation.
+
+### Out of the box logging
+
+Three stacks are supported:
+* [AWS for Fluent Bit](https://docs.fluentbit.io/manual/installation/aws-container): Forward containers logs to Cloudwatch Logs
+* [Grafana Loki](https://grafana.com/oss/loki/): Uses [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/) to forward logs
+    to [Loki](https://grafana.com/oss/loki/). Grafana or a tEKS supported
+    monitoring stack (see below) is necessary to display logs.
 
 ### Out of the box monitoring
 
 * Prometheus Operator with defaults dashboards
 * Addons that support metrics are enable along with their `serviceMonitor`
-* Custom grafana dashboard are available by default.
+* Custom grafana dashboard are available by default
+
+Two stacks are supported:
+* [Victoria Metrics](https://victoriametrics.com/) [Stack](https://github.com/VictoriaMetrics/helm-charts/tree/master/charts/victoria-metrics-k8s-stack): [Victoria Metrics](https://victoriametrics.com/) is a Prometheus alertnative, [compatible with prometheus CRDs](https://github.com/VictoriaMetrics/operator#overview)
+* [Kube Prometheus Stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack): Classic [Prometheus](https://prometheus.io/) Monitoring
 
 ### Helm v3 provider
 
@@ -96,8 +140,7 @@ customization of the cluster policy
 
 ### Other and not limited to
 
-* priorityClasses for addons
-* use of [`kubectl-provider`], no more local exec and custom manifest are properly handled
+* priorityClasses for addons and critical addons
 * lot of manual stuff have been automated under the hood
 
 ## Requirements
@@ -111,7 +154,7 @@ Terragrunt is not a hard requirement but all the modules are tested with Terragr
 
 ## Examples
 
-[`terragrunt/live`](terragrunt/live) folder provides an opinionated directory structure for a production environment with an example using
+[`terragrunt/live`](terragrunt/live) folder provides an opinionated directory structure for a production environment.
 
 ## Additional infrastructure blocks
 

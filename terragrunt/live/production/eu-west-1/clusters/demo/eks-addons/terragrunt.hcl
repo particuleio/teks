@@ -17,13 +17,23 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.1.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v3.2.0"
 }
 
 generate "provider-local" {
   path      = "provider-local.tf"
   if_exists = "overwrite"
   contents  = file("../../../../../../provider-config/eks-addons/eks-addons.tf")
+}
+
+generate "provider-github" {
+  path      = "provider-github.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<-EOF
+    provider "github" {
+      owner = "${include.root.locals.merged.github_owner}"
+    }
+  EOF
 }
 
 inputs = {
@@ -47,10 +57,11 @@ inputs = {
   }
 
   cert-manager = {
-    enabled             = true
-    acme_http01_enabled = true
-    acme_dns01_enabled  = true
-    extra_values        = <<-EXTRA_VALUES
+    enabled                   = true
+    acme_http01_enabled       = true
+    acme_dns01_enabled        = true
+    acme_http01_ingress_class = "nginx"
+    extra_values              = <<-EXTRA_VALUES
       ingressShim:
         defaultIssuerName: letsencrypt
         defaultIssuerKind: ClusterIssuer
@@ -60,7 +71,7 @@ inputs = {
 
   cluster-autoscaler = {
     enabled      = true
-    version      = "v1.21.0"
+    version      = "v1.21.2"
     extra_values = <<-EXTRA_VALUES
       extraArgs:
         scale-down-utilization-threshold: 0.7
@@ -76,13 +87,13 @@ inputs = {
   # For this to work:
   # * GITHUB_TOKEN should be set
   flux2 = {
-    enabled               = false
+    enabled               = true
     target_path           = "gitops/clusters/${include.root.locals.merged.env}/${include.root.locals.merged.name}"
-    github_url            = "ssh://git@github.com/owner/repo"
-    repository            = "repo"
+    github_url            = "ssh://git@github.com/particuleio/teks"
+    repository            = "teks"
     branch                = "main"
-    repository_visibility = "private"
-    version               = "v0.25.1"
+    repository_visibility = "public"
+    version               = "v0.25.3"
     auto_image_update     = true
   }
 
@@ -113,7 +124,7 @@ inputs = {
     extra_values                = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 8.3.3
+          tag: 8.3.4
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -140,6 +151,7 @@ inputs = {
           ruleSelectorNilUsesHelmValues: false
           serviceMonitorSelectorNilUsesHelmValues: false
           podMonitorSelectorNilUsesHelmValues: false
+          probeSelectorNilUsesHelmValues: false
           storageSpec:
             volumeClaimTemplate:
               spec:
@@ -147,13 +159,51 @@ inputs = {
                 resources:
                   requests:
                     storage: 10Gi
+          resources:
+            requests:
+              cpu: 1
+              memory: 2Gi
+            limits:
+              cpu: 2
+              memory: 2Gi
       EXTRA_VALUES
   }
 
   loki-stack = {
     enabled              = true
     bucket_force_destroy = true
-
+    extra_values         = <<-VALUES
+      resources:
+        requests:
+          cpu: 1
+          memory: 2Gi
+        limits:
+          cpu: 2
+          memory: 4Gi
+      config:
+        limits_config:
+          ingestion_rate_mb: 320
+          ingestion_burst_size_mb: 512
+          max_streams_per_user: 100000
+        chunk_store_config:
+          max_look_back_period: 2160h
+        table_manager:
+          retention_deletes_enabled: true
+          retention_period: 2160h
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/tls-acme: "true"
+          nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+          nginx.ingress.kubernetes.io/auth-tls-secret: "telemetry/loki-ca"
+        hosts:
+          - host: logz.${include.root.locals.merged.default_domain_name}
+            paths: ["/"]
+        tls:
+          - secretName: logz.${include.root.locals.merged.default_domain_name}
+            hosts:
+              - logz.${include.root.locals.merged.default_domain_name}
+        VALUES
     bucket_lifecycle_rule = [
       {
         id      = "log"
@@ -173,6 +223,7 @@ inputs = {
 
   promtail = {
     enabled = true
+    wait    = false
   }
 
   thanos = {

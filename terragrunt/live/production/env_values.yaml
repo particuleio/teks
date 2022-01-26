@@ -1,2 +1,2 @@
-env: demo
+env: production
 default_domain_name: clusterfrak-dynamics.io
