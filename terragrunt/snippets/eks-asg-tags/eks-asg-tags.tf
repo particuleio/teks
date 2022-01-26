@@ -17,7 +17,7 @@ resource "null_resource" "node_groups_asg_tags" {
     taints            = jsonencode(lookup(var.eks_managed_node_groups[each.key], "taint", null))
     restricted_labels = jsonencode(lookup(var.eks_managed_node_groups[each.key], "restricted_labels", null))
     instance_types    = jsonencode(lookup(var.eks_managed_node_groups[each.key], "instance_types", null))
-    filemd5           = filemd5("eks-asg-tags")
+    filemd5           = filemd5("eks-asg-tags.tf")
   }
 
   provisioner "local-exec" {
