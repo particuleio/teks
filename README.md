@@ -21,6 +21,7 @@
   * [Bottlerocket support](#bottlerocket-support)
   * [AWS Session Manager by default](#aws-session-manager-by-default)
   * [From and to Zero scaling with EKS Managed Node Groups](#from-and-to-zero-scaling-with-eks-managed-node-groups)
+  * [Automatic dependencies upgrade](#automatic-dependencies-upgrade)
   * [Enforced security](#enforced-security)
   * [Out of the box logging](#out-of-the-box-logging)
   * [Out of the box monitoring](#out-of-the-box-monitoring)
@@ -38,6 +39,9 @@ tEKS is a set of Terraform / Terragrunt modules designed to get you everything
 you need to run a production EKS cluster on AWS. It ships with sensible
 defaults, and add a lot of common addons with their configurations that work out
 of the box.
+
+This is our opinionated view of what a well structred infrastructure as code
+repository should look like.
 
 :warning: the v5 and further version of this project have been completely revamp
 and now offer a skeleton to use as a base for your infrastructure projects
@@ -107,6 +111,12 @@ aws ssm start-session --target INSTANCE_ID
 
 tEKS support scaling to and from 0, even with using [well know Kubernetes labels](https://kubernetes.io/docs/reference/labels-annotations-taints/), there are a number of [ongoing issues](https://github.com/aws/containers-roadmap/issues/724) for support of [EKS Managed node groups](https://docs.aws.amazon.com/eks/latest/userguide/managed-node-groups.html) with [Cluster Autoscaler](https://github.com/kubernetes/autoscaler/tree/master/cluster-autoscaler). Thanks to [automatic ASG tagging](https://github.com/particuleio/teks/blob/main/terragrunt/snippets/eks-asg-tags/eks-asg-tags.tf), tEKS adds the necessary tags on autoscaling group to balance similar node groups and allow you to scale to and from 0 and even to use well know labels such as `node.kubernetes.io/instance-type` or `topology.kubernetes.io/zone
 `. The logic can be extended to support other well known labels.
+
+### Automatic dependencies upgrade
+
+We are using renovate to automatically open PR with the latest dependencies
+update (Terraform modules upgrade) so you never miss an upgrade and are alwasy
+up to date with the latest features.
 
 ### Enforced security
 
