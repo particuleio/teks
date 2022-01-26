@@ -1,4 +1,4 @@
-# EKS module
+ EKS module
 
 ## Upstream configuration
 

@@ -18,7 +18,7 @@ The configuration is curated to be tightly integrated with AWS and EKS.
 All the configuration is done in `eks-addons/terragrunt.hcl`.
 
 ```json
-{!terragrunt/live/production/eu-west-1/clusters/demo/eks-addons!}
+{!terragrunt/live/production/eu-west-1/clusters/demo/eks-addons/terragrunt.hcl!}
 ```
 
 ### Default charts values

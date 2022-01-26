@@ -6,5 +6,5 @@ To customize it. Modify the `vpc/terragrunt.hcl` file. You can use any inputs
 available in the upstream module.
 
 ```json
-{!terragrunt/live/production/eu-west-1/clusters/demo/vpc!}
+{!terragrunt/live/production/eu-west-1/clusters/demo/vpc/terragrunt.hcl!}
 ```
