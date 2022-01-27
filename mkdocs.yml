@@ -46,6 +46,7 @@ markdown_extensions:
 
 nav:
   - Overview: index.md
+  - Quickstart: quickstart.md
   - Documentation:
       - Getting started: user-guides/getting-started.md
       - VPC: user-guides/vpc.md

@@ -15,6 +15,7 @@
 * [Contributing](#contributing)
 * [Requirements](#requirements)
   * [Terragrunt](#terragrunt)
+* [Quickstart](#quickstart)
 * [Main purposes](#main-purposes)
 * [What you get](#what-you-get)
 * [Curated Features](#curated-features)
@@ -31,6 +32,10 @@
   * [Other and not limited to](#other-and-not-limited-to)
   * [Always up to date](#always-up-to-date)
 * [Requirements](#requirements-1)
+  * [Pre-commit](#pre-commit)
+  * [ASDF](#asdf)
+    * [Enabling plugins](#enabling-plugins)
+    * [Installing tools](#installing-tools)
 * [Examples](#examples)
 * [Additional infrastructure blocks](#additional-infrastructure-blocks)
 * [Branches](#branches)
@@ -72,6 +77,11 @@ directly](mailto:contact@particule.io).
 
 * [Terraform](https://www.terraform.io/downloads.html)
 * [Terragrunt](https://github.com/gruntwork-io/terragrunt/releases)
+
+## Quickstart
+
+Quickstart guide is available [here](./QUICKSTART.md) or on the [official
+documentation website](https://particuleio.github.io/teks/)
 
 ## Main purposes
 
@@ -192,6 +202,30 @@ Terragrunt is not a hard requirement but all the modules are tested with Terragr
 * [Terragrunt](https://github.com/gruntwork-io/terragrunt#install-terragrunt)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * [helm](https://helm.sh/)
+
+### Pre-commit
+
+This repository use pre-commit hooks, please see
+[this](https://github.com/antonbabenko/pre-commit-terraform#how-to-install) on
+how to setup tooling
+
+### ASDF
+
+[ASDF](https://asdf-vm.com/) is a package manager which is great for managing
+cloud native tooling. More info [here](https://particule.io/blog/asdf/)(eg.
+French).
+
+#### Enabling plugins
+
+```
+for p in $(cut -d " " .tool-versions -f1); do asdf plugin add $p; done
+```
+
+#### Installing tools
+
+```
+asdf install
+```
 
 ## Examples
 

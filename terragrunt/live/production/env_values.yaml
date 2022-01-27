@@ -1,2 +1,6 @@
+---
+# Environment name, normally equal to folder name, here it is production by default
 env: production
+
+# Default domain name that will be used by default ingress resources, use a registered Route53 domain in the AWS Account
 default_domain_name: clusterfrak-dynamics.io

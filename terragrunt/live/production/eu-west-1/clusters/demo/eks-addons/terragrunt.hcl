@@ -149,6 +149,8 @@ inputs = {
           size: 1Gi
       prometheus:
         prometheusSpec:
+          nodeSelector:
+            kubernetes.io/arch: amd64
           scrapeInterval: 60s
           retention: 2d
           retentionSize: "10GB"

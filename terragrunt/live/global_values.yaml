@@ -1,5 +1,13 @@
 ---
+# Your AWS Account ID
 aws_account_id: 161285725140
+
+# Prefix to be added to created resources
 prefix: pio-teks
+
+# AWS S3 bucket region where Terraform will store state
 tf_state_bucket_region: eu-west-1
+
+# Github username or organization, this can be used by Flux2 to auto configure
+# Github bootstrap
 github_owner: particuleio
