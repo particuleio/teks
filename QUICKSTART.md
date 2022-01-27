@@ -159,7 +159,7 @@ terragrunt output grafana_password
     `eu-west-1/clusters/demo` folder.
 
 :warning: there is an issue with flux 2 namespace not terminating correctly
-because CRDs are deleted before namespace is terminated. To unstuck `flux-system` namespace deletion, you can run the following command⚠
+because CRDs are deleted before namespace is terminated. To unstuck `flux-system` namespace deletion, you can run the following command:
 
 ```
 kubectl get namespace "flux-system" -o json | tr -d "\n" | sed "s/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/" | kubectl replace --raw /api/v1/namespaces/flux-system/finalize -f -
