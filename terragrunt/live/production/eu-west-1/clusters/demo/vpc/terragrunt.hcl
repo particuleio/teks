@@ -5,7 +5,7 @@ include "root" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.11.4"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.11.5"
 }
 
 locals {
