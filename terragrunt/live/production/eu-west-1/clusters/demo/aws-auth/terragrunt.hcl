@@ -17,7 +17,7 @@ generate "provider-local" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-eks-aws-auth.git?ref=v1.1.0"
+  source = "../../../../../../snippets/eks-aws-auth"
 }
 
 inputs = {
@@ -26,12 +26,17 @@ inputs = {
 
   aws_auth_computed = dependency.eks.outputs.aws_auth_configmap_yaml
 
-  aws_auth = <<-EOF
-    data:
-      mapUsers: |
-        - userarn: arn:aws:iam::161285725140:user/klefevre
-          username: admin
-          groups:
-            - system:masters
+  aws_auth_extra_roles = <<-EOF
+    - rolearn: arn:aws:iam::00000:role/demo
+      username: admin
+      groups:
+        - system:masters
+    EOF
+  aws_auth_extra_users = <<-EOF
+    mapUsers: |
+      - userarn: arn:aws:iam::161285725140:user/klefevre
+        username: admin
+        groups:
+          - system:masters
     EOF
 }
