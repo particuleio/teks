@@ -21,7 +21,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v4.3.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v4.5.0"
 }
 
 generate "provider-local" {
@@ -95,9 +95,9 @@ inputs = {
     target_path           = "gitops/clusters/${include.root.locals.merged.env}/${include.root.locals.merged.name}"
     github_url            = "ssh://git@github.com/particuleio/teks"
     repository            = "teks"
-    branch                = "main"
+    branch                = "flux"
     repository_visibility = "public"
-    version               = "v0.25.3"
+    version               = "v0.27.1"
     auto_image_update     = true
   }
 
