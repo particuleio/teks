@@ -1,0 +1,15 @@
+pull_request_rules:
+  - name: Automatic merge on approval
+    conditions:
+      - base=main
+      - "approved-reviews-by>=1"
+    actions:
+      merge:
+        method: squash
+  - name: Automatic merge on approval release
+    conditions:
+      - base=release
+      - "approved-reviews-by>=1"
+    actions:
+      merge:
+        method: merge
