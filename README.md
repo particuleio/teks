@@ -108,7 +108,7 @@ support a bunch of various configuration.
 
 [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) is available
 for node groups (see example
-(here)[https://github.com/particuleio/teks/tree/main/terragrunt/live/production/eu-west-1/clusters/demo/eks]).
+[here](https://github.com/particuleio/teks/tree/main/terragrunt/live/production/eu-west-1/clusters/demo/eks)).
 Bottle rocket is a container centric OS with less attack surface and no default
 shell.
 
@@ -190,7 +190,7 @@ Our cutting edges addons include (not limited to):
   * [AWS EFS CSI Drivers](https://secrets-store-csi-driver.sigs.k8s.io/): Use AWS NFS shares.
   * [Secret Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/): load
       secret from Secret Managers with
-      [`aws-secret-store-csi-driver`(https://github.com/aws/secrets-store-csi-driver-provider-aws)]
+      `aws-secret-store-csi-driver` [driver](https://github.com/aws/secrets-store-csi-driver-provider-aws)
   * [Linkerd2](https://linkerd.io/) or [Certificate Manager CSI](https://cert-manager.io/docs/usage/csi/) for mTLS
 
 
@@ -212,7 +212,7 @@ how to setup tooling
 ### ASDF
 
 [ASDF](https://asdf-vm.com/) is a package manager which is great for managing
-cloud native tooling. More info [here](https://particule.io/blog/asdf/)(eg.
+cloud native tooling. More info [here](https://particule.io/blog/asdf/) (eg.
 French).
 
 #### Enabling plugins
