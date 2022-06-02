@@ -17,7 +17,7 @@ include "encryption_config" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.22.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.23.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
