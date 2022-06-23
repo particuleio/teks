@@ -16,12 +16,24 @@ include "encryption_config" {
   merge_strategy = "deep"
 }
 
+locals {
+  full_name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.provider}-${include.root.locals.merged.env}-${include.root.locals.merged.aws_region}"
+
+  mng_tags = merge(
+    include.root.locals.custom_tags,
+    {
+      VantaDescription : "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-eks-mng",
+      CreateAutoAlarms : true,
+    }
+  )
+}
+
 terraform {
   source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.26.1"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
-    execute  = ["bash", "-c", "aws eks update-kubeconfig --name ${include.root.locals.full_name} --kubeconfig  ${get_terragrunt_dir()}/kubeconfig 2>/dev/null"]
+    execute  = ["bash", "-c", "aws eks update-kubeconfig --name ${local.full_name} --role-arn arn:aws:iam::${include.root.locals.merged.aws_account_id}:role/github-action-iac-administrator --kubeconfig ${get_terragrunt_dir()}/kubeconfig 2>/dev/null"]
   }
 
   after_hook "kube-system-label" {
@@ -64,7 +76,7 @@ inputs = {
   manage_aws_auth_configmap = true
 
   cluster_name                    = include.root.locals.full_name
-  cluster_version                 = "1.21"
+  cluster_version                 = "1.22"
   cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -76,15 +88,15 @@ inputs = {
   ]
   cluster_addons = {
     coredns = {
-      addon_version     = "v1.8.4-eksbuild.1"
+      addon_version     = "v1.8.7-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
     kube-proxy = {
-      addon_version     = "v1.21.2-eksbuild.2"
+      addon_version     = "v1.22.6-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
     vpc-cni = {
-      addon_version     = "v1.10.1-eksbuild.1"
+      addon_version     = "v1.11.0-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
   }

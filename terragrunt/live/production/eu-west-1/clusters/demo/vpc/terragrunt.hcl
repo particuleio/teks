@@ -8,36 +8,38 @@ terraform {
   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.14.2"
 }
 
+dependency "datasources" {
+  config_path = "../../../datasources"
+}
+
 locals {
-  azs = [
-    "${include.root.locals.merged.aws_region}a",
-    "${include.root.locals.merged.aws_region}b",
-    "${include.root.locals.merged.aws_region}c"
-  ]
-  cidr            = "10.0.0.0/16"
-  subnets         = cidrsubnets(local.cidr, 3, 3, 3, 3, 3, 3)
-  private_subnets = chunklist(local.subnets, 3)[0]
-  public_subnets  = chunklist(local.subnets, 3)[1]
+  vpc_cidr         = "10.42.0.0/16"
+  full_name        = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}"
+  eks_cluster_name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.provider}-${include.root.locals.merged.env}-${include.root.locals.merged.aws_region}"
 }
 
 inputs = {
 
   tags = merge(
-    include.root.locals.custom_tags
+    include.root.locals.custom_tags,
+    {
+      "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared",
+    }
   )
 
-  name = include.root.locals.full_name
+  name = local.full_name
+  cidr = local.vpc_cidr
+  azs  = dependency.datasources.outputs.aws_availability_zones.names
 
-  cidr = local.cidr
-
-  azs             = local.azs
-  private_subnets = local.private_subnets
-  public_subnets  = local.public_subnets
+  intra_subnets   = [for k, v in slice(dependency.datasources.outputs.aws_availability_zones.names, 0, 3) : cidrsubnet(local.vpc_cidr, 8, k)]
+  public_subnets  = [for k, v in slice(dependency.datasources.outputs.aws_availability_zones.names, 0, 3) : cidrsubnet(local.vpc_cidr, 3, k + 1)]
+  private_subnets = [for k, v in slice(dependency.datasources.outputs.aws_availability_zones.names, 0, 3) : cidrsubnet(local.vpc_cidr, 3, k + 4)]
 
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
   public_subnet_ipv6_prefixes     = [0, 1, 2]
   private_subnet_ipv6_prefixes    = [3, 4, 5]
+  intra_subnet_ipv6_prefixes      = [6, 7, 8]
 
   enable_nat_gateway = true
   single_nat_gateway = true
@@ -45,13 +47,39 @@ inputs = {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
+  manage_default_security_group = true
+
+  default_security_group_egress = [
+    {
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = "0.0.0.0/0"
+      ipv6_cidr_blocks = "::/0"
+    }
+  ]
+  default_security_group_ingress = [
+    {
+      from_port        = 0
+      to_port          = 0
+      protocol         = "-1"
+      cidr_blocks      = "0.0.0.0/0"
+      ipv6_cidr_blocks = "::/0"
+    }
+  ]
+
   public_subnet_tags = {
-    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/elb"                                 = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                          = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/internal-elb"                        = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"                 = "1"
   }
+
+  enable_flow_log                                 = true
+  create_flow_log_cloudwatch_log_group            = true
+  create_flow_log_cloudwatch_iam_role             = true
+  flow_log_cloudwatch_log_group_retention_in_days = 365
 }

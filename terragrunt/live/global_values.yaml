@@ -1,4 +1,5 @@
 ---
+provider: aws
 # Your AWS Account ID
 aws_account_id: 161285725140
 

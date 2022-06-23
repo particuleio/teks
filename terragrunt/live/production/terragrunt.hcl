@@ -1,15 +1,15 @@
 skip                          = true
-terragrunt_version_constraint = ">= 0.32"
+terragrunt_version_constraint = ">= 0.36"
 
 remote_state {
   backend = "s3"
 
   config = {
-    bucket         = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-tg-state-store"
-    key            = "${path_relative_to_include()}/terraform.tfstate"
-    region         = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["tf_state_bucket_region"]}"
+    bucket         = "${local.merged.prefix}-${local.merged.env}-tg-state-store"
+    key            = "${local.merged.provider}/${path_relative_to_include()}/terraform.tfstate"
+    region         = local.merged.tf_state_bucket_region
     encrypt        = true
-    dynamodb_table = "${yamldecode(file(find_in_parent_folders("global_values.yaml")))["prefix"]}-${yamldecode(file(find_in_parent_folders("env_values.yaml")))["env"]}-tg-state-lock"
+    dynamodb_table = "${local.merged.prefix}-${local.merged.env}-tg-state-lock"
   }
 
   generate = {
@@ -20,23 +20,25 @@ remote_state {
 
 locals {
   merged = merge(
-    yamldecode(file(find_in_parent_folders("global_values.yaml"))),
-    yamldecode(file(find_in_parent_folders("env_values.yaml"))),
-    yamldecode(file(find_in_parent_folders("region_values.yaml"))),
-    yamldecode(file(find_in_parent_folders("component_values.yaml")))
+    try(yamldecode(file(find_in_parent_folders("global_values.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("env_values.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("zone_values.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("region_values.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("component_values.yaml"))), {})
   )
   custom_tags = merge(
-    yamldecode(file(find_in_parent_folders("global_tags.yaml"))),
-    yamldecode(file(find_in_parent_folders("env_tags.yaml"))),
-    yamldecode(file(find_in_parent_folders("region_tags.yaml"))),
-    yamldecode(file(find_in_parent_folders("component_tags.yaml")))
+    try(yamldecode(file(find_in_parent_folders("global_tags.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("env_tags.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("zone_tags.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("region_tags.yaml"))), {}),
+    try(yamldecode(file(find_in_parent_folders("component_tags.yaml"))), {})
   )
   full_name = "${local.merged.prefix}-${local.merged.env}-${local.merged.name}"
 }
 
 generate "provider-aws" {
   path      = "provider-aws.tf"
-  if_exists = "overwrite"
+  if_exists = "overwrite_terragrunt"
   contents  = <<-EOF
     variable "provider_default_tags" {
       type = map
