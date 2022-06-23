@@ -18,11 +18,18 @@ inputs = {
   vpc_id = dependency.vpc.outputs.vpc_id
   endpoints = {
     s3 = {
-      service             = "s3"
-      service_type        = "Gateway"
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = flatten([dependency.vpc.outputs.private_route_table_ids, dependency.vpc.outputs.public_route_table_ids])
+      tags            = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-s3-vpc-endpoint" }
+    },
+    kms = {
+      service             = "kms"
+      service_type        = "Interface"
+      subnet_ids          = flatten([dependency.vpc.outputs.private_subnets])
+      security_group_ids  = [dependency.vpc.outputs.default_security_group_id]
       private_dns_enabled = true
-      route_table_ids     = flatten([dependency.vpc.outputs.intra_route_table_ids, dependency.vpc.outputs.private_route_table_ids, dependency.vpc.outputs.public_route_table_ids])
-      tags                = { Name = "s3-vpc-endpoint" }
+      tags                = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-kms-vpc-endpoint" }
     },
   }
   tags = merge(
