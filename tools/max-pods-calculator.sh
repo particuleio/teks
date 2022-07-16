@@ -161,4 +161,3 @@ if [ "$CPU_COUNT" -gt 30 ] ; then
 else
     echo $(min_number $MAX_POD_CEILING_FOR_LOW_CPU $max_pods)
 fi
-

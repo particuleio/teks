@@ -13,7 +13,7 @@ dependency "datasources" {
 }
 
 locals {
-  vpc_cidr         = "10.42.0.0/16"
+  vpc_cidr = "10.42.0.0/16"
 }
 
 inputs = {
@@ -68,12 +68,12 @@ inputs = {
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/elb"                          = "1"
+    "kubernetes.io/role/elb"                                 = "1"
   }
 
   private_subnet_tags = {
     "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/internal-elb"                 = "1"
+    "kubernetes.io/role/internal-elb"                        = "1"
   }
 
   enable_flow_log                                 = true
