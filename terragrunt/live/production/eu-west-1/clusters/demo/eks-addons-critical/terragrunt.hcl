@@ -103,7 +103,7 @@ inputs = {
   }
 
   velero = {
-    enabled = true
+    enabled      = true
     extra_values = <<-EXTRA_VALUES
       nodeSelector:
         kubernetes.io/arch: amd64

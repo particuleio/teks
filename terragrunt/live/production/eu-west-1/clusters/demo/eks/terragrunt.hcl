@@ -95,7 +95,7 @@ inputs = {
     }
   }
 
-  vpc_id     = dependency.vpc.outputs.vpc_id
+  vpc_id                   = dependency.vpc.outputs.vpc_id
   control_plane_subnet_ids = dependency.vpc.outputs.intra_subnets
 
   enable_irsa = true
