@@ -82,12 +82,6 @@ inputs = {
     EXTRA_VALUES
   }
 
-  external-dns = {
-    external-dns = {
-      enabled = true
-    },
-  }
-
   # For this to work:
   # * GITHUB_TOKEN should be set
   flux2 = {

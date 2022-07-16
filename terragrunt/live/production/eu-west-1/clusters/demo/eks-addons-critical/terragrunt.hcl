@@ -83,6 +83,12 @@ inputs = {
     enabled = true
   }
 
+  external-dns = {
+    external-dns = {
+      enabled = true
+    },
+  }
+
   metrics-server = {
     enabled       = true
     allowed_cidrs = dependency.vpc.outputs.intra_subnets_cidr_blocks
