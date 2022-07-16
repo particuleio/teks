@@ -14,8 +14,6 @@ dependency "datasources" {
 
 locals {
   vpc_cidr         = "10.42.0.0/16"
-  full_name        = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}"
-  eks_cluster_name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.provider}-${include.root.locals.merged.env}-${include.root.locals.merged.aws_region}"
 }
 
 inputs = {
@@ -23,11 +21,11 @@ inputs = {
   tags = merge(
     include.root.locals.custom_tags,
     {
-      "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared",
+      "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared",
     }
   )
 
-  name = local.full_name
+  name = include.root.locals.full_name
   cidr = local.vpc_cidr
   azs  = dependency.datasources.outputs.aws_availability_zones.names
 
@@ -69,12 +67,12 @@ inputs = {
   ]
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
     "kubernetes.io/role/elb"                          = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.eks_cluster_name}" = "shared"
+    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
     "kubernetes.io/role/internal-elb"                 = "1"
   }
 
@@ -82,4 +80,5 @@ inputs = {
   create_flow_log_cloudwatch_log_group            = true
   create_flow_log_cloudwatch_iam_role             = true
   flow_log_cloudwatch_log_group_retention_in_days = 365
+  flow_log_traffic_type                           = "REJECT"
 }
