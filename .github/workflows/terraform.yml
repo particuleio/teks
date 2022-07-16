@@ -45,7 +45,9 @@ jobs:
     - name: 'asdf:install'
       uses: asdf-vm/actions/install@v1.1.0
 
-    - uses: actions/setup-python@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version-file: '.python-version'
 
     - name: Init tooling
       run: |
