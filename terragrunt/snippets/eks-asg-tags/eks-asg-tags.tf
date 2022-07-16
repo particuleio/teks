@@ -1,70 +1,92 @@
+locals {
+  mngs         = var.eks_managed_node_groups
+  mng_defaults = var.eks_managed_node_group_defaults
+
+  cluster_name = var.cluster_name
+
+  taint_effects = {
+    NO_SCHEDULE        = "NoSchedule"
+    NO_EXECUTE         = "NoExecute"
+    PREFER_NO_SCHEDULE = "PreferNoSchedule"
+  }
+
+  mng_ca_tags_defaults = {
+    "k8s.io/cluster-autoscaler/enabled"               = "true"
+    "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
+  }
+
+  mng_ca_tags_taints_defaults = try(local.mng_defaults.taints, []) != [] ? {
+    for taint in local.mng_defaults.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}" => "${taint.value}:${local.taint_effects[taint.effect]}"
+  } : {}
+
+  mng_ca_tags_labels_defaults = try(local.mng_defaults.labels, {}) != {} ? {
+    for label_key, label_value in local.mng_defaults.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value
+  } : {}
+
+  mng_ca_tags_taints = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    { for taint in mng_value.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}" => "${taint.value}:${local.taint_effects[taint.effect]}" }
+    ) if try(mng_value.taints, []) != []
+  }
+
+  mng_ca_tags_labels = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    { for label_key, label_value in mng_value.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value },
+    ) if try(mng_value.labels, {}) != {}
+  }
+
+  mng_ca_tags_restricted_labels = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    { for label_key, label_value in mng_value.restricted_labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value },
+    ) if try(mng_value.restricted_labels, {}) != {}
+  }
+
+  mng_ca_tags_implicit = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    length(try(mng_value.instance_types, local.mng_defaults.instance_types)) == 1 ? { "k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/instance-type" = one(try(mng_value.instance_types, local.mng_defaults.instance_types)) } : {},
+    length(try(mng_value.subnet_ids, local.mng_defaults.subnet_ids)) == 1 ? { "k8s.io/cluster-autoscaler/node-template/label/topology.ebs.csi.aws.com/zone" = one(data.aws_autoscaling_group.node_groups[mng_key].availability_zones) } : {},
+    length(try(mng_value.subnet_ids, local.mng_defaults.subnet_ids)) == 1 ? { "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/zone" = one(data.aws_autoscaling_group.node_groups[mng_key].availability_zones) } : {},
+    )
+  }
+
+  mng_ca_tags = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    local.mng_ca_tags_defaults,
+    local.mng_ca_tags_taints_defaults,
+    local.mng_ca_tags_labels_defaults,
+    try(local.mng_ca_tags_taints[mng_key], {}),
+    try(local.mng_ca_tags_labels[mng_key], {}),
+    try(local.mng_ca_tags_restricted_labels[mng_key], {}),
+    local.mng_ca_tags_implicit[mng_key],
+  ) }
+
+  mng_asg_custom_tags = { for mng_key, mng_value in local.mngs : mng_key => merge(var.tags, try(local.mng_defaults.tags, {}), try(mng_value.tags, {})) }
+}
+
 data "aws_autoscaling_group" "node_groups" {
   for_each = module.eks_managed_node_group
   name     = each.value.node_group_resources.0.autoscaling_groups.0.name
 }
 
-data "aws_arn" "node_groups" {
-  for_each = data.aws_autoscaling_group.node_groups
-  arn      = each.value.arn
-}
+resource "aws_autoscaling_group_tag" "mng_ca" {
+  # Create a tuple in a map for each ASG tag combo
+  for_each = merge([for mng_key, mng_tags in local.mng_ca_tags : { for tag_key, tag_value in mng_tags : "${mng_key}-${substr(tag_key, 25, -1)}" => { mng = mng_key, key = tag_key, value = tag_value } }]...)
 
-resource "null_resource" "node_groups_asg_tags" {
-  for_each = data.aws_autoscaling_group.node_groups
+  # Lookup the ASG name for the MNG, erroring if there is more than one
+  autoscaling_group_name = one(module.eks_managed_node_group[each.value.mng].node_group_autoscaling_group_names)
 
-  triggers = {
-    asg               = each.value.arn
-    labels            = jsonencode(lookup(var.eks_managed_node_groups[each.key], "labels", null))
-    taints            = jsonencode(lookup(var.eks_managed_node_groups[each.key], "taint", null))
-    restricted_labels = jsonencode(lookup(var.eks_managed_node_groups[each.key], "restricted_labels", null))
-    instance_types    = jsonencode(lookup(var.eks_managed_node_groups[each.key], "instance_types", null))
-    filemd5           = filemd5("eks-asg-tags.tf")
+  tag {
+    key                 = each.value.key
+    value               = each.value.value
+    propagate_at_launch = false
   }
-
-  provisioner "local-exec" {
-    command = <<EOF
-
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${lookup(var.eks_managed_node_groups[each.key], "labels", null) == null ? "[]" : jsonencode([for k, v in var.eks_managed_node_groups[each.key].labels : {
-    "ResourceId" : each.value.name
-    "ResourceType" : "auto-scaling-group",
-    "Key" : "k8s.io/cluster-autoscaler/node-template/label/${k}",
-    "Value" : v,
-    "PropagateAtLaunch" : true
-    }])}'
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${lookup(var.eks_managed_node_groups[each.key], "restricted_labels", null) == null ? "[]" : jsonencode([for k, v in var.eks_managed_node_groups[each.key].restricted_labels : {
-    "ResourceId" : each.value.name
-    "ResourceType" : "auto-scaling-group",
-    "Key" : "k8s.io/cluster-autoscaler/node-template/label/${k}",
-    "Value" : v,
-    "PropagateAtLaunch" : true
-  }])}'
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${jsonencode({
-  "ResourceId" : each.value.name
-  "ResourceType" : "auto-scaling-group",
-  "Key" : "k8s.io/cluster-autoscaler/node-template/label/topology.kubernetes.io/zone",
-  "Value" : one(data.aws_autoscaling_group.node_groups[each.key].availability_zones),
-  "PropagateAtLaunch" : true
-  })}'
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${jsonencode({
-  "ResourceId" : each.value.name
-  "ResourceType" : "auto-scaling-group",
-  "Key" : "k8s.io/cluster-autoscaler/node-template/label/topology.ebs.csi.aws.com/zone",
-  "Value" : one(data.aws_autoscaling_group.node_groups[each.key].availability_zones),
-  "PropagateAtLaunch" : true
-  })}'
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${jsonencode({
-  "ResourceId" : each.value.name
-  "ResourceType" : "auto-scaling-group",
-  "Key" : "k8s.io/cluster-autoscaler/node-template/label/node.kubernetes.io/instance-type",
-  "Value" : one(var.eks_managed_node_groups[each.key].instance_types),
-  "PropagateAtLaunch" : true
-  })}'
-    aws autoscaling create-or-update-tags --region ${data.aws_arn.node_groups[each.key].region} --tags '${lookup(var.eks_managed_node_groups[each.key], "taint", null) == null ? "[]" : jsonencode([for i in var.eks_managed_node_groups[each.key].taint : {
-    "ResourceId" : each.value.name
-    "ResourceType" : "auto-scaling-group",
-    "Key" : "k8s.io/cluster-autoscaler/node-template/taint/${i.key}",
-    "Value" : "${i.value}:${replace(title(replace(lower(i.effect), "_", " ")), " ", "")}",
-    "PropagateAtLaunch" : true
-}])}'
-    EOF
 }
+
+resource "aws_autoscaling_group_tag" "mng_asg_tags" {
+  # Create a tuple in a map for each ASG tag combo
+  for_each = merge([for mng_key, mng_tags in local.mng_asg_custom_tags : { for tag_key, tag_value in mng_tags : "${mng_key}-${tag_key}" => { mng = mng_key, key = tag_key, value = tag_value } }]...)
+
+  # Lookup the ASG name for the MNG, erroring if there is more than one
+  autoscaling_group_name = one(module.eks_managed_node_group[each.value.mng].node_group_autoscaling_group_names)
+
+  tag {
+    key                 = each.value.key
+    value               = each.value.value
+    propagate_at_launch = true
+  }
 }
