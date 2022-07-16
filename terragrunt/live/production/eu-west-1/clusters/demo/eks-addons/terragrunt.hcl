@@ -21,7 +21,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v7.0.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v8.1.0"
 }
 
 generate "provider-local" {
@@ -75,17 +75,17 @@ inputs = {
 
   cluster-autoscaler = {
     enabled      = true
-    version      = "v1.21.2"
+    version      = "v1.22.2"
     extra_values = <<-EXTRA_VALUES
-      extraArgs:
-        scale-down-utilization-threshold: 0.7
-      EXTRA_VALUES
+    extraArgs:
+      scale-down-utilization-threshold: 0.7
+    EXTRA_VALUES
   }
 
   external-dns = {
     external-dns = {
       enabled = true
-    }
+    },
   }
 
   # For this to work:
@@ -97,38 +97,19 @@ inputs = {
     repository            = "teks"
     branch                = "flux"
     repository_visibility = "public"
-    version               = "v0.27.1"
+    version               = "v0.31.3"
     auto_image_update     = true
-  }
-
-  ingress-nginx = {
-    enabled       = true
-    use_nlb_ip    = true
-    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
-    extra_values  = <<-EXTRA_VALUES
-      controller:
-        ingressClassResource:
-          enabled: true
-          default: true
-        replicaCount: 2
-        minAvailable: 1
-        kind: "Deployment"
-        resources:
-          requests:
-            cpu: 100m
-            memory: 64Mi
-      EXTRA_VALUES
   }
 
   kube-prometheus-stack = {
     enabled                     = true
-    allowed_cidrs               = dependency.vpc.outputs.private_subnets_cidr_blocks
+    allowed_cidrs               = dependency.vpc.outputs.intra_subnets_cidr_blocks
     thanos_sidecar_enabled      = true
     thanos_bucket_force_destroy = true
     extra_values                = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 8.3.4
+          tag: 9.0.3
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -225,6 +206,34 @@ inputs = {
         }
       },
     ]
+  }
+
+  ingress-nginx = {
+    enabled       = true
+    use_nlb_ip    = true
+    allowed_cidrs = dependency.vpc.outputs.intra_subnets_cidr_blocks
+    extra_values  = <<-EXTRA_VALUES
+      controller:
+        ingressClassResource:
+          enabled: true
+          default: true
+        replicaCount: 2
+        minAvailable: 1
+        kind: "Deployment"
+        resources:
+          requests:
+            cpu: 300m
+            memory: 128Mi
+        service:
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: preserve_client_ip.enabled=true
+      defaultBackend:
+        enabled: true
+        replicaCount: 2
+        minAvailable: 0
+        nodeSelector:
+          kubernetes.io/arch: amd64
+      EXTRA_VALUES
   }
 
   promtail = {

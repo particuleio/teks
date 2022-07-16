@@ -17,23 +17,17 @@ include "encryption_config" {
 }
 
 locals {
-  full_name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.provider}-${include.root.locals.merged.env}-${include.root.locals.merged.aws_region}"
-
   mng_tags = merge(
     include.root.locals.custom_tags,
-    {
-      VantaDescription : "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-eks-mng",
-      CreateAutoAlarms : true,
-    }
   )
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.26.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.26.3"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
-    execute  = ["bash", "-c", "aws eks update-kubeconfig --name ${local.full_name} --role-arn arn:aws:iam::${include.root.locals.merged.aws_account_id}:role/github-action-iac-administrator --kubeconfig ${get_terragrunt_dir()}/kubeconfig 2>/dev/null"]
+    execute  = ["bash", "-c", "aws eks update-kubeconfig --name ${include.root.locals.full_name} --kubeconfig ${get_terragrunt_dir()}/kubeconfig 2>/dev/null"]
   }
 
   after_hook "kube-system-label" {
@@ -96,17 +90,17 @@ inputs = {
       resolve_conflicts = "OVERWRITE"
     }
     vpc-cni = {
-      addon_version     = "v1.11.0-eksbuild.1"
+      addon_version     = "v1.11.2-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
   }
 
   vpc_id     = dependency.vpc.outputs.vpc_id
-  subnet_ids = dependency.vpc.outputs.private_subnets
+  control_plane_subnet_ids = dependency.vpc.outputs.intra_subnets
 
   enable_irsa = true
 
-  cloudwatch_log_group_retention_in_days = 7
+  cloudwatch_log_group_retention_in_days = 365
 
   node_security_group_additional_rules = {
     ingress_self_all = {
@@ -123,17 +117,49 @@ inputs = {
       type                          = "ingress"
       source_cluster_security_group = true
     }
-    ingress_node_port_tcp = {
-      from_port        = 30000
-      to_port          = 32767
+    ingress_node_port_tcp_1 = {
+      from_port        = 1025
+      to_port          = 5472 # Exclude calico-typha port 5473
+      protocol         = "tcp"
+      type             = "ingress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    ingress_node_port_tcp_2 = {
+      from_port        = 5474
+      to_port          = 10249 # Exclude kubelet port 10250
+      protocol         = "tcp"
+      type             = "ingress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    ingress_node_port_tcp_3 = {
+      from_port        = 10251
+      to_port          = 10255 # Exclude kube-proxy HCHK port 10256
+      protocol         = "tcp"
+      type             = "ingress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    ingress_node_port_tcp_4 = {
+      from_port        = 10257
+      to_port          = 61677 # Exclude aws-node port 61678
+      protocol         = "tcp"
+      type             = "ingress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    ingress_node_port_tcp_5 = {
+      from_port        = 61679
+      to_port          = 65535
       protocol         = "tcp"
       type             = "ingress"
       cidr_blocks      = ["0.0.0.0/0"]
       ipv6_cidr_blocks = ["::/0"]
     }
     ingress_node_port_udp = {
-      from_port        = 30000
-      to_port          = 32767
+      from_port        = 1025
+      to_port          = 65535
       protocol         = "udp"
       type             = "ingress"
       cidr_blocks      = ["0.0.0.0/0"]
@@ -150,19 +176,37 @@ inputs = {
   }
 
   eks_managed_node_group_defaults = {
-    force_update_version         = true
+    tags                         = local.mng_tags
     desired_size                 = 1
-    min_size                     = 0
-    max_size                     = 10
-    ebs_optimized                = true
+    min_size                     = 1
+    max_size                     = 100
     capacity_type                = "ON_DEMAND"
+    platform                     = "bottlerocket"
+    ami_release_version          = "1.8.0-a6233c22"
     iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+    ebs_optimized                = true
+    update_config = {
+      max_unavailable_percentage = 33
+    }
     block_device_mappings = {
       root = {
         device_name = "/dev/xvda"
         ebs = {
-          volume_size = 15
-          volume_type = "gp3"
+          volume_size           = 2
+          volume_type           = "gp3"
+          delete_on_termination = true
+          encrypted             = true
+          kms_key_id            = dependency.encryption_config.outputs.arn
+        }
+      }
+      containers = {
+        device_name = "/dev/xvdb"
+        ebs = {
+          volume_size           = 15
+          volume_type           = "gp3"
+          delete_on_termination = true
+          encrypted             = true
+          kms_key_id            = dependency.encryption_config.outputs.arn
         }
       }
     }
@@ -171,25 +215,12 @@ inputs = {
   eks_managed_node_groups = {
 
     "default-a" = {
-      desired_size            = 1
-      ami_type                = "AL2_x86_64"
-      platform                = "linux"
-      instance_types          = ["t3a.large"]
-      subnet_ids              = [dependency.vpc.outputs.private_subnets[0]]
-      pre_bootstrap_user_data = <<-EOT
-        #!/bin/bash
-        set -ex
-        cat <<-EOF > /etc/profile.d/bootstrap.sh
-        export CONTAINER_RUNTIME="containerd"
-        export USE_MAX_PODS=false
-        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
-        EOF
-        # Source extra environment variables in bootstrap script
-        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
-        cd /tmp
-        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-        sudo systemctl enable amazon-ssm-agent
-        sudo systemctl start amazon-ssm-agent
+      ami_type                   = "BOTTLEROCKET_x86_64"
+      instance_types             = ["t3a.large"]
+      subnet_ids                 = [dependency.vpc.outputs.private_subnets[0]]
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args       = <<-EOT
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"
@@ -198,35 +229,12 @@ inputs = {
 
     "default-b" = {
       ami_type                   = "BOTTLEROCKET_x86_64"
-      platform                   = "bottlerocket"
       instance_types             = ["t3a.large"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[1]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
-      block_device_mappings = {
-        root = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 2
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-        containers = {
-          device_name = "/dev/xvdb"
-          ebs = {
-            volume_size           = 20
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-      }
       labels = {
         network = "private"
       }
@@ -239,53 +247,20 @@ inputs = {
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[2]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
-      block_device_mappings = {
-        root = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 2
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-        containers = {
-          device_name = "/dev/xvdb"
-          ebs = {
-            volume_size           = 20
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-      }
       labels = {
         network = "private"
       }
     }
 
     "arm-a" = {
-      ami_type                = "AL2_ARM_64"
-      instance_types          = ["t4g.medium"]
-      subnet_ids              = [dependency.vpc.outputs.private_subnets[0]]
-      pre_bootstrap_user_data = <<-EOT
-        #!/bin/bash
-        set -ex
-        cat <<-EOF > /etc/profile.d/bootstrap.sh
-        export CONTAINER_RUNTIME="containerd"
-        export USE_MAX_PODS=false
-        export KUBELET_EXTRA_ARGS="--max-pods=${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}"
-        EOF
-        # Source extra environment variables in bootstrap script
-        sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
-        cd /tmp
-        sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_arm64/amazon-ssm-agent.rpm
-        sudo systemctl enable amazon-ssm-agent
-        sudo systemctl start amazon-ssm-agent
+      ami_type                   = "BOTTLEROCKET_ARM_64"
+      instance_types             = ["t4g.medium"]
+      subnet_ids                 = [dependency.vpc.outputs.private_subnets[0]]
+      enable_bootstrap_user_data = true
+      bootstrap_extra_args       = <<-EOT
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"
@@ -294,35 +269,12 @@ inputs = {
 
     "arm-b" = {
       ami_type                   = "BOTTLEROCKET_ARM_64"
-      platform                   = "bottlerocket"
       instance_types             = ["t4g.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[1]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
-      block_device_mappings = {
-        root = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 2
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-        containers = {
-          device_name = "/dev/xvdb"
-          ebs = {
-            volume_size           = 20
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-      }
       labels = {
         network = "private"
       }
@@ -330,35 +282,12 @@ inputs = {
 
     "arm-c" = {
       ami_type                   = "BOTTLEROCKET_ARM_64"
-      platform                   = "bottlerocket"
       instance_types             = ["t4g.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[2]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.large --cni-version 1.10.1 --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version 1.11.2 --cni-prefix-delegation-enabled")}
         EOT
-      block_device_mappings = {
-        root = {
-          device_name = "/dev/xvda"
-          ebs = {
-            volume_size           = 2
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-        containers = {
-          device_name = "/dev/xvdb"
-          ebs = {
-            volume_size           = 20
-            volume_type           = "gp3"
-            delete_on_termination = true
-            encrypted             = true
-            kms_key_id            = dependency.encryption_config.outputs.arn
-          }
-        }
-      }
       labels = {
         network = "private"
       }

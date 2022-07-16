@@ -17,7 +17,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v7.0.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v8.1.0"
 }
 
 generate "provider-local" {
@@ -60,7 +60,7 @@ inputs = {
 
   aws-for-fluent-bit = {
     enabled                          = true
-    containers_log_retention_in_days = 14
+    containers_log_retention_in_days = 365
   }
 
   aws-ebs-csi-driver = {
@@ -72,7 +72,11 @@ inputs = {
   }
 
   aws-load-balancer-controller = {
-    enabled = true
+    enabled      = true
+    extra_values = <<-EXTRA_VALUES
+      image:
+        repository: 602401143452.dkr.ecr.eu-west-1.amazonaws.com/amazon/aws-load-balancer-controller
+      EXTRA_VALUES
   }
 
   csi-external-snapshotter = {
@@ -81,7 +85,7 @@ inputs = {
 
   metrics-server = {
     enabled       = true
-    allowed_cidrs = dependency.vpc.outputs.private_subnets_cidr_blocks
+    allowed_cidrs = dependency.vpc.outputs.intra_subnets_cidr_blocks
   }
 
   npd = {
@@ -98,4 +102,11 @@ inputs = {
     enabled = true
   }
 
+  velero = {
+    enabled = true
+    extra_values = <<-EXTRA_VALUES
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      EXTRA_VALUES
+  }
 }
