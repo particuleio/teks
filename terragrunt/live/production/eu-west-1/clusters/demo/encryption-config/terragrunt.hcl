@@ -5,7 +5,7 @@ include "root" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-aws-kms.git?ref=v1.1.0"
+  source = "github.com/particuleio/terraform-aws-kms.git?ref=v1.2.0"
 }
 
 inputs = {
