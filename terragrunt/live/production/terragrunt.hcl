@@ -63,4 +63,4 @@ generate "provider-aws" {
 
 # Use this to impersonate a role, useful for EKS when you want a role to be
 # the "root" use and not a personal AWS account
-# iam_role = "arn:aws:iam::${yamldecode(file("global_values.yaml"))["aws_account_id"]}:role/administrator"
+# iam_role = "arn:aws:iam::${yamldecode(file(find_in_parent_folders("global_values.yaml")))["aws_account_id"]}:role/administrator"
