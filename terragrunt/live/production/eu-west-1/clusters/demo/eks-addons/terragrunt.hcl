@@ -178,8 +178,7 @@ inputs = {
           nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
           nginx.ingress.kubernetes.io/auth-tls-secret: "telemetry/loki-ca"
         hosts:
-          - host: logz.${include.root.locals.merged.default_domain_name}
-            paths: ["/"]
+          - logz.${include.root.locals.merged.default_domain_name}
         tls:
           - secretName: logz.${include.root.locals.merged.default_domain_name}
             hosts:
