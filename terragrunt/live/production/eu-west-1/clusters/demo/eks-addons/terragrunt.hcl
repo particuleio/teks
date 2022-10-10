@@ -21,7 +21,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v9.4.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v10.1.1"
 }
 
 generate "provider-local" {
@@ -75,7 +75,7 @@ inputs = {
 
   cluster-autoscaler = {
     enabled      = true
-    version      = "v1.22.2"
+    version      = "v1.23.1"
     extra_values = <<-EXTRA_VALUES
     extraArgs:
       scale-down-utilization-threshold: 0.7
@@ -91,19 +91,20 @@ inputs = {
     repository            = "teks"
     branch                = "flux"
     repository_visibility = "public"
-    version               = "v0.31.3"
+    version               = "v0.35.0"
     auto_image_update     = true
   }
 
   kube-prometheus-stack = {
-    enabled                     = true
-    allowed_cidrs               = dependency.vpc.outputs.intra_subnets_cidr_blocks
-    thanos_sidecar_enabled      = true
-    thanos_bucket_force_destroy = true
-    extra_values                = <<-EXTRA_VALUES
+    enabled                           = true
+    allowed_cidrs                     = dependency.vpc.outputs.intra_subnets_cidr_blocks
+    thanos_sidecar_enabled            = true
+    thanos_bucket_force_destroy       = true
+    grafana_create_iam_resources_irsa = true
+    extra_values                      = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 9.0.3
+          tag: 9.1.7
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -161,7 +162,7 @@ inputs = {
         limits:
           cpu: 2
           memory: 4Gi
-      config:
+      loki:
         limits_config:
           ingestion_rate_mb: 320
           ingestion_burst_size_mb: 512
@@ -178,8 +179,7 @@ inputs = {
           nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
           nginx.ingress.kubernetes.io/auth-tls-secret: "telemetry/loki-ca"
         hosts:
-          - host: logz.${include.root.locals.merged.default_domain_name}
-            paths: ["/"]
+          - logz.${include.root.locals.merged.default_domain_name}
         tls:
           - secretName: logz.${include.root.locals.merged.default_domain_name}
             hosts:
@@ -196,7 +196,7 @@ inputs = {
           },
         ]
         expiration = {
-          days = 30
+          days = 365
         }
       },
     ]

@@ -1,12 +1,12 @@
 repos:
   - repo: https://github.com/gitguardian/gg-shield
-    rev: v1.12.0
+    rev: v1.13.3
     hooks:
       - id: ggshield
         language_version: python3
         stages: [commit]
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.74.1
+    rev: v1.76.0
     hooks:
       - id: terraform_fmt
       - id: terraform_docs

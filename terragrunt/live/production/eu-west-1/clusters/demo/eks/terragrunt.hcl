@@ -70,7 +70,7 @@ inputs = {
   manage_aws_auth_configmap = true
 
   cluster_name                    = include.root.locals.full_name
-  cluster_version                 = "1.22"
+  cluster_version                 = "1.23"
   cluster_enabled_log_types       = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
@@ -82,15 +82,15 @@ inputs = {
   ]
   cluster_addons = {
     coredns = {
-      addon_version     = "v1.8.7-eksbuild.1"
+      addon_version     = "v1.8.7-eksbuild.3"
       resolve_conflicts = "OVERWRITE"
     }
     kube-proxy = {
-      addon_version     = "v1.22.6-eksbuild.1"
+      addon_version     = "v1.23.7-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
     vpc-cni = {
-      addon_version     = "v1.11.2-eksbuild.1"
+      addon_version     = "v1.11.4-eksbuild.1"
       resolve_conflicts = "OVERWRITE"
     }
   }
@@ -182,7 +182,7 @@ inputs = {
     max_size                     = 100
     capacity_type                = "ON_DEMAND"
     platform                     = "bottlerocket"
-    ami_release_version          = "1.8.0-a6233c22"
+    ami_release_version          = "1.9.2-b8074d44"
     iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
     ebs_optimized                = true
     update_config = {

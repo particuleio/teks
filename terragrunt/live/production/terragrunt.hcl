@@ -50,7 +50,6 @@ generate "provider-aws" {
         tags = var.provider_default_tags
       }
     }
-    data "aws_default_tags" "current" {}
   EOF
 }
 
