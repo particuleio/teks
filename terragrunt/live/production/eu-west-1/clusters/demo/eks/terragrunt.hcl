@@ -23,7 +23,7 @@ locals {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.30.3"
+  source = "github.com/terraform-aws-modules/terraform-aws-eks?ref=v18.31.0"
 
   after_hook "kubeconfig" {
     commands = ["apply"]
