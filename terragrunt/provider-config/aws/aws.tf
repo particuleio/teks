@@ -1,3 +1,3 @@
 provider "aws" {
-  region = local.aws_region
+  region = local.merged.aws_region
 }
