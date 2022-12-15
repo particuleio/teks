@@ -13,7 +13,9 @@ dependency "datasources" {
 }
 
 locals {
-  vpc_cidr = "10.42.0.0/16"
+  vpc_cidr     = "10.42.0.0/16"
+  vpc_name     = include.root.locals.full_name
+  cluster_name = include.root.locals.full_name
 }
 
 inputs = {
@@ -21,11 +23,11 @@ inputs = {
   tags = merge(
     include.root.locals.custom_tags,
     {
-      "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared",
+      "kubernetes.io/cluster/${local.cluster_name}" = "shared",
     }
   )
 
-  name = include.root.locals.full_name
+  name = local.vpc_name
   cidr = local.vpc_cidr
   azs  = dependency.datasources.outputs.aws_availability_zones.names
 
@@ -67,13 +69,15 @@ inputs = {
   ]
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/elb"                                 = "1"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
+    "karpenter.sh/discovery"                      = "true"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${include.root.locals.full_name}" = "shared"
-    "kubernetes.io/role/internal-elb"                        = "1"
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
+    "karpenter.sh/discovery"                      = "true"
   }
 
   enable_flow_log                                 = true

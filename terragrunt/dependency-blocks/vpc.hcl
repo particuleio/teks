@@ -15,7 +15,17 @@ dependency "vpc" {
       "subnet-00000004",
       "subnet-00000005",
     ]
+    intra_subnets = [
+      "subnet-00000006",
+      "subnet-00000007",
+      "subnet-00000008",
+    ]
     private_subnets_cidr_blocks = [
+      "192.168.0.0/16",
+      "10.0.0.0/8",
+      "172.16.0.0/12"
+    ]
+    intra_subnets_cidr_blocks = [
       "192.168.0.0/16",
       "10.0.0.0/8",
       "172.16.0.0/12"

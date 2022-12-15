@@ -23,6 +23,10 @@ locals {
     for label_key, label_value in local.mng_defaults.labels : "k8s.io/cluster-autoscaler/node-template/label/${label_key}" => label_value
   } : {}
 
+  mng_ca_tags_resources_defaults = try(local.mng_defaults.resources, {}) != {} ? {
+    for resource_key, resource_value in local.mng_defaults.resources : "k8s.io/cluster-autoscaler/node-template/resources/${resource_key}" => resource_value
+  } : {}
+
   mng_ca_tags_taints = { for mng_key, mng_value in local.mngs : mng_key => merge(
     { for taint in mng_value.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}" => "${taint.value}:${local.taint_effects[taint.effect]}" }
     ) if try(mng_value.taints, []) != []
@@ -45,14 +49,21 @@ locals {
     )
   }
 
+  mng_ca_tags_resources = { for mng_key, mng_value in local.mngs : mng_key => merge(
+    { for resource_key, resource_value in mng_value.resource : "k8s.io/cluster-autoscaler/node-template/resources/${resource_key}" => resource_value },
+    ) if try(mng_value.resources, {}) != {}
+  }
+
   mng_ca_tags = { for mng_key, mng_value in local.mngs : mng_key => merge(
     local.mng_ca_tags_defaults,
     local.mng_ca_tags_taints_defaults,
     local.mng_ca_tags_labels_defaults,
+    local.mng_ca_tags_resources_defaults,
     try(local.mng_ca_tags_taints[mng_key], {}),
     try(local.mng_ca_tags_labels[mng_key], {}),
     try(local.mng_ca_tags_restricted_labels[mng_key], {}),
     local.mng_ca_tags_implicit[mng_key],
+    try(local.mng_ca_tags_resources[mng_key], {}),
   ) }
 
   mng_asg_custom_tags = { for mng_key, mng_value in local.mngs : mng_key => merge(var.tags, try(local.mng_defaults.tags, {}), try(mng_value.tags, {})) }
