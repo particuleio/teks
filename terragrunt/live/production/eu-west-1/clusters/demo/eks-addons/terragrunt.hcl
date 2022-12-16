@@ -21,7 +21,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v11.4.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v12.0.0"
 }
 
 generate "provider-local" {
@@ -50,7 +50,7 @@ inputs = {
     name = "${basename(get_terragrunt_dir())}-ds"
   }
 
-  cluster-name = dependency.eks.outputs.cluster_id
+  cluster-name = dependency.eks.outputs.cluster_name
 
   tags = merge(
     include.root.locals.custom_tags
@@ -58,6 +58,8 @@ inputs = {
 
   eks = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
+    "oidc_provider_arn" = dependency.eks.outputs.oidc_provider_arn
+    "cluster_endpoint" = dependency.eks.outputs.cluster_endpoint
   }
 
   cert-manager = {
@@ -74,8 +76,8 @@ inputs = {
   }
 
   cluster-autoscaler = {
-    enabled      = true
-    version      = "v1.23.1"
+    enabled      = false
+    version      = "v1.24.0"
     extra_values = <<-EXTRA_VALUES
     extraArgs:
       scale-down-utilization-threshold: 0.7
@@ -85,13 +87,13 @@ inputs = {
   # For this to work:
   # * GITHUB_TOKEN should be set
   flux2 = {
-    enabled               = true
+    enabled               = false
     target_path           = "gitops/clusters/${include.root.locals.merged.env}/${include.root.locals.merged.name}"
     github_url            = "ssh://git@github.com/particuleio/teks"
     repository            = "teks"
     branch                = "flux"
     repository_visibility = "public"
-    version               = "v0.35.0"
+    version               = "v0.37.0"
     auto_image_update     = true
   }
 
@@ -104,7 +106,7 @@ inputs = {
     extra_values                      = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 9.1.7
+          tag: 9.3.1
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -228,6 +230,11 @@ inputs = {
         nodeSelector:
           kubernetes.io/arch: amd64
       EXTRA_VALUES
+  }
+
+  karpenter = {
+    enabled = true
+    iam_role_arn = dependency.eks.outputs.eks_managed_node_groups["initial"].iam_role_arn
   }
 
   promtail = {
