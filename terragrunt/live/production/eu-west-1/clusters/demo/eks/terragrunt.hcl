@@ -17,7 +17,7 @@ include "ebs_encryption" {
 }
 
 locals {
-  aws_vpc_cni_version = "1.12.0"
+  aws_vpc_cni_version = "1.12.1"
   cluster_name        = include.root.locals.full_name
 
   mng_tags = merge(
@@ -82,10 +82,10 @@ inputs = {
       addon_version = "v1.8.7-eksbuild.3"
     }
     kube-proxy = {
-      addon_version = "v1.24.7-eksbuild.2"
+      addon_version = "v1.24.9-eksbuild.1"
     }
     vpc-cni = {
-      addon_version = "v1.12.0-eksbuild.1"
+      addon_version = "v1.12.1-eksbuild.1"
     }
   }
 

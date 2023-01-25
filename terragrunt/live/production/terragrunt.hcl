@@ -18,6 +18,16 @@ remote_state {
   }
 }
 
+
+terraform {
+
+  before_hook "tflint" {
+    commands = ["apply", "plan"]
+    execute  = ["tflint"]
+  }
+
+}
+
 locals {
   merged = merge(
     try(yamldecode(file(find_in_parent_folders("global_values.yaml"))), {}),
@@ -40,15 +50,8 @@ generate "provider-aws" {
   path      = "provider-aws.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<-EOF
-    variable "provider_default_tags" {
-      type = map
-      default = {}
-    }
     provider "aws" {
       region = "${local.merged.aws_region}"
-      default_tags {
-        tags = var.provider_default_tags
-      }
     }
   EOF
 }
