@@ -1,6 +1,6 @@
 provider "kubectl" {
   host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
@@ -10,7 +10,7 @@ provider "kubectl" {
 
 provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+  cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws"
@@ -21,7 +21,7 @@ provider "kubernetes" {
 provider "helm" {
   kubernetes {
     host                   = data.aws_eks_cluster.cluster.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
+    cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
