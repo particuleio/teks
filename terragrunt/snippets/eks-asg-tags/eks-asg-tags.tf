@@ -15,7 +15,7 @@ locals {
     "k8s.io/cluster-autoscaler/${local.cluster_name}" = "owned"
   }
 
-  mng_ca_tags_taints_defaults = try(local.mng_defaults.taints, []) != [] ? {
+  mng_ca_tags_taints_defaults = length(try(local.mng_defaults.taints, [])) != 0 ? {
     for taint in local.mng_defaults.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}" => "${taint.value}:${local.taint_effects[taint.effect]}"
   } : {}
 
@@ -29,7 +29,7 @@ locals {
 
   mng_ca_tags_taints = { for mng_key, mng_value in local.mngs : mng_key => merge(
     { for taint in mng_value.taints : "k8s.io/cluster-autoscaler/node-template/taint/${taint.key}" => "${taint.value}:${local.taint_effects[taint.effect]}" }
-    ) if try(mng_value.taints, []) != []
+    ) if length(try(mng_value.taints, [])) != 0
   }
 
   mng_ca_tags_labels = { for mng_key, mng_value in local.mngs : mng_key => merge(
@@ -71,7 +71,7 @@ locals {
 
 data "aws_autoscaling_group" "node_groups" {
   for_each = module.eks_managed_node_group
-  name     = each.value.node_group_resources.0.autoscaling_groups.0.name
+  name     = each.value.node_group_resources[0].autoscaling_groups[0].name
 }
 
 resource "aws_autoscaling_group_tag" "mng_ca" {
