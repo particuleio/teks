@@ -43,7 +43,7 @@ jobs:
       uses: actions/checkout@v3
 
     - name: 'asdf:install'
-      uses: asdf-vm/actions/install@v1.1.0
+      uses: asdf-vm/actions/install@v2.1.0
 
     - uses: actions/setup-python@v4
       with:
