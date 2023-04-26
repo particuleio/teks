@@ -26,5 +26,3 @@ jobs:
 
     - name: Check Renovate configuraton
       run: renovate-config-validator
-
-

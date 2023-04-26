@@ -58,8 +58,8 @@ inputs = {
 
   eks = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
-    "oidc_provider_arn" = dependency.eks.outputs.oidc_provider_arn
-    "cluster_endpoint" = dependency.eks.outputs.cluster_endpoint
+    "oidc_provider_arn"       = dependency.eks.outputs.oidc_provider_arn
+    "cluster_endpoint"        = dependency.eks.outputs.cluster_endpoint
   }
 
   cert-manager = {
@@ -233,7 +233,7 @@ inputs = {
   }
 
   karpenter = {
-    enabled = true
+    enabled      = true
     iam_role_arn = dependency.eks.outputs.eks_managed_node_groups["initial"].iam_role_arn
   }
 
