@@ -73,19 +73,19 @@ inputs = {
   manage_aws_auth_configmap = true
 
   cluster_name                   = local.cluster_name
-  cluster_version                = "1.24"
+  cluster_version                = "1.26"
   cluster_enabled_log_types      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   cluster_endpoint_public_access = true
 
   cluster_addons = {
     coredns = {
-      addon_version = "v1.8.7-eksbuild.3"
+      addon_version = "v1.9.3-eksbuild.2"
     }
     kube-proxy = {
-      addon_version = "v1.24.9-eksbuild.1"
+      addon_version = "v1.26.2-eksbuild.1"
     }
     vpc-cni = {
-      addon_version = "v1.12.1-eksbuild.1"
+      addon_version = "v1.12.6-eksbuild.1"
     }
   }
 
@@ -172,7 +172,7 @@ inputs = {
     max_size            = 100
     capacity_type       = "ON_DEMAND"
     platform            = "bottlerocket"
-    ami_release_version = "1.11.1-104f8e0f"
+    ami_release_version = "1.13.4-f549851d"
     iam_role_additional_policies = {
       additional = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     }
@@ -215,7 +215,7 @@ inputs = {
       subnet_ids                 = dependency.vpc.outputs.private_subnets
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"
@@ -225,11 +225,11 @@ inputs = {
 
     "default-a" = {
       ami_type                   = "BOTTLEROCKET_x86_64"
-      instance_types             = ["t3a.large"]
+      instance_types             = ["t3a.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[0]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"
@@ -239,11 +239,11 @@ inputs = {
 
     "default-b" = {
       ami_type                   = "BOTTLEROCKET_x86_64"
-      instance_types             = ["t3a.large"]
+      instance_types             = ["t3a.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[1]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"
@@ -254,11 +254,11 @@ inputs = {
     "default-c" = {
       ami_type                   = "BOTTLEROCKET_x86_64"
       platform                   = "bottlerocket"
-      instance_types             = ["t3a.large"]
+      instance_types             = ["t3a.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[2]]
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
-        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
+        "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
         network = "private"

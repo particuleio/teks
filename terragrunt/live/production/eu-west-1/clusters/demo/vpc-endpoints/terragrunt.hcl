@@ -11,7 +11,7 @@ include "vpc" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v3.19.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v4.0.1"
 }
 
 inputs = {
@@ -23,6 +23,12 @@ inputs = {
       route_table_ids = flatten([dependency.vpc.outputs.private_route_table_ids, dependency.vpc.outputs.public_route_table_ids])
       tags            = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-s3-vpc-endpoint" }
     },
+    dynamodb = {
+      service         = "dynamodb"
+      service_type    = "Gateway"
+      route_table_ids = flatten([dependency.vpc.outputs.private_route_table_ids, dependency.vpc.outputs.public_route_table_ids])
+      tags            = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-dynamodb-vpc-endpoint" }
+    },
     kms = {
       service             = "kms"
       service_type        = "Interface"
@@ -30,6 +36,14 @@ inputs = {
       security_group_ids  = [dependency.vpc.outputs.default_security_group_id]
       private_dns_enabled = true
       tags                = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-kms-vpc-endpoint" }
+    },
+    ec2 = {
+      service             = "ec2"
+      service_type        = "Interface"
+      subnet_ids          = flatten([dependency.vpc.outputs.private_subnets])
+      security_group_ids  = [dependency.vpc.outputs.default_security_group_id]
+      private_dns_enabled = true
+      tags                = { Name = "${include.root.locals.merged.prefix}-${include.root.locals.merged.env}-ec2-vpc-endpoint" }
     },
   }
   tags = merge(
