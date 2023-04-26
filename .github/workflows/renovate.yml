@@ -1,0 +1,30 @@
+name: 'renovate:config'
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+    - '.github/renovate.json'
+
+jobs:
+  renovate-config-check:
+    name: 'renovate:config'
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.15.0'
+
+    - name: Install Renovate
+      run: |
+        npm install -g renovate
+        renovate --version
+
+    - name: Check Renovate configuraton
+      run: renovate-config-validator
+
+
