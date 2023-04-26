@@ -15,35 +15,16 @@ env:
   GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
 jobs:
-  renovate-config-check:
-    name: 'renovate:config'
-    runs-on: ubuntu-20.04
-    if: github.ref != 'refs/heads/release'
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: '15'
-        check-latest: true
-
-    - name: Install Renovate
-      run: npm install -g renovate
-
-    - name: Check Renovate configuraton
-      run: renovate-config-validator
-
   terraform-pre-commit:
     name: 'terraform:pre-commit'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.ref != 'refs/heads/release'
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
     - name: 'asdf:install'
-      uses: asdf-vm/actions/install@v1.1.0
+      uses: asdf-vm/actions/install@v2
 
     - uses: actions/setup-python@v4
       with:
@@ -54,7 +35,7 @@ jobs:
         tflint --init
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
+      uses: aws-actions/configure-aws-credentials@v2
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -78,7 +59,7 @@ jobs:
   terraform-release:
     if: github.ref == 'refs/heads/release'
     name: 'terraform:release'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout
       uses: actions/checkout@v3
