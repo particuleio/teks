@@ -218,7 +218,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -232,7 +232,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -246,7 +246,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -261,7 +261,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -275,7 +275,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -289,7 +289,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }
@@ -303,7 +303,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network = "private"
+        network   = "private"
         karpenter = "false"
       }
     }

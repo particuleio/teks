@@ -35,13 +35,13 @@ inputs = {
   public_subnets  = [for k, v in slice(dependency.datasources.outputs.aws_availability_zones.names, 0, 3) : cidrsubnet(local.vpc_cidr, 3, k + 1)]
   private_subnets = [for k, v in slice(dependency.datasources.outputs.aws_availability_zones.names, 0, 3) : cidrsubnet(local.vpc_cidr, 3, k + 4)]
 
-  enable_ipv6                     = true
-  public_subnet_ipv6_prefixes     = [0, 1, 2]
+  enable_ipv6                                    = true
+  public_subnet_ipv6_prefixes                    = [0, 1, 2]
   public_subnet_assign_ipv6_address_on_creation  = true
-  private_subnet_ipv6_prefixes    = [3, 4, 5]
+  private_subnet_ipv6_prefixes                   = [3, 4, 5]
   private_subnet_assign_ipv6_address_on_creation = true
-  intra_subnet_ipv6_prefixes      = [6, 7, 8]
-  intra_subnet_assign_ipv6_address_on_creation = true
+  intra_subnet_ipv6_prefixes                     = [6, 7, 8]
+  intra_subnet_assign_ipv6_address_on_creation   = true
 
   enable_nat_gateway = true
   single_nat_gateway = true

@@ -57,8 +57,8 @@ inputs = {
 
   eks = {
     "cluster_oidc_issuer_url" = dependency.eks.outputs.cluster_oidc_issuer_url
-    "oidc_provider_arn" = dependency.eks.outputs.oidc_provider_arn
-    "cluster_endpoint" = dependency.eks.outputs.cluster_endpoint
+    "oidc_provider_arn"       = dependency.eks.outputs.oidc_provider_arn
+    "cluster_endpoint"        = dependency.eks.outputs.cluster_endpoint
   }
 
   aws-for-fluent-bit = {

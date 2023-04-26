@@ -16,7 +16,7 @@ inputs = {
 
   description = "EKS Secret Encryption Key for ${include.root.locals.full_name}"
 
-  aliases     = [
+  aliases = [
     "${include.root.locals.full_name}_secret_encryption"
   ]
 
