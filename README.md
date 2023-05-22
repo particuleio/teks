@@ -187,7 +187,7 @@ We always support the latest modules and features [for our addons module](https:
 
 Our cutting edges addons include (not limited to):
   * [AWS EBS CSI Drivers](https://github.com/kubernetes-sigs/aws-ebs-csi-driver): Support for Volume encryption by default, snapshot, etc
-  * [AWS EFS CSI Drivers](https://secrets-store-csi-driver.sigs.k8s.io/): Use AWS NFS shares.
+  * [AWS EFS CSI Drivers](https://github.com/kubernetes-sigs/aws-efs-csi-driver): Use AWS NFS shares.
   * [Secret Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/): load
       secret from Secret Managers with
       `aws-secret-store-csi-driver` [driver](https://github.com/aws/secrets-store-csi-driver-provider-aws)
