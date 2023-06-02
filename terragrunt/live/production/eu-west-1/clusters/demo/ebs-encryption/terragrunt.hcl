@@ -5,7 +5,7 @@ include "root" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-kms.git?ref=v1.3.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-kms.git?ref=v1.5.0"
 }
 
 dependency "datasources" {
