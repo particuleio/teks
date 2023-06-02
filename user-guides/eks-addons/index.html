@@ -1,0 +1,887 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Website and documentation for tEKS project">
+      
+      
+        <meta name="author" content="ArchiFleKs">
+      
+      
+        <link rel="canonical" href="https://particuleio.github.io/teks/user-guides/eks-addons/">
+      
+      
+        <link rel="prev" href="../eks/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.4.2, mkdocs-material-9.0.6">
+    
+    
+      
+        <title>EKS Addons - tEKS</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.558e4712.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.2505c338.min.css">
+      
+      
+
+    
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#eks-addons-module" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="tEKS" class="md-header__button md-logo" aria-label="tEKS" data-md-component="logo">
+      
+  <img src="../../images/logo-white.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            tEKS
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              EKS Addons
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/particuleio/teks" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    particuleio/teks
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="tEKS" class="md-nav__button md-logo" aria-label="tEKS" data-md-component="logo">
+      
+  <img src="../../images/logo-white.svg" alt="logo">
+
+    </a>
+    tEKS
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/particuleio/teks" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    particuleio/teks
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        Quickstart
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+      
+      
+      
+      <input class="md-nav__toggle md-toggle " data-md-toggle="__nav_3" type="checkbox" id="__nav_3" checked>
+      
+      
+      
+        <label class="md-nav__link" for="__nav_3" tabindex="0" aria-expanded="true">
+          Documentation
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Documentation" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Documentation
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/" class="md-nav__link">
+        Getting started
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vpc/" class="md-nav__link">
+        VPC
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eks/" class="md-nav__link">
+        EKS
+      </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          EKS Addons
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        EKS Addons
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    Customization
+  </a>
+  
+    <nav class="md-nav" aria-label="Customization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-charts-values" class="md-nav__link">
+    Default charts values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overriding-helm-provider-values" class="md-nav__link">
+    Overriding Helm provider values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overriding-charts-valuesyaml" class="md-nav__link">
+    Overriding charts values.yaml
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    Customization
+  </a>
+  
+    <nav class="md-nav" aria-label="Customization">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#default-charts-values" class="md-nav__link">
+    Default charts values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overriding-helm-provider-values" class="md-nav__link">
+    Overriding Helm provider values
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#overriding-charts-valuesyaml" class="md-nav__link">
+    Overriding charts values.yaml
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+
+<h1 id="eks-addons-module">EKS addons module<a class="headerlink" href="#eks-addons-module" title="Permanent link">&para;</a></h1>
+<p><code>terraform-kubernetes-addons:aws</code> is a custom module maintained
+<a href="https://github.com/particuleio/terraform-kubernetes-addons/tree/main/modules/aws">here</a> and provides:</p>
+<ul>
+<li>helm v3 charts</li>
+<li>manifests</li>
+<li>operators</li>
+</ul>
+<p>For commonly used addons one Kubernetes and most specifically with EKS.</p>
+<p>The configuration is curated to be tightly integrated with AWS and EKS.</p>
+<h2 id="customization">Customization<a class="headerlink" href="#customization" title="Permanent link">&para;</a></h2>
+<p>All the configuration is done in <code>eks-addons/terragrunt.hcl</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cies</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">hs</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;../eks-addons-critical&quot;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="err">i</span><span class="kc">n</span><span class="err">clude</span><span class="w"> </span><span class="s2">&quot;root&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">h</span><span class="w">           </span><span class="err">=</span><span class="w"> </span><span class="kc">f</span><span class="err">i</span><span class="kc">n</span><span class="err">d_i</span><span class="kc">n</span><span class="err">_pare</span><span class="kc">nt</span><span class="err">_</span><span class="kc">f</span><span class="err">olders()</span>
+<span class="w">  </span><span class="err">expose</span><span class="w">         </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="err">merge_s</span><span class="kc">trate</span><span class="err">gy</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;deep&quot;</span>
+<span class="p">}</span>
+
+<span class="err">i</span><span class="kc">n</span><span class="err">clude</span><span class="w"> </span><span class="s2">&quot;vpc&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">h</span><span class="w">           </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;../../../../../../dependency-blocks/vpc.hcl&quot;</span>
+<span class="w">  </span><span class="err">expose</span><span class="w">         </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="err">merge_s</span><span class="kc">trate</span><span class="err">gy</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;deep&quot;</span>
+<span class="p">}</span>
+
+<span class="err">i</span><span class="kc">n</span><span class="err">clude</span><span class="w"> </span><span class="s2">&quot;eks&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">h</span><span class="w">           </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;../../../../../../dependency-blocks/eks.hcl&quot;</span>
+<span class="w">  </span><span class="err">expose</span><span class="w">         </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="err">merge_s</span><span class="kc">trate</span><span class="err">gy</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;deep&quot;</span>
+<span class="p">}</span>
+
+<span class="kc">terraf</span><span class="err">orm</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">source</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v12.8.0&quot;</span>
+<span class="p">}</span>
+
+<span class="err">ge</span><span class="kc">nerate</span><span class="w"> </span><span class="s2">&quot;provider-local&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">h</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;provider-local.tf&quot;</span>
+<span class="w">  </span><span class="err">i</span><span class="kc">f</span><span class="err">_exis</span><span class="kc">ts</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;overwrite&quot;</span>
+<span class="w">  </span><span class="err">co</span><span class="kc">ntents</span><span class="w">  </span><span class="err">=</span><span class="w"> </span><span class="kc">f</span><span class="err">ile(</span><span class="s2">&quot;../../../../../../provider-config/eks-addons/eks-addons.tf&quot;</span><span class="err">)</span>
+<span class="p">}</span>
+
+<span class="err">ge</span><span class="kc">nerate</span><span class="w"> </span><span class="s2">&quot;provider-github&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="err">pa</span><span class="kc">t</span><span class="err">h</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;provider-github.tf&quot;</span>
+<span class="w">  </span><span class="err">i</span><span class="kc">f</span><span class="err">_exis</span><span class="kc">ts</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;overwrite_terragrunt&quot;</span>
+<span class="w">  </span><span class="err">co</span><span class="kc">ntents</span><span class="w">  </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">OF</span>
+<span class="w">    </span><span class="err">provider</span><span class="w"> </span><span class="s2">&quot;github&quot;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="err">ow</span><span class="kc">ner</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;${include.root.locals.merged.github_owner}&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="err">EOF</span>
+<span class="p">}</span>
+
+<span class="err">i</span><span class="kc">n</span><span class="err">pu</span><span class="kc">ts</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">  </span><span class="err">priori</span><span class="kc">t</span><span class="err">y</span><span class="mi">-</span><span class="err">class</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kc">na</span><span class="err">me</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">base</span><span class="kc">na</span><span class="err">me(ge</span><span class="kc">t</span><span class="err">_</span><span class="kc">terra</span><span class="err">gru</span><span class="kc">nt</span><span class="err">_dir())</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">priori</span><span class="kc">t</span><span class="err">y</span><span class="mi">-</span><span class="err">class</span><span class="mi">-</span><span class="err">ds</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kc">na</span><span class="err">me</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;${basename(get_terragrunt_dir())}-ds&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">clus</span><span class="kc">ter</span><span class="mi">-</span><span class="kc">na</span><span class="err">me</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.clus</span><span class="kc">ter</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span>
+
+<span class="w">  </span><span class="kc">ta</span><span class="err">gs</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">merge(</span>
+<span class="w">    </span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.cus</span><span class="kc">t</span><span class="err">om_</span><span class="kc">ta</span><span class="err">gs</span>
+<span class="w">  </span><span class="err">)</span>
+
+<span class="w">  </span><span class="err">eks</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="s2">&quot;cluster_oidc_issuer_url&quot;</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.clus</span><span class="kc">ter</span><span class="err">_oidc_issuer_url</span>
+<span class="w">    </span><span class="s2">&quot;oidc_provider_arn&quot;</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.oidc_provider_ar</span><span class="kc">n</span>
+<span class="w">    </span><span class="s2">&quot;cluster_endpoint&quot;</span><span class="w">        </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.clus</span><span class="kc">ter</span><span class="err">_e</span><span class="kc">n</span><span class="err">dpoi</span><span class="kc">nt</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">cer</span><span class="kc">t</span><span class="mi">-</span><span class="err">ma</span><span class="kc">na</span><span class="err">ger</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">acme_h</span><span class="kc">tt</span><span class="err">p</span><span class="mi">01</span><span class="err">_e</span><span class="kc">na</span><span class="err">bled</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">acme_d</span><span class="kc">ns</span><span class="mi">01</span><span class="err">_e</span><span class="kc">na</span><span class="err">bled</span><span class="w">        </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">acme_h</span><span class="kc">tt</span><span class="err">p</span><span class="mi">01</span><span class="err">_i</span><span class="kc">n</span><span class="err">gress_class</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;nginx&quot;</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w">              </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">XTRA_VALUES</span>
+<span class="w">      </span><span class="err">i</span><span class="kc">n</span><span class="err">gressShim</span><span class="p">:</span>
+<span class="w">        </span><span class="err">de</span><span class="kc">fault</span><span class="err">IssuerName</span><span class="p">:</span><span class="w"> </span><span class="err">le</span><span class="kc">tsen</span><span class="err">cryp</span><span class="kc">t</span>
+<span class="w">        </span><span class="err">de</span><span class="kc">fault</span><span class="err">IssuerKi</span><span class="kc">n</span><span class="err">d</span><span class="p">:</span><span class="w"> </span><span class="err">Clus</span><span class="kc">ter</span><span class="err">Issuer</span>
+<span class="w">        </span><span class="err">de</span><span class="kc">fault</span><span class="err">IssuerGroup</span><span class="p">:</span><span class="w"> </span><span class="err">cer</span><span class="kc">t</span><span class="mi">-</span><span class="err">ma</span><span class="kc">na</span><span class="err">ger.io</span>
+<span class="w">      </span><span class="err">EXTRA_VALUES</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">clus</span><span class="kc">ter</span><span class="mi">-</span><span class="err">au</span><span class="kc">t</span><span class="err">oscaler</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">versio</span><span class="kc">n</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;v1.24.0&quot;</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">XTRA_VALUES</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">Args</span><span class="p">:</span>
+<span class="w">      </span><span class="err">scale</span><span class="mi">-</span><span class="err">dow</span><span class="kc">n</span><span class="mi">-</span><span class="err">u</span><span class="kc">t</span><span class="err">iliza</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="mi">-</span><span class="kc">t</span><span class="err">hreshold</span><span class="p">:</span><span class="w"> </span><span class="mf">0.7</span>
+<span class="w">    </span><span class="err">EXTRA_VALUES</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="err">For</span><span class="w"> </span><span class="kc">t</span><span class="err">his</span><span class="w"> </span><span class="kc">t</span><span class="err">o</span><span class="w"> </span><span class="err">work</span><span class="p">:</span>
+<span class="w">  </span><span class="err">#</span><span class="w"> </span><span class="err">*</span><span class="w"> </span><span class="err">GITHUB_TOKEN</span><span class="w"> </span><span class="err">should</span><span class="w"> </span><span class="err">be</span><span class="w"> </span><span class="err">se</span><span class="kc">t</span>
+<span class="w">  </span><span class="kc">flu</span><span class="err">x</span><span class="mi">2</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">               </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="kc">tar</span><span class="err">ge</span><span class="kc">t</span><span class="err">_pa</span><span class="kc">t</span><span class="err">h</span><span class="w">           </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;gitops/clusters/${include.root.locals.merged.env}/${include.root.locals.merged.name}&quot;</span>
+<span class="w">    </span><span class="err">gi</span><span class="kc">t</span><span class="err">hub_url</span><span class="w">            </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;ssh://git@github.com/particuleio/teks&quot;</span>
+<span class="w">    </span><span class="err">reposi</span><span class="kc">t</span><span class="err">ory</span><span class="w">            </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;teks&quot;</span>
+<span class="w">    </span><span class="err">bra</span><span class="kc">n</span><span class="err">ch</span><span class="w">                </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;flux&quot;</span>
+<span class="w">    </span><span class="err">reposi</span><span class="kc">t</span><span class="err">ory_visibili</span><span class="kc">t</span><span class="err">y</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;public&quot;</span>
+<span class="w">    </span><span class="err">versio</span><span class="kc">n</span><span class="w">               </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;v0.37.0&quot;</span>
+<span class="w">    </span><span class="err">au</span><span class="kc">t</span><span class="err">o_image_upda</span><span class="kc">te</span><span class="w">     </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">kube</span><span class="mi">-</span><span class="err">prome</span><span class="kc">t</span><span class="err">heus</span><span class="mi">-</span><span class="err">s</span><span class="kc">ta</span><span class="err">ck</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">                           </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">allowed_cidrs</span><span class="w">                     </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.vpc.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.i</span><span class="kc">ntra</span><span class="err">_sub</span><span class="kc">nets</span><span class="err">_cidr_blocks</span>
+<span class="w">    </span><span class="kc">t</span><span class="err">ha</span><span class="kc">n</span><span class="err">os_sidecar_e</span><span class="kc">na</span><span class="err">bled</span><span class="w">            </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="kc">t</span><span class="err">ha</span><span class="kc">n</span><span class="err">os_bucke</span><span class="kc">t</span><span class="err">_</span><span class="kc">f</span><span class="err">orce_des</span><span class="kc">tr</span><span class="err">oy</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">gra</span><span class="kc">fana</span><span class="err">_crea</span><span class="kc">te</span><span class="err">_iam_resources_irsa</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w">                      </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">XTRA_VALUES</span>
+<span class="w">      </span><span class="err">gra</span><span class="kc">fana</span><span class="p">:</span>
+<span class="w">        </span><span class="err">image</span><span class="p">:</span>
+<span class="w">          </span><span class="kc">ta</span><span class="err">g</span><span class="p">:</span><span class="w"> </span><span class="mf">9.3.1</span>
+<span class="w">        </span><span class="err">deployme</span><span class="kc">nt</span><span class="err">S</span><span class="kc">trate</span><span class="err">gy</span><span class="p">:</span>
+<span class="w">          </span><span class="kc">t</span><span class="err">ype</span><span class="p">:</span><span class="w"> </span><span class="err">Recrea</span><span class="kc">te</span>
+<span class="w">        </span><span class="err">i</span><span class="kc">n</span><span class="err">gress</span><span class="p">:</span>
+<span class="w">          </span><span class="err">a</span><span class="kc">nn</span><span class="err">o</span><span class="kc">tat</span><span class="err">io</span><span class="kc">ns</span><span class="p">:</span>
+<span class="w">            </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/</span><span class="kc">tls</span><span class="mi">-</span><span class="err">acme</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
+<span class="w">          </span><span class="err">i</span><span class="kc">n</span><span class="err">gressClassName</span><span class="p">:</span><span class="w"> </span><span class="kc">n</span><span class="err">gi</span><span class="kc">n</span><span class="err">x</span>
+<span class="w">          </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">          </span><span class="err">hos</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">            </span><span class="mi">-</span><span class="w"> </span><span class="kc">tele</span><span class="err">me</span><span class="kc">tr</span><span class="err">y.$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">          </span><span class="kc">tls</span><span class="p">:</span>
+<span class="w">            </span><span class="mi">-</span><span class="w"> </span><span class="err">secre</span><span class="kc">t</span><span class="err">Name</span><span class="p">:</span><span class="w"> </span><span class="err">$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">              </span><span class="err">hos</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">                </span><span class="mi">-</span><span class="w"> </span><span class="kc">tele</span><span class="err">me</span><span class="kc">tr</span><span class="err">y.$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">        </span><span class="err">persis</span><span class="kc">ten</span><span class="err">ce</span><span class="p">:</span>
+<span class="w">          </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">          </span><span class="err">accessModes</span><span class="p">:</span>
+<span class="w">            </span><span class="mi">-</span><span class="w"> </span><span class="err">ReadWri</span><span class="kc">te</span><span class="err">O</span><span class="kc">n</span><span class="err">ce</span>
+<span class="w">          </span><span class="err">size</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="err">Gi</span>
+<span class="w">      </span><span class="err">prome</span><span class="kc">t</span><span class="err">heus</span><span class="p">:</span>
+<span class="w">        </span><span class="err">prome</span><span class="kc">t</span><span class="err">heusSpec</span><span class="p">:</span>
+<span class="w">          </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">            </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">          </span><span class="err">scrapeI</span><span class="kc">nter</span><span class="err">val</span><span class="p">:</span><span class="w"> </span><span class="mi">60</span><span class="err">s</span>
+<span class="w">          </span><span class="err">re</span><span class="kc">tent</span><span class="err">io</span><span class="kc">n</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="err">d</span>
+<span class="w">          </span><span class="err">re</span><span class="kc">tent</span><span class="err">io</span><span class="kc">n</span><span class="err">Size</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;10GB&quot;</span>
+<span class="w">          </span><span class="err">ruleSelec</span><span class="kc">t</span><span class="err">orNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">          </span><span class="err">serviceMo</span><span class="kc">n</span><span class="err">i</span><span class="kc">t</span><span class="err">orSelec</span><span class="kc">t</span><span class="err">orNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">          </span><span class="err">podMo</span><span class="kc">n</span><span class="err">i</span><span class="kc">t</span><span class="err">orSelec</span><span class="kc">t</span><span class="err">orNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">          </span><span class="err">probeSelec</span><span class="kc">t</span><span class="err">orNilUsesHelmValues</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">          </span><span class="err">s</span><span class="kc">t</span><span class="err">orageSpec</span><span class="p">:</span>
+<span class="w">            </span><span class="err">volumeClaimTempla</span><span class="kc">te</span><span class="p">:</span>
+<span class="w">              </span><span class="err">spec</span><span class="p">:</span>
+<span class="w">                </span><span class="err">accessModes</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;ReadWriteOnce&quot;</span><span class="p">]</span>
+<span class="w">                </span><span class="err">resources</span><span class="p">:</span>
+<span class="w">                  </span><span class="err">reques</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">                    </span><span class="err">s</span><span class="kc">t</span><span class="err">orage</span><span class="p">:</span><span class="w"> </span><span class="mi">10</span><span class="err">Gi</span>
+<span class="w">          </span><span class="err">resources</span><span class="p">:</span>
+<span class="w">            </span><span class="err">reques</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">              </span><span class="err">cpu</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">              </span><span class="err">memory</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="err">Gi</span>
+<span class="w">            </span><span class="err">limi</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">              </span><span class="err">cpu</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">              </span><span class="err">memory</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="err">Gi</span>
+<span class="w">      </span><span class="err">EXTRA_VALUES</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">loki</span><span class="mi">-</span><span class="err">s</span><span class="kc">ta</span><span class="err">ck</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">              </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">bucke</span><span class="kc">t</span><span class="err">_</span><span class="kc">f</span><span class="err">orce_des</span><span class="kc">tr</span><span class="err">oy</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w">         </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mi">-</span><span class="err">VALUES</span>
+<span class="w">      </span><span class="err">resources</span><span class="p">:</span>
+<span class="w">        </span><span class="err">reques</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">          </span><span class="err">cpu</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">          </span><span class="err">memory</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="err">Gi</span>
+<span class="w">        </span><span class="err">limi</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">          </span><span class="err">cpu</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">          </span><span class="err">memory</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="err">Gi</span>
+<span class="w">      </span><span class="err">loki</span><span class="p">:</span>
+<span class="w">        </span><span class="err">limi</span><span class="kc">ts</span><span class="err">_co</span><span class="kc">nf</span><span class="err">ig</span><span class="p">:</span>
+<span class="w">          </span><span class="err">i</span><span class="kc">n</span><span class="err">ges</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">_ra</span><span class="kc">te</span><span class="err">_mb</span><span class="p">:</span><span class="w"> </span><span class="mi">320</span>
+<span class="w">          </span><span class="err">i</span><span class="kc">n</span><span class="err">ges</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">_burs</span><span class="kc">t</span><span class="err">_size_mb</span><span class="p">:</span><span class="w"> </span><span class="mi">512</span>
+<span class="w">          </span><span class="err">max_s</span><span class="kc">trea</span><span class="err">ms_per_user</span><span class="p">:</span><span class="w"> </span><span class="mi">100000</span>
+<span class="w">        </span><span class="err">chu</span><span class="kc">n</span><span class="err">k_s</span><span class="kc">t</span><span class="err">ore_co</span><span class="kc">nf</span><span class="err">ig</span><span class="p">:</span>
+<span class="w">          </span><span class="err">max_look_back_period</span><span class="p">:</span><span class="w"> </span><span class="mi">2160</span><span class="err">h</span>
+<span class="w">        </span><span class="kc">ta</span><span class="err">ble_ma</span><span class="kc">na</span><span class="err">ger</span><span class="p">:</span>
+<span class="w">          </span><span class="err">re</span><span class="kc">tent</span><span class="err">io</span><span class="kc">n</span><span class="err">_dele</span><span class="kc">tes</span><span class="err">_e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">          </span><span class="err">re</span><span class="kc">tent</span><span class="err">io</span><span class="kc">n</span><span class="err">_period</span><span class="p">:</span><span class="w"> </span><span class="mi">2160</span><span class="err">h</span>
+<span class="w">      </span><span class="err">i</span><span class="kc">n</span><span class="err">gress</span><span class="p">:</span>
+<span class="w">        </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="err">a</span><span class="kc">nn</span><span class="err">o</span><span class="kc">tat</span><span class="err">io</span><span class="kc">ns</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/</span><span class="kc">tls</span><span class="mi">-</span><span class="err">acme</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
+<span class="w">          </span><span class="kc">n</span><span class="err">gi</span><span class="kc">n</span><span class="err">x.i</span><span class="kc">n</span><span class="err">gress.kuber</span><span class="kc">netes</span><span class="err">.io/au</span><span class="kc">t</span><span class="err">h</span><span class="mi">-</span><span class="kc">tls</span><span class="mi">-</span><span class="err">veri</span><span class="kc">f</span><span class="err">y</span><span class="mi">-</span><span class="err">clie</span><span class="kc">nt</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;on&quot;</span>
+<span class="w">          </span><span class="kc">n</span><span class="err">gi</span><span class="kc">n</span><span class="err">x.i</span><span class="kc">n</span><span class="err">gress.kuber</span><span class="kc">netes</span><span class="err">.io/au</span><span class="kc">t</span><span class="err">h</span><span class="mi">-</span><span class="kc">tls</span><span class="mi">-</span><span class="err">secre</span><span class="kc">t</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;telemetry/loki-ca&quot;</span>
+<span class="w">        </span><span class="err">hos</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">          </span><span class="mi">-</span><span class="w"> </span><span class="err">logz.$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">        </span><span class="kc">tls</span><span class="p">:</span>
+<span class="w">          </span><span class="mi">-</span><span class="w"> </span><span class="err">secre</span><span class="kc">t</span><span class="err">Name</span><span class="p">:</span><span class="w"> </span><span class="err">logz.$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">            </span><span class="err">hos</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">              </span><span class="mi">-</span><span class="w"> </span><span class="err">logz.$</span><span class="p">{</span><span class="err">i</span><span class="kc">n</span><span class="err">clude.roo</span><span class="kc">t</span><span class="err">.locals.merged.de</span><span class="kc">fault</span><span class="err">_domai</span><span class="kc">n</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="p">}</span>
+<span class="w">        </span><span class="err">VALUES</span>
+<span class="w">    </span><span class="err">bucke</span><span class="kc">t</span><span class="err">_li</span><span class="kc">fe</span><span class="err">cycle_rule</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">      </span><span class="p">{</span>
+<span class="w">        </span><span class="err">id</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;log&quot;</span>
+<span class="w">        </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="kc">trans</span><span class="err">i</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">          </span><span class="p">{</span>
+<span class="w">            </span><span class="err">days</span><span class="w">          </span><span class="err">=</span><span class="w"> </span><span class="mi">14</span>
+<span class="w">            </span><span class="err">s</span><span class="kc">t</span><span class="err">orage_class</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;INTELLIGENT_TIERING&quot;</span>
+<span class="w">          </span><span class="p">},</span>
+<span class="w">        </span><span class="p">]</span>
+<span class="w">        </span><span class="err">expira</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">          </span><span class="err">days</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="mi">365</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">    </span><span class="p">]</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">i</span><span class="kc">n</span><span class="err">gress</span><span class="mi">-</span><span class="kc">n</span><span class="err">gi</span><span class="kc">n</span><span class="err">x</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">use_</span><span class="kc">nl</span><span class="err">b_ip</span><span class="w">    </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">allowed_cidrs</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.vpc.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.i</span><span class="kc">ntra</span><span class="err">_sub</span><span class="kc">nets</span><span class="err">_cidr_blocks</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w">  </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">XTRA_VALUES</span>
+<span class="w">      </span><span class="err">co</span><span class="kc">ntr</span><span class="err">oller</span><span class="p">:</span>
+<span class="w">        </span><span class="err">i</span><span class="kc">n</span><span class="err">gressClassResource</span><span class="p">:</span>
+<span class="w">          </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">          </span><span class="err">de</span><span class="kc">fault</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="err">replicaCou</span><span class="kc">nt</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">        </span><span class="err">mi</span><span class="kc">n</span><span class="err">Available</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="err">ki</span><span class="kc">n</span><span class="err">d</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Deployment&quot;</span>
+<span class="w">        </span><span class="err">resources</span><span class="p">:</span>
+<span class="w">          </span><span class="err">reques</span><span class="kc">ts</span><span class="p">:</span>
+<span class="w">            </span><span class="err">cpu</span><span class="p">:</span><span class="w"> </span><span class="mi">300</span><span class="err">m</span>
+<span class="w">            </span><span class="err">memory</span><span class="p">:</span><span class="w"> </span><span class="mi">128</span><span class="err">Mi</span>
+<span class="w">        </span><span class="err">service</span><span class="p">:</span>
+<span class="w">          </span><span class="err">a</span><span class="kc">nn</span><span class="err">o</span><span class="kc">tat</span><span class="err">io</span><span class="kc">ns</span><span class="p">:</span>
+<span class="w">            </span><span class="err">service.be</span><span class="kc">ta</span><span class="err">.kuber</span><span class="kc">netes</span><span class="err">.io/aws</span><span class="mi">-</span><span class="err">load</span><span class="mi">-</span><span class="err">bala</span><span class="kc">n</span><span class="err">cer</span><span class="mi">-</span><span class="kc">tar</span><span class="err">ge</span><span class="kc">t</span><span class="mi">-</span><span class="err">group</span><span class="mi">-</span><span class="err">a</span><span class="kc">ttr</span><span class="err">ibu</span><span class="kc">tes</span><span class="p">:</span><span class="w"> </span><span class="err">preserve_clie</span><span class="kc">nt</span><span class="err">_ip.e</span><span class="kc">na</span><span class="err">bled=</span><span class="kc">true</span>
+<span class="w">      </span><span class="err">de</span><span class="kc">fault</span><span class="err">Backe</span><span class="kc">n</span><span class="err">d</span><span class="p">:</span>
+<span class="w">        </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">        </span><span class="err">replicaCou</span><span class="kc">nt</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">        </span><span class="err">mi</span><span class="kc">n</span><span class="err">Available</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">EXTRA_VALUES</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">karpe</span><span class="kc">nter</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">iam_role_ar</span><span class="kc">n</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.eks_ma</span><span class="kc">na</span><span class="err">ged_</span><span class="kc">n</span><span class="err">ode_groups</span><span class="p">[</span><span class="s2">&quot;initial&quot;</span><span class="p">]</span><span class="err">.iam_role_ar</span><span class="kc">n</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="err">prom</span><span class="kc">ta</span><span class="err">il</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">wai</span><span class="kc">t</span><span class="w">    </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="kc">t</span><span class="err">ha</span><span class="kc">n</span><span class="err">os</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">              </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">bucke</span><span class="kc">t</span><span class="err">_</span><span class="kc">f</span><span class="err">orce_des</span><span class="kc">tr</span><span class="err">oy</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">#</span><span class="w"> </span><span class="err">Wai</span><span class="kc">t</span><span class="err">i</span><span class="kc">n</span><span class="err">g</span><span class="w"> </span><span class="kc">f</span><span class="err">or</span><span class="w"> </span><span class="err">ARM</span><span class="w"> </span><span class="err">suppor</span><span class="kc">t</span><span class="w"> </span><span class="err">h</span><span class="kc">tt</span><span class="err">ps</span><span class="p">:</span><span class="c1">//github.com/bitnami/charts/issues/7305</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;</span><span class="mf">-E</span><span class="err">XTRA_VALUES</span>
+<span class="w">      </span><span class="err">query</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">queryFro</span><span class="kc">nten</span><span class="err">d</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">bucke</span><span class="kc">t</span><span class="err">web</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">compac</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">s</span><span class="kc">t</span><span class="err">orega</span><span class="kc">te</span><span class="err">way</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">ruler</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">receive</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">receiveDis</span><span class="kc">tr</span><span class="err">ibu</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">        </span><span class="kc">n</span><span class="err">odeSelec</span><span class="kc">t</span><span class="err">or</span><span class="p">:</span>
+<span class="w">          </span><span class="err">kuber</span><span class="kc">netes</span><span class="err">.io/arch</span><span class="p">:</span><span class="w"> </span><span class="err">amd</span><span class="mi">64</span>
+<span class="w">      </span><span class="err">EXTRA_VALUES</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h3 id="default-charts-values">Default charts values<a class="headerlink" href="#default-charts-values" title="Permanent link">&para;</a></h3>
+<p>Some values are defined by default directly into the module. These can off
+course be overridden and or merged/replaced. You can find the defaults values
+in the <a href="https://github.com/particuleio/terraform-kubernetes-addons/tree/main/modules/aws">upstream module</a>. Eg. default values
+for <code>cluster-autoscaler</code> are in <a href="https://github.com/particuleio/terraform-kubernetes-addons/blob/main/modules/aws/cluster-autoscaler.tf"><code>cluster-autoscaler.tf</code></a>.</p>
+<h3 id="overriding-helm-provider-values">Overriding Helm provider values<a class="headerlink" href="#overriding-helm-provider-values" title="Permanent link">&para;</a></h3>
+<p>Helm provider have defaults values defined <a href="https://github.com/particuleio/terraform-kubernetes-addons/blob/main/locals.tf">here</a>:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="err">helm_de</span><span class="kc">faults</span><span class="err">_de</span><span class="kc">faults</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">a</span><span class="kc">t</span><span class="err">omic</span><span class="w">                </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">clea</span><span class="kc">nu</span><span class="err">p_o</span><span class="kc">n</span><span class="err">_</span><span class="kc">fa</span><span class="err">il</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy_upda</span><span class="kc">te</span><span class="w">     </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">disable_crd_hooks</span><span class="w">     </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">disable_webhooks</span><span class="w">      </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="kc">f</span><span class="err">orce_upda</span><span class="kc">te</span><span class="w">          </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">recrea</span><span class="kc">te</span><span class="err">_pods</span><span class="w">         </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">re</span><span class="kc">n</span><span class="err">der_subchar</span><span class="kc">t</span><span class="err">_</span><span class="kc">n</span><span class="err">o</span><span class="kc">tes</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">replace</span><span class="w">               </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">rese</span><span class="kc">t</span><span class="err">_values</span><span class="w">          </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">reuse_values</span><span class="w">          </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">skip_crds</span><span class="w">             </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="kc">t</span><span class="err">imeou</span><span class="kc">t</span><span class="w">               </span><span class="err">=</span><span class="w"> </span><span class="mi">3600</span>
+<span class="w">    </span><span class="err">veri</span><span class="kc">f</span><span class="err">y</span><span class="w">                </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">wai</span><span class="kc">t</span><span class="w">                  </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w">          </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<p>These can be overridden globally with the <code>helm_defaults</code> input variable or
+can be overridden per chart in <code>terragrunt.hcl</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="err">helm_de</span><span class="kc">faults</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">replace</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">veri</span><span class="kc">f</span><span class="err">y</span><span class="w">  </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="kc">t</span><span class="err">imeou</span><span class="kc">t</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="mi">300</span>
+<span class="w">  </span><span class="p">}</span>
+
+
+<span class="w">  </span><span class="err">clus</span><span class="kc">ter</span><span class="err">_au</span><span class="kc">t</span><span class="err">oscaler</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">crea</span><span class="kc">te</span><span class="err">_iam_resources_irsa</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">iam_policy_override</span><span class="w">       </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;&quot;</span>
+<span class="w">    </span><span class="err">versio</span><span class="kc">n</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;v1.14.7&quot;</span>
+<span class="w">    </span><span class="err">char</span><span class="kc">t</span><span class="err">_versio</span><span class="kc">n</span><span class="w">             </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;6.4.0&quot;</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">de</span><span class="kc">fault</span><span class="err">_</span><span class="kc">net</span><span class="err">work_policy</span><span class="w">    </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">clus</span><span class="kc">ter</span><span class="err">_</span><span class="kc">na</span><span class="err">me</span><span class="w">              </span><span class="err">=</span><span class="w"> </span><span class="err">depe</span><span class="kc">n</span><span class="err">de</span><span class="kc">n</span><span class="err">cy.eks.ou</span><span class="kc">t</span><span class="err">pu</span><span class="kc">ts</span><span class="err">.clus</span><span class="kc">ter</span><span class="err">_id</span>
+<span class="w">    </span><span class="kc">t</span><span class="err">imeou</span><span class="kc">t</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="mi">3600</span><span class="w"> </span><span class="err">&lt;=</span><span class="w"> </span><span class="err">here</span><span class="w"> </span><span class="err">you</span><span class="w"> </span><span class="err">ca</span><span class="kc">n</span><span class="w"> </span><span class="err">add</span><span class="w"> </span><span class="err">a</span><span class="kc">n</span><span class="err">y</span><span class="w"> </span><span class="err">helm</span><span class="w"> </span><span class="err">provider</span><span class="w"> </span><span class="err">override</span>
+<span class="w">  </span><span class="p">}</span>
+</code></pre></div>
+<h3 id="overriding-charts-valuesyaml">Overriding charts values.yaml<a class="headerlink" href="#overriding-charts-valuesyaml" title="Permanent link">&para;</a></h3>
+<p>It is possible to add or override values per charts. Helm provider use the
+same merge logic as Helm so you can basically rewrite the whole
+<code>values.yaml</code> if needed.</p>
+<p>Each chart has a <code>extra_values</code> variable where you can specify custom values.</p>
+<div class="highlight"><pre><span></span><code><span class="kc">flu</span><span class="err">x</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="err">crea</span><span class="kc">te</span><span class="err">_iam_resources_irsa</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="err">versio</span><span class="kc">n</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;1.18.0&quot;</span>
+<span class="w">    </span><span class="err">char</span><span class="kc">t</span><span class="err">_versio</span><span class="kc">n</span><span class="w">             </span><span class="err">=</span><span class="w"> </span><span class="s2">&quot;1.2.0&quot;</span>
+<span class="w">    </span><span class="err">e</span><span class="kc">na</span><span class="err">bled</span><span class="w">                   </span><span class="err">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="w">    </span><span class="err">de</span><span class="kc">fault</span><span class="err">_</span><span class="kc">net</span><span class="err">work_policy</span><span class="w">    </span><span class="err">=</span><span class="w"> </span><span class="kc">true</span>
+
+<span class="w">    </span><span class="err">ex</span><span class="kc">tra</span><span class="err">_values</span><span class="w"> </span><span class="err">=</span><span class="w"> </span><span class="err">&lt;&lt;EXTRA_VALUES</span>
+<span class="err">gi</span><span class="kc">t</span><span class="p">:</span>
+<span class="w">  </span><span class="err">url</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssh://git@gitlab.com/myrepo/gitops-${local.env}.git&quot;</span>
+<span class="w">  </span><span class="err">pollI</span><span class="kc">nter</span><span class="err">val</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2m&quot;</span>
+<span class="err">rbac</span><span class="p">:</span>
+<span class="w">  </span><span class="err">crea</span><span class="kc">te</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span>
+<span class="err">regis</span><span class="kc">tr</span><span class="err">y</span><span class="p">:</span>
+<span class="w">  </span><span class="err">au</span><span class="kc">t</span><span class="err">oma</span><span class="kc">t</span><span class="err">io</span><span class="kc">n</span><span class="err">I</span><span class="kc">nter</span><span class="err">val</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2m&quot;</span>
+<span class="err">EXTRA_VALUES</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>There are some examples in the <code>terragrunt.hcl</code> file. Not all the variables
+available are present. If you want a full list of variable, you can find them
+in the <a href="https://github.com/particuleio/terraform-kubernetes-addons/tree/main/modules/aws">upstream module</a>. For example
+for <code>cluster-autoscaler</code> you can see the default <a href="https://github.com/particuleio/terraform-kubernetes-addons/blob/main/modules/aws/cluster-autoscaler.tf#L2">here</a>.</p>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a>
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["tabs", "instant"], "search": "../../assets/javascripts/workers/search.e5c33ebb.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.51d95adb.min.js"></script>
+      
+    
+  </body>
+</html>
