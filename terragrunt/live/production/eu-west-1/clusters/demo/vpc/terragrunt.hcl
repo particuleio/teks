@@ -5,7 +5,7 @@ include "root" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v4.0.1"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v5.0.0"
 }
 
 dependency "datasources" {
