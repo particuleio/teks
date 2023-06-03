@@ -71,13 +71,13 @@ inputs = {
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/elb"                      = "1"
-    "karpenter.sh/discovery"                      = "true"
+    "karpenter.sh/discovery"                      = local.cluster_name
   }
 
   private_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = "1"
-    "karpenter.sh/discovery"                      = "true"
+    "karpenter.sh/discovery"                      = local.cluster_name
   }
 
   enable_flow_log                                 = true

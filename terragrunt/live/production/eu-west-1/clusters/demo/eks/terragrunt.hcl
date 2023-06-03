@@ -17,7 +17,7 @@ include "ebs_encryption" {
 }
 
 locals {
-  aws_vpc_cni_version = "1.12.1"
+  aws_vpc_cni_version = "1.12.6"
   cluster_name        = include.root.locals.full_name
 
   mng_tags = merge(
@@ -73,19 +73,19 @@ inputs = {
   manage_aws_auth_configmap = true
 
   cluster_name                   = local.cluster_name
-  cluster_version                = "1.26"
+  cluster_version                = "1.27"
   cluster_enabled_log_types      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
   cluster_endpoint_public_access = true
 
   cluster_addons = {
     coredns = {
-      addon_version = "v1.9.3-eksbuild.2"
+      most_recent = true
     }
     kube-proxy = {
-      addon_version = "v1.26.2-eksbuild.1"
+      most_recent = true
     }
     vpc-cni = {
-      addon_version = "v1.12.6-eksbuild.1"
+      most_recent = true
     }
   }
 
@@ -168,11 +168,11 @@ inputs = {
   eks_managed_node_group_defaults = {
     tags                = local.mng_tags
     desired_size        = 1
-    min_size            = 1
+    min_size            = 0
     max_size            = 100
     capacity_type       = "ON_DEMAND"
     platform            = "bottlerocket"
-    ami_release_version = "1.13.4-f549851d"
+    ami_release_version = "1.14.1-842c7134"
     iam_role_additional_policies = {
       additional = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     }
@@ -182,6 +182,9 @@ inputs = {
     }
     resources = {
       ephemeral-storage = "1Gi"
+    }
+    labels = {
+      karpenter = "false"
     }
     block_device_mappings = {
       root = {
@@ -209,19 +212,26 @@ inputs = {
 
   eks_managed_node_groups = {
 
-    "initial" = {
+    # Initial pool created to have a stable IAM role to pass to Karpenter 
+    "unused" = {
+      desired_size               = 0
+      min_size                   = 0
       ami_type                   = "BOTTLEROCKET_x86_64"
-      instance_types             = ["t3a.large"]
+      instance_types             = ["t3a.medium"]
       subnet_ids                 = dependency.vpc.outputs.private_subnets
       enable_bootstrap_user_data = true
       bootstrap_extra_args       = <<-EOT
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.large --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
+      }
+      restricted_labels = {
+        "k8s.io/cluster-autoscaler/enabled" = "false"
       }
     }
+
+    # Default AMD64 pool to boostrap components
 
     "default-a" = {
       ami_type                   = "BOTTLEROCKET_x86_64"
@@ -232,8 +242,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
 
@@ -246,8 +255,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
 
@@ -261,12 +269,14 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t3a.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
 
+    # Below are example pools for ARM64 instances.
+
     "arm-a" = {
+      desired_size               = 0
       ami_type                   = "BOTTLEROCKET_ARM_64"
       instance_types             = ["t4g.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[0]]
@@ -275,12 +285,12 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
 
     "arm-b" = {
+      desired_size               = 0
       ami_type                   = "BOTTLEROCKET_ARM_64"
       instance_types             = ["t4g.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[1]]
@@ -289,12 +299,12 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
 
     "arm-c" = {
+      desired_size               = 0
       ami_type                   = "BOTTLEROCKET_ARM_64"
       instance_types             = ["t4g.medium"]
       subnet_ids                 = [dependency.vpc.outputs.private_subnets[2]]
@@ -303,8 +313,7 @@ inputs = {
         "max-pods" = ${run_cmd("/bin/sh", "-c", "../../../../../../../tools/max-pods-calculator.sh --instance-type t4g.medium --cni-version ${local.aws_vpc_cni_version} --cni-prefix-delegation-enabled")}
         EOT
       labels = {
-        network   = "private"
-        karpenter = "false"
+        network = "private"
       }
     }
   }

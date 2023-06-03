@@ -21,10 +21,23 @@ remote_state {
 
 terraform {
 
-  before_hook "tflint" {
-    commands = ["apply", "plan"]
-    execute  = ["tflint"]
-  }
+  # Example of tflint hook
+  #
+  #  before_hook "tflint" {
+  #    commands = ["apply", "plan"]
+  #    execute  = ["tflint"]
+  #  }
+
+  # Example of tfsec hook
+  # 
+  #  before_hook "tfsec" {
+  #    commands = ["plan"]
+  #    execute = [
+  #      "/bin/sh",
+  #      "-c",
+  #      "tfsec . --var-file terragrunt-debug.tfvars.json --config-file ${find_in_parent_folders(".tfsec.yaml")} --exclude-downloaded-modules --no-color 1>&2"
+  #    ]
+  #  }
 
 }
 

@@ -21,7 +21,7 @@ include "eks" {
 }
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v12.9.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v14.0.1"
 }
 
 generate "provider-local" {
@@ -36,6 +36,29 @@ generate "provider-github" {
   contents  = <<-EOF
     provider "github" {
       owner = "${include.root.locals.merged.github_owner}"
+    }
+  EOF
+}
+
+# Should be removed in flux2 is not used
+#
+generate "provider-flux" {
+  path      = "provider-flux.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<-EOF
+    provider "flux" {
+      kubernetes = {
+        host                   = data.aws_eks_cluster.cluster.endpoint
+        token                  = data.aws_eks_cluster_auth.cluster.token
+        cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority[0].data)
+      }
+      git = {
+        url = "ssh://git@github.com/${include.root.locals.merged.github_owner}/$${local.flux2.repository}.git"
+        ssh = {
+          username    = "git"
+          private_key = try(tls_private_key.identity[0].private_key_pem, null)
+        }
+      }
     }
   EOF
 }
@@ -76,9 +99,11 @@ inputs = {
   }
 
   cluster-autoscaler = {
-    enabled      = false
-    version      = "v1.24.0"
+    enabled      = true
+    version      = "v1.26.3"
     extra_values = <<-EXTRA_VALUES
+    image:
+      repository: registry.k8s.io/autoscaling/cluster-autoscaler
     extraArgs:
       scale-down-utilization-threshold: 0.7
     EXTRA_VALUES
@@ -87,14 +112,11 @@ inputs = {
   # For this to work:
   # * GITHUB_TOKEN should be set
   flux2 = {
-    enabled               = false
-    target_path           = "gitops/clusters/${include.root.locals.merged.env}/${include.root.locals.merged.name}"
-    github_url            = "ssh://git@github.com/particuleio/teks"
-    repository            = "teks"
-    branch                = "flux"
-    repository_visibility = "public"
-    version               = "v0.37.0"
-    auto_image_update     = true
+    enabled    = true
+    path       = "gitops/clusters/${include.root.locals.merged.env}/${dependency.eks.outputs.cluster_name}"
+    repository = "teks-gitops"
+    branch     = "main"
+    version    = "v2.0.0-rc.5"
   }
 
   kube-prometheus-stack = {
@@ -106,7 +128,7 @@ inputs = {
     extra_values                      = <<-EXTRA_VALUES
       grafana:
         image:
-          tag: 9.3.1
+          tag: 9.5.2
         deploymentStrategy:
           type: Recreate
         ingress:
@@ -230,11 +252,6 @@ inputs = {
         nodeSelector:
           kubernetes.io/arch: amd64
       EXTRA_VALUES
-  }
-
-  karpenter = {
-    enabled      = true
-    iam_role_arn = dependency.eks.outputs.eks_managed_node_groups["initial"].iam_role_arn
   }
 
   promtail = {

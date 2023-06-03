@@ -18,7 +18,7 @@ include "eks" {
 
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v12.9.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v14.0.1"
 }
 
 generate "provider-local" {
@@ -74,6 +74,10 @@ inputs = {
     use_kms          = true
   }
 
+  aws-efs-csi-driver = {
+    enabled = true
+  }
+
   aws-load-balancer-controller = {
     enabled      = true
     extra_values = <<-EXTRA_VALUES
@@ -92,6 +96,11 @@ inputs = {
     },
   }
 
+  karpenter = {
+    enabled      = true
+    iam_role_arn = dependency.eks.outputs.eks_managed_node_groups["unused"].iam_role_arn
+  }
+
   metrics-server = {
     enabled       = true
     allowed_cidrs = dependency.vpc.outputs.intra_subnets_cidr_blocks
@@ -103,14 +112,10 @@ inputs = {
   }
 
   tigera-operator = {
-    enabled = true
+    enabled = false
   }
 
   velero = {
-    enabled      = true
-    extra_values = <<-EXTRA_VALUES
-      nodeSelector:
-        kubernetes.io/arch: amd64
-      EXTRA_VALUES
+    enabled = false
   }
 }
