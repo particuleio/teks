@@ -18,7 +18,7 @@ include "eks" {
 
 
 terraform {
-  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v14.4.0"
+  source = "github.com/particuleio/terraform-kubernetes-addons.git//modules/aws?ref=v14.5.0"
 }
 
 generate "provider-local" {
