@@ -21,7 +21,7 @@ jobs:
     if: github.ref != 'refs/heads/release'
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 'asdf:install'
       uses: asdf-vm/actions/install@v2
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v2
