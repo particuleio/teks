@@ -18,7 +18,7 @@ requirement but our way of managing required tooling.
 ### Enabling plugins
 
 ```
-for p in $(cut -d " " .tool-versions -f1); do asdf plugin add $p; done
+for p in $(cut -d " " -f1 .tool-versions); do asdf plugin-add $p; done
 ```
 
 ### Installing tools
