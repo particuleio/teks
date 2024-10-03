@@ -17,7 +17,7 @@ env:
 jobs:
   terraform-pre-commit:
     name: 'terraform:pre-commit'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.ref != 'refs/heads/release'
     steps:
     - name: Checkout
@@ -59,7 +59,7 @@ jobs:
   terraform-release:
     if: github.ref == 'refs/heads/release'
     name: 'terraform:release'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Checkout
       uses: actions/checkout@v4
