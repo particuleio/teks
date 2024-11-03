@@ -11,7 +11,7 @@ include "vpc" {
 }
 
 terraform {
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v5.14.0"
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=v5.15.0"
 }
 
 inputs = {
